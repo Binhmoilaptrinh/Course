@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace WebAPI.Data;
 
-public partial class AspNetUser
+public partial class AspNetUser : IdentityUser
 {
     public string Id { get; set; } = null!;
 
