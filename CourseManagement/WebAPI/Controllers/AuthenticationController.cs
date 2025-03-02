@@ -6,6 +6,7 @@ using WebAPI.DTOS;
 using System;
 using Microsoft.AspNetCore.Authorization;
 using WebAPI.DTOS;
+using WebAPI.DTOS.Authentication;
 
 namespace WebAPI.Controllers
 {
@@ -20,34 +21,47 @@ namespace WebAPI.Controllers
             _authService = authService;
         }
 
+        [HttpPost("signup")]
+        public async Task<IActionResult> Signup([FromBody] SignupModel user)
+        {
+            try
+            {
+                var result = await _authService.SignupAsync(user);
+                if (result == "User registered successfully.")
+                {
+                    return Ok(new { message = result });
+                }
+                return BadRequest(new { message = result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserForAuthentication loginModel)
+        public async Task<IActionResult> Login([FromBody] LoginModel login)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var isValid = await _authService.ValidateUser(loginModel);
-            if (!isValid)
-                return Unauthorized(new { message = "Invalid email or password." });
-
-            var isConfirmed = await _authService.IsEmailConfirmed(loginModel.Email);
-            if (!isConfirmed)
-                return BadRequest(new { message = "Please confirm your email before logging in." });
-
-            var token = await _authService.CreateToken();
-
-            Response.Cookies.Append("jwtToken", token, new CookieOptions
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(30)
-            });
+                return BadRequest("Invalid request");
+            }
 
-            var roles = await _authService.GetUserRoles(loginModel.Email);
-            var redirectUrl = roles.Contains("Administrator") ? "/admin/dashboard" : "/homepage/index";
+            try
+            {
+                var token = await _authService.LoginAsync(login);
+                if (token == null)
+                {
+                    return Unauthorized("Invalid credentials");
+                }
 
-            return Ok(new { token, redirectUrl, roles });
+                return Ok(new { token });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
+
     }
 }
