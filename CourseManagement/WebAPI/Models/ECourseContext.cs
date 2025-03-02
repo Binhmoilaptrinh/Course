@@ -5,6 +5,11 @@ namespace WebAPI.Models
 {
     public class ECourseContext : DbContext
     {
+        public ECourseContext(DbContextOptions<ECourseContext> options)
+       : base(options)
+        {
+        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
@@ -29,6 +34,7 @@ namespace WebAPI.Models
         {
             // Thiết lập cấu hình kết nối với cơ sở dữ liệu
             // optionsBuilder.UseSqlServer("Your_Connection_String");
+
             if (!optionsBuilder.IsConfigured)
             {
                 IConfigurationRoot configuration = new ConfigurationBuilder()
