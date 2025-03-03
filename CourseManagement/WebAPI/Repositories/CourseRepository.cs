@@ -30,11 +30,32 @@ namespace WebAPI.Repositories
             return course;
         }
 
+        public async Task DeleteAsync(int id)
+        {
+            var course = await _context.Courses.FindAsync(id);
+            if (course != null)
+            {
+                _context.Courses.Remove(course);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<IEnumerable<Course>> GetAllAsync()
         {
             var courses = await _context.Courses.ToListAsync();
             return courses;
+        }
 
+        public async Task<Course> GetByIdAsync(int id)
+        {
+            return await _context.Courses.FindAsync(id);
+        }
+
+        public async Task<Course> UpdateAsync(Course course)
+        {
+            _context.Entry(course).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return course;
         }
     }
 }

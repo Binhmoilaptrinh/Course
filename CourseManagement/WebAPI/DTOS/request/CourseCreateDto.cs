@@ -1,6 +1,6 @@
 ﻿namespace WebAPI.DTOS.request
 {
-    public class CourseCreateDto
+    public class CourseRequestDto
     {
         public string? Title { get; set; }
         public int CategoryId { get; set; }

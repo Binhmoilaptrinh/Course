@@ -12,7 +12,7 @@ namespace WebAPI.Mappings
             CreateMap<CategoryRequestDto, Category>();
             CreateMap<Category, CategoryResponse>();
             CreateMap<Course, CourseAdminResponseDto>();
-            CreateMap<CourseCreateDto, Course>();
+            CreateMap<CourseRequestDto, Course>().ForAllMembers(opt => opt.Condition((src, data, srcMember) => srcMember != null));//bỏ qua giá trị null khi mapping
         }
     }
 }
