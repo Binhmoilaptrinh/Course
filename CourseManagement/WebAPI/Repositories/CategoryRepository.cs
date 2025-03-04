@@ -40,6 +40,11 @@ namespace WebAPI.Repositories
             return await _context.Categories.FindAsync(id);
         }
 
+        public async Task<bool> IsExistByIdAsync(int id)
+        {
+            return await _context.Categories.AnyAsync(x => x.Id == id);
+        }
+
         public async Task<Category> UpdateAsync(Category category)
         {
             _context.Entry(category).State = EntityState.Modified;

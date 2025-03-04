@@ -8,6 +8,8 @@ namespace WebAPI.Repositories.Interfaces
         Task<IEnumerable<Course>> GetAllAsync();
         Task<Course> GetByIdAsync(int id);
 
+        Task<bool> IsExistByIdAsync(int id);
+
         Task<Course> CreateAsync(Course course);
 
         Task<Course> UpdateAsync(Course course);

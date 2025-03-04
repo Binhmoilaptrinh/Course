@@ -1,4 +1,6 @@
-﻿namespace WebAPI.DTOS.response
+﻿using Microsoft.EntityFrameworkCore.Update.Internal;
+
+namespace WebAPI.DTOS.response
 {
     public class CourseAdminResponseDto
     {

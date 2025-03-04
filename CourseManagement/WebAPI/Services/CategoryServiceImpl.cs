@@ -2,6 +2,7 @@
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
 using WebAPI.Models;
+using WebAPI.Repositories;
 using WebAPI.Repositories.Interfaces;
 using WebAPI.Services.Interfaces;
 
@@ -61,6 +62,11 @@ namespace WebAPI.Services
             _mapper.Map(requestDto, existingCate);
             var updateCate = await _repository.UpdateAsync(existingCate);
             return _mapper.Map<CategoryResponse>(updateCate);
+        }
+
+        public async Task<bool> IsExistByIdAsync(int id)
+        {
+            return await _repository.IsExistByIdAsync(id);
         }
     }
 }

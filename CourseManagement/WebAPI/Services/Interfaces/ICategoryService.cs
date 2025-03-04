@@ -13,5 +13,7 @@ namespace WebAPI.Services.Interfaces
         Task<CategoryResponse> UpdateCategoryAsync(int id, CategoryRequestDto category);
 
         Task DeleteCategoryAsyc(int id);
+
+        Task<bool> IsExistByIdAsync(int id);
     }
 }

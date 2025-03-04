@@ -26,6 +26,8 @@ builder.Services.AddScoped<ICourseService, CourseServiceImpl>();
 builder.Services.AddTransient<IFileService, FileService>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IUserService, UserServiceImpl>();
+builder.Services.AddTransient<IChapterRepository, ChapterRepository>();
+builder.Services.AddTransient<IChapterService, ChapterServiceImpl>();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddCors(options =>
 {

@@ -16,13 +16,6 @@ namespace WebAPI.Repositories
             _context = context;
         }
 
-        public async Task<Course> createAsync(Course course)
-        {
-            _context.Courses.Add(course);
-            await _context.SaveChangesAsync();
-            return course;
-        }
-
         public async Task<Course> CreateAsync(Course course)
         {
             _context.Courses.Add(course);
@@ -42,13 +35,20 @@ namespace WebAPI.Repositories
 
         public async Task<IEnumerable<Course>> GetAllAsync()
         {
-            var courses = await _context.Courses.ToListAsync();
+            var courses = await _context.Courses.Include(x => x.Category).ToListAsync();
             return courses;
         }
 
         public async Task<Course> GetByIdAsync(int id)
         {
-            return await _context.Courses.FindAsync(id);
+            return await _context.Courses
+                .Include(x => x.Category)
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
+
+        public async Task<bool> IsExistByIdAsync(int id)
+        {
+           return await _context.Courses.AnyAsync(x => x.Id == id);
         }
 
         public async Task<Course> UpdateAsync(Course course)
@@ -59,3 +59,4 @@ namespace WebAPI.Repositories
         }
     }
 }
+

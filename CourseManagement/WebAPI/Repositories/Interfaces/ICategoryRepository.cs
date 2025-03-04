@@ -12,5 +12,7 @@ namespace WebAPI.Repositories.Interfaces
         Task<Category> UpdateAsync(Category category);
 
         Task DeleteAsyc(int id);
+
+        Task<bool> IsExistByIdAsync(int id);
     }
 }

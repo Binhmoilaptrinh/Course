@@ -14,5 +14,7 @@ namespace WebAPI.Services.Interfaces
         Task<CourseAdminResponseDto> UpdateCourseAsync(int id, CourseRequestDto course);
 
         Task DeleteAsync(int id);
+
+        Task<bool> IsExistCourseByIdAsync(int id);
     }
 }

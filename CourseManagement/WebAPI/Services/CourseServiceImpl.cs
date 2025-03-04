@@ -13,6 +13,7 @@ namespace WebAPI.Services
         private readonly ICourseRepository _courseRepository;
         private readonly IUserService _userService;
         private readonly IFileService _fileService;
+        private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
 
         public CourseServiceImpl(ICourseRepository courseRepository, IMapper mapper, IFileService fileService, IUserService userService)
@@ -33,6 +34,10 @@ namespace WebAPI.Services
         {
             try
             {
+                if(! await _categoryService.IsExistByIdAsync(request.CategoryId))
+                {
+                    throw new Exception($"Category with Id {request.CategoryId} not found");
+                }
                 var user = await _userService.GetUserByIdAsync(1);
                 string thumbnail = await ValidateFile(request.Thumbnail);
                 string previewVideo = await ValidateFile(request.PreviewVideo);
@@ -60,6 +65,7 @@ namespace WebAPI.Services
             {
                 var user = await _userService.GetUserByIdAsync(1);
                 _mapper.Map(request, existingCourse);
+                existingCourse.Updater = user;
                 if (request.Thumbnail != null)
                 {
                     string thumbnail = await ValidateFile(request.Thumbnail);
@@ -70,6 +76,7 @@ namespace WebAPI.Services
                     string previewVideo = await ValidateFile(request.PreviewVideo);
                     existingCourse.PreviewVideo = previewVideo;
                 }
+                existingCourse.UpdatedAt = DateTime.Now;
                 var updateCourse = await _courseRepository.UpdateAsync(existingCourse);
                 return _mapper.Map<CourseAdminResponseDto>(updateCourse);
             }
@@ -81,8 +88,8 @@ namespace WebAPI.Services
 
         public async Task DeleteAsync(int id)
         {
-            var course = await _courseRepository.GetByIdAsync(id);
-            if (course == null)
+            
+            if (! await _courseRepository.IsExistByIdAsync(id))
             {
                 throw new Exception($"Course with Id {id} not found");
             }
@@ -92,6 +99,10 @@ namespace WebAPI.Services
         public async Task<CourseAdminResponseDto> GetCourseByIdAsync(int id)
         {
             var course = await _courseRepository.GetByIdAsync(id);
+            if (course == null)
+            {
+                throw new Exception($"Course with Id {id} not found");
+            }
             return _mapper.Map<CourseAdminResponseDto>(course);
         }
 
@@ -103,6 +114,11 @@ namespace WebAPI.Services
             }
             string[] allowedFileExtentions = [".jpg", ".jpeg", ".png", ".mp4"];
             return await _fileService.SaveFileAsync(file, allowedFileExtentions);
+        }
+
+        public async Task<bool> IsExistCourseByIdAsync(int id)
+        {
+            return await _courseRepository.IsExistByIdAsync(id);
         }
     }
 }
