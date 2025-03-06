@@ -10,5 +10,8 @@ namespace WebAPI.Services.Interfaces
         Task<string> SignupAsync(SignupModel signup);
 
         Task<string> LoginAsync(LoginModel login);
+        Task<string> HashPasswordAsync(string password);
+
+        
     }
 }
