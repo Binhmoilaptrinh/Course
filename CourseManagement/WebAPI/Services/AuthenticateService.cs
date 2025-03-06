@@ -30,7 +30,7 @@ namespace WebAPI.Services
             }
 
             var user = await _eCourseContext.Users.FirstOrDefaultAsync(u => u.Username == login.Username);
-            if (user == null || !VerifyPassword(login.Password, user.Password))
+            if (user == null || !await VerifyPasswordAsync(login.Password, user.Password))
             {
                 return null; // Trả về null nếu username không tồn tại hoặc mật khẩu không khớp
             }
@@ -78,7 +78,7 @@ namespace WebAPI.Services
             }
 
             // Hash password trước khi lưu vào database
-            string hashedPassword = HashPassword(user.Password);
+            string hashedPassword = await HashPasswordAsync(user.Password);
 
             var newUser = new User
             {
@@ -109,12 +109,13 @@ namespace WebAPI.Services
             return "User registered successfully.";
         }
 
-        private bool VerifyPassword(string inputPassword, string storedHashedPassword)
+        private async Task<bool> VerifyPasswordAsync(string inputPassword, string storedHashedPassword)
         {
-            string hashedInput = HashPassword(inputPassword); // Hash lại mật khẩu nhập vào
+            string hashedInput = await HashPasswordAsync(inputPassword); // Hash lại mật khẩu nhập vào
             return hashedInput == storedHashedPassword; // So sánh với mật khẩu đã lưu
         }
-        private string HashPassword(string password)
+
+        public Task<string> HashPasswordAsync(string password)
         {
             using (var sha256 = SHA256.Create())
             {
@@ -124,7 +125,7 @@ namespace WebAPI.Services
                 {
                     builder.Append(b.ToString("x2"));
                 }
-                return builder.ToString();
+                return Task.FromResult(builder.ToString());
             }
         }
 

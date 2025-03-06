@@ -1,7 +1,14 @@
 ﻿using AutoMapper;
+<<<<<<< HEAD
+using WebAPI.DTOS.reponse;
+using WebAPI.DTOS.request;
+using WebAPI.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+=======
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
 using WebAPI.Models;
+>>>>>>> 87b1073cfd82b875b0b5b5b2d6f1d83de6a1a9f6
 
 namespace WebAPI.Mappings
 {
@@ -9,6 +16,16 @@ namespace WebAPI.Mappings
     {
         public AutoMapperProfile()
         {
+<<<<<<< HEAD
+            CreateMap<StaffRequestDto, User>();
+            CreateMap<User, StaffReponseDto>();
+            CreateMap<StaffReponseDto, User>();
+            CreateMap<UserRoleRequest, UserRole>();
+            CreateMap<UserRole, UserRoleResponseDto>();
+            CreateMap<DiscountRequestDto, Discount>();
+            CreateMap<Discount, DiscountResponseDto>();
+
+=======
             CreateMap<CategoryRequestDto, Category>();
             CreateMap<Category, CategoryResponse>();
             CreateMap<Course, CourseAdminResponseDto>()
@@ -18,6 +35,7 @@ namespace WebAPI.Mappings
 
             CreateMap<ChapterRequestDto, Chapter>();
             CreateMap<Chapter, ChapterResponse >();
+>>>>>>> 87b1073cfd82b875b0b5b5b2d6f1d83de6a1a9f6
         }
     }
 }

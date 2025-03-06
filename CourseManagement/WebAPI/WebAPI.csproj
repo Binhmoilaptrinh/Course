@@ -8,6 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+<<<<<<< HEAD
+    <PackageReference Include="MailKit" Version="4.10.0" />
+=======
+>>>>>>> 87b1073cfd82b875b0b5b5b2d6f1d83de6a1a9f6
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.0" />
@@ -20,14 +24,21 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+<<<<<<< HEAD
+    <PackageReference Include="MimeKit" Version="4.10.0" />
+=======
     <PackageReference Include="payOS" Version="1.0.9" />
+>>>>>>> 87b1073cfd82b875b0b5b5b2d6f1d83de6a1a9f6
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Exceptions\" />
     <Folder Include="Extensions\" />
+<<<<<<< HEAD
+=======
     <Folder Include="Uploads\" />
+>>>>>>> 87b1073cfd82b875b0b5b5b2d6f1d83de6a1a9f6
   </ItemGroup>
 
 </Project>
