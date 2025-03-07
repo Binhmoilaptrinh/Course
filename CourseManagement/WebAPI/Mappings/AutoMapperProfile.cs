@@ -2,6 +2,7 @@
 using WebAPI.DTOS.response;
 using WebAPI.DTOS.request;
 using WebAPI.Models;
+using WebAPI.DTOS.reponse;
 
 namespace WebAPI.Mappings
 {
@@ -10,8 +11,8 @@ namespace WebAPI.Mappings
         public AutoMapperProfile()
         {
             CreateMap<StaffRequestDto, User>();
-            CreateMap<User, StaffResponseDto>(); // Fixed naming inconsistency
-            CreateMap<StaffResponseDto, User>();
+            CreateMap<User, StaffReponseDto>(); // Fixed naming inconsistency
+            CreateMap<StaffReponseDto, User>();
             CreateMap<UserRoleRequest, UserRole>();
             CreateMap<UserRole, UserRoleResponseDto>();
             CreateMap<DiscountRequestDto, Discount>();
