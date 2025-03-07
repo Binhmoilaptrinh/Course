@@ -19,7 +19,8 @@ namespace WebAPI.Mappings
             CreateMap<Discount, DiscountResponseDto>();
             CreateMap<CategoryRequestDto, Category>();
             CreateMap<Category, CategoryResponse>();
-            
+            CreateMap<Course, CourseClientDTO>();
+
             CreateMap<Course, CourseAdminResponseDto>()
                 .ForMember(dest => dest.categoryResponse, opt => opt.MapFrom(src => src.Category));
             
