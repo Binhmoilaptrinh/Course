@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
-using WebAPI.DTOS.reponse;
 using WebAPI.DTOS.request;
+using WebAPI.DTOS.response;
 
 namespace WebAPI.Services.Interfaces
 {

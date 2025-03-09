@@ -1,4 +1,4 @@
-﻿namespace WebAPI.DTOS.reponse
+﻿namespace WebAPI.DTOS.response
 {
     public class DiscountResponseDto
     {
@@ -9,7 +9,7 @@
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int CourseID {  get; set; }
+        public int CourseID { get; set; }
         public string CourseName { get; set; } // Lấy tên khóa học từ bảng Course
     }
 }

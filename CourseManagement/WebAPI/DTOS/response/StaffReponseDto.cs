@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebAPI.DTOS.reponse
+namespace WebAPI.DTOS.response
 {
     public class StaffReponseDto
     {
