@@ -52,7 +52,7 @@ builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 // Đăng ký IFileService với Transient Lifetime
 builder.Services.AddTransient<IFileService, FileService>();
 
-// Cấu hình CORS
+// Cấu hình COR
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", policy =>
