@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using WebAPI.DTOS.request;
-using WebAPI.DTOS.reponse;
 using WebAPI.Repositories.Interfaces;
 using WebAPI.Services.Interfaces;
+using WebAPI.DTOS.response;
 
 namespace WebAPI.Services
 {

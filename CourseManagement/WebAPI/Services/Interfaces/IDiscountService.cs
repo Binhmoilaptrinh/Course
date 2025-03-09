@@ -1,5 +1,5 @@
-﻿using WebAPI.DTOS.reponse;
-using WebAPI.DTOS.request;
+﻿using WebAPI.DTOS.request;
+using WebAPI.DTOS.response;
 
 namespace WebAPI.Services.Interfaces
 {

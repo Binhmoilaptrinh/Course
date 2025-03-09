@@ -1,4 +1,4 @@
-﻿namespace WebAPI.DTOS.reponse
+﻿namespace WebAPI.DTOS.response
 {
     public class UserRoleResponseDto
     {
