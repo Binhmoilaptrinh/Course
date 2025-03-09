@@ -1,6 +1,11 @@
-﻿namespace WebAPI.Services.Interfaces
+﻿using WebAPI.DTOS.request;
+using WebAPI.Models;
+
+namespace WebAPI.Services.Interfaces
 {
-    public class IPaymentService
+    public interface IPaymentService
     {
+        Task<string> CreatePaymentUrl(int courseId);
+        Task<Payment> UpdatePayment(PaymentRequest request);
     }
 }

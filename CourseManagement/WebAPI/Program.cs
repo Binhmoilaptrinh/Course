@@ -9,6 +9,7 @@ using WebAPI.Repositories;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using WebAPI.DTOS;
 using Microsoft.Extensions.FileProviders;
+using WebAPI.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,13 +39,16 @@ builder.Services.Configure<SendEmail>(builder.Configuration.GetSection("SendEmai
 builder.Services.AddScoped<ISendEmail, SendEmailService>();
 builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
+builder.Services.AddScoped<PaymentHelper>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ICourseLearningService, CourseLearningService>();
 builder.Services.AddScoped<ICategoryService, CategoryServiceImpl>();
 builder.Services.AddScoped<ICourseService, CourseServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IChapterService, ChapterServiceImpl>();
 builder.Services.AddScoped<ICourseClientService, CourseClientService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 // Đăng ký IFileService với Transient Lifetime
 builder.Services.AddTransient<IFileService, FileService>();
 

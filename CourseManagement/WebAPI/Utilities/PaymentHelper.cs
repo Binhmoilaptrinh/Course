@@ -19,11 +19,11 @@ namespace WebAPI.Utilities
             _checksumKey = configuration["PayOS:ChecksumKey"];
         }
 
-        public async Task<string> GetLinkAsync(long orderCode, int price, List<ItemData> items)
+        public  async Task<string> GetLinkAsync(long orderCode, int price, List<ItemData> items)
         {
             PayOS payOS = new(_clientId, _apiKey, _checksumKey);
-            string cancelUrl = "https://shopping.2handshop.id.vn/payment-error";
-            string returnUrl = "https://shopping.2handshop.id.vn/payment-success";
+            string cancelUrl = "https://localhost:7256/Payments/UpdateSuccess";
+            string returnUrl = "https://localhost:7256/Payments/UpdateFail";
             PaymentData paymentData = new PaymentData(orderCode, price, "Thanh toan don hang",
                 items, cancelUrl, returnUrl);
 
@@ -32,7 +32,7 @@ namespace WebAPI.Utilities
             return createPayment.checkoutUrl;
         }
 
-        public async Task<bool> VerifyPaymentAsync(long orderCode)
+        public  async Task<bool> VerifyPaymentAsync(long orderCode)
         {
             PayOS payOS = new(_clientId, _apiKey, _checksumKey);
             var paymentStatus = await payOS.getPaymentLinkInformation(orderCode);
