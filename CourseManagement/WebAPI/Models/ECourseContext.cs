@@ -128,7 +128,7 @@ namespace WebAPI.Models
 
             modelBuilder.Entity<Lesson>()
                .HasOne(c => c.Chapter)
-               .WithMany()
+               .WithMany(c => c.Lessons)
                .HasForeignKey(c => c.ChapterId)
                .OnDelete(DeleteBehavior.Restrict);
 
@@ -142,7 +142,7 @@ namespace WebAPI.Models
                 .HasOne(c => c.Updater)
                 .WithMany()
                 .HasForeignKey(c => c.UpdateBy)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Chapter>()
                 .Property(c => c.CreatedAt)
@@ -203,9 +203,9 @@ namespace WebAPI.Models
 
             modelBuilder.Entity<Question>()
                .HasOne(c => c.Lesson)
-               .WithMany()
+               .WithMany(l => l.Questions)
                .HasForeignKey(c => c.LessonId)
-               .OnDelete(DeleteBehavior.Restrict);
+               .OnDelete(DeleteBehavior.Cascade);
 
             //Answer
             modelBuilder.Entity<Answer>()
@@ -217,9 +217,9 @@ namespace WebAPI.Models
 
             modelBuilder.Entity<Answer>()
                .HasOne(c => c.Question)
-               .WithMany()
+               .WithMany(q => q.Answers)
                .HasForeignKey(c => c.QuestionId)
-               .OnDelete(DeleteBehavior.Restrict);
+               .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<LessonProgress>()
         .HasKey(lp => lp.Id);

@@ -36,5 +36,7 @@ namespace WebAPI.Models
         public User Creator { get; set; }
         public User Updater { get; set; }
         public Chapter Chapter { get; set; }
+
+        public ICollection<Question> Questions { get; set; } = new List<Question>();
     }
 }

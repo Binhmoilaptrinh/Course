@@ -9,9 +9,24 @@ using WebAPI.Repositories;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using WebAPI.DTOS;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.OData;
+using Microsoft.OData.ModelBuilder;
+using WebAPI.Models;
 using WebAPI.Utilities;
 
+
 var builder = WebApplication.CreateBuilder(args);
+//odata
+var modelBuilder = new ODataConventionModelBuilder();
+modelBuilder.EntitySet<Lesson>("Lesson");
+modelBuilder.EntitySet<Chapter>("Chapter");
+modelBuilder.EntitySet<Course>("Course");
+builder.Services.AddControllers().AddOData(
+    options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
+    .AddRouteComponents(
+    "odata",
+        modelBuilder.GetEdmModel())
+);
 
 // Inject IConfiguration
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
@@ -52,7 +67,24 @@ builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 // Đăng ký IFileService với Transient Lifetime
 builder.Services.AddTransient<IFileService, FileService>();
 
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IUserService, UserServiceImpl>();
+builder.Services.AddTransient<IChapterRepository, ChapterRepository>();
+builder.Services.AddTransient<IChapterService, ChapterServiceImpl>();
+builder.Services.AddTransient<ILessonRepository, LessonRepository>();
+builder.Services.AddTransient<ILessonService, LessonServiceImpl>();
+
+builder.Services.AddTransient<IAnswerRepository, AnswerRepository>();
+builder.Services.AddTransient<IAnswerService, AnswerServiceImpl>();
+
+builder.Services.AddTransient<IQuestionRepository, QuestionRepository>();
+builder.Services.AddTransient<IQuestionService, QuestionServiceImpl>();
+
+builder.Services.AddAutoMapper(typeof(Program));
+
+
 // Cấu hình CORS
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", policy =>

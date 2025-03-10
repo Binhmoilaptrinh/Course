@@ -5,7 +5,7 @@ namespace WebAPI.Repositories.Interfaces
 {
     public interface ICourseRepository
     {
-        Task<IEnumerable<Course>> GetAllAsync();
+        IQueryable<Course> GetAll();
         Task<Course> GetByIdAsync(int id);
 
         Task<bool> IsExistByIdAsync(int id);
