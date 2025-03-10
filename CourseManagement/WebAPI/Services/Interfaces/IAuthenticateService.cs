@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using WebAPI.DTOS;
+using WebAPI.DTOS.Authentication;
 
 namespace WebAPI.Services.Interfaces
 {
     public interface IAuthenticateService
     {
-        //Task<IdentityResult> RegisterUser(UserForRegistration userForRegistration);
-        Task<bool> ValidateUser(UserForAuthentication userForAuth);
-        Task<string> CreateToken();
-        Task<bool> IsEmailConfirmed(string email);
-        Task<IList<string>> GetUserRoles(string email);
+
+        Task<string> SignupAsync(SignupModel signup);
+
+        Task<string> LoginAsync(LoginModel login);
+        Task<string> HashPasswordAsync(string password);
+
+        
     }
 }

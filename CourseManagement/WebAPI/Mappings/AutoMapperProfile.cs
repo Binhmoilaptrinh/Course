@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
+using WebAPI.DTOS.request;
 using WebAPI.Models;
 
 namespace WebAPI.Mappings
@@ -10,14 +10,31 @@ namespace WebAPI.Mappings
         public AutoMapperProfile()
         {
 
+            CreateMap<Course, CourseAdminResponseDto>();
+
+            CreateMap<StaffRequestDto, User>();
+            CreateMap<User, StaffReponseDto>(); // Fixed naming inconsistency
+            CreateMap<StaffReponseDto, User>();
+            CreateMap<UserRoleRequest, UserRole>();
+            CreateMap<UserRole, UserRoleResponseDto>();
+            CreateMap<DiscountRequestDto, Discount>();
+            CreateMap<Discount, DiscountResponseDto>();
             CreateMap<CategoryRequestDto, Category>();
             CreateMap<Category, CategoryResponse>();
-            CreateMap<Course, CourseAdminResponseDto>();
+            CreateMap<Course, CourseClientDTO>();
+          
+           
+         
+            CreateMap<Course, CourseAdminResponseDto>()
+                .ForMember(dest => dest.categoryResponse, opt => opt.MapFrom(src => src.Category));
+            
+
             CreateMap<CourseRequestDto, Course>()
-                .ForAllMembers(opt => opt.Condition((src, data, srcMember) => srcMember != null));//bỏ qua giá trị null khi mapping
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null)); // Skip null values when mapping
 
             CreateMap<ChapterRequestDto, Chapter>();
             CreateMap<Chapter, ChapterResponse>();
+
 
             CreateMap<LessonQuizzRequestDto, Lesson>();
 
