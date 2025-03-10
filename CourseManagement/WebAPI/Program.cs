@@ -7,8 +7,22 @@ using WebAPI.Repositories;
 using WebAPI.Services.Interfaces;
 using WebAPI.Services;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.OData;
+using Microsoft.OData.ModelBuilder;
+using WebAPI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+//odata
+var modelBuilder = new ODataConventionModelBuilder();
+modelBuilder.EntitySet<Lesson>("Lesson");
+modelBuilder.EntitySet<Chapter>("Chapter");
+modelBuilder.EntitySet<Course>("Course");
+builder.Services.AddControllers().AddOData(
+    options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
+    .AddRouteComponents(
+    "odata",
+        modelBuilder.GetEdmModel())
+);
 
 // Add services to the container.
 builder.Services.ConfigureSqlContext(builder.Configuration);
@@ -28,6 +42,15 @@ builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IUserService, UserServiceImpl>();
 builder.Services.AddTransient<IChapterRepository, ChapterRepository>();
 builder.Services.AddTransient<IChapterService, ChapterServiceImpl>();
+builder.Services.AddTransient<ILessonRepository, LessonRepository>();
+builder.Services.AddTransient<ILessonService, LessonServiceImpl>();
+
+builder.Services.AddTransient<IAnswerRepository, AnswerRepository>();
+builder.Services.AddTransient<IAnswerService, AnswerServiceImpl>();
+
+builder.Services.AddTransient<IQuestionRepository, QuestionRepository>();
+builder.Services.AddTransient<IQuestionService, QuestionServiceImpl>();
+
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddCors(options =>
 {

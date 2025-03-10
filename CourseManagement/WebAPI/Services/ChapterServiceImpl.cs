@@ -26,7 +26,7 @@ namespace WebAPI.Services
 
         public async Task<ChapterResponse> CreateChapterAsync(ChapterRequestDto request)
         {
-            if (! await _courseService.IsExistCourseByIdAsync(request.CourseId))
+            if (!await _courseService.IsExistCourseByIdAsync(request.CourseId))
             {
                 throw new Exception($"Course with id {request.CourseId} not exist");
             }
@@ -61,7 +61,7 @@ namespace WebAPI.Services
                 throw new Exception($"Chapter with Id {id} not found");
             }
 
-            if (! await _courseService.IsExistCourseByIdAsync(request.CourseId))
+            if (!await _courseService.IsExistCourseByIdAsync(request.CourseId))
             {
                 throw new Exception($"Course with Id {id} not found");
             }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DTOS.response;
 using WebAPI.Mappings;
@@ -33,11 +34,17 @@ namespace WebAPI.Repositories
             }
         }
 
-        public async Task<IEnumerable<Course>> GetAllAsync()
+        //public async Task<IEnumerable<Course>> GetAllAsync()
+        //{
+        //    var courses = await _context.Courses.Include(x => x.Category).ToListAsync();
+        //    return courses;
+        //}
+        public IQueryable<Course> GetAll()
         {
-            var courses = await _context.Courses.Include(x => x.Category).ToListAsync();
+            var courses = _context.Courses.Include(x => x.Category);
             return courses;
         }
+
 
         public async Task<Course> GetByIdAsync(int id)
         {

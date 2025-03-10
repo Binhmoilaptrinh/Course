@@ -1,57 +1,60 @@
-﻿using WebAPI.Services.Interfaces;
+﻿using Azure.Storage;
+using Azure.Storage.Blobs;
+using WebAPI.DTOS.request;
+using WebAPI.DTOS.response;
+using WebAPI.Models;
+using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Services
 {
-    public class FileService(IWebHostEnvironment environment) : IFileService
+    public class FileService : IFileService
     {
+        private readonly string _storageAccount = "elearningcourse";
+        private readonly string _key = "d7y4wTEjIl0mMyy9Tlu6Ds9qgS0twnsKblHJ+aexF6PPg/0IoCk+cpT3QSMBazoU/0C+e4krt9cr+AStz43GaA==";
+        private BlobContainerClient _filesContainer;
+        private readonly ECourseContext _context;
 
-        public async Task<string> SaveFileAsync(IFormFile imageFile, string[] allowedFileExtensions)
+        public FileService(ECourseContext context)
         {
-            if (imageFile == null)
-            {
-                throw new ArgumentNullException(nameof(imageFile));
-            }
-
-            var contentPath = environment.ContentRootPath;
-            var path = Path.Combine(contentPath, "Uploads");
-            // path = "c://projects/ImageManipulation.Ap/uploads" ,not exactly, but something like that
-
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            // Check the allowed extenstions
-            var ext = Path.GetExtension(imageFile.FileName);
-            if (!allowedFileExtensions.Contains(ext))
-            {
-                throw new ArgumentException($"Only {string.Join(",", allowedFileExtensions)} are allowed.");
-            }
-
-            // generate a unique filename
-            var fileName = $"{Guid.NewGuid().ToString()}{ext}";
-            var fileNameWithPath = Path.Combine(path, fileName);
-            using var stream = new FileStream(fileNameWithPath, FileMode.Create);
-            await imageFile.CopyToAsync(stream);
-            return fileName;
+            var credential = new StorageSharedKeyCredential(_storageAccount, _key);
+            var blobUri = $"https://{_storageAccount}.blob.core.windows.net";
+            var blobServiceClient = new BlobServiceClient(new Uri(blobUri), credential);
+            _filesContainer = blobServiceClient.GetBlobContainerClient("web");
+            _context = context;
         }
 
-
-        public void DeleteFile(string fileNameWithExtension)
+        public async Task<List<BlobDto>> ListAsync()
         {
-            if (string.IsNullOrEmpty(fileNameWithExtension))
+            List<BlobDto> files = new List<BlobDto>();
+            await foreach (var file in _filesContainer.GetBlobsAsync())
             {
-                throw new ArgumentNullException(nameof(fileNameWithExtension));
+                string uri = _filesContainer.Uri.ToString();
+                var name = file.Name;
+                var fullUri = $"{uri}.{name}";
+                files.Add(new BlobDto
+                {
+                    Uri = fullUri,
+                    Name = name,
+                    ContentType = file.Properties.ContentType
+                });
             }
-            var contentPath = environment.ContentRootPath;
-            var path = Path.Combine(contentPath, $"Uploads", fileNameWithExtension);
-
-            if (!File.Exists(path))
-            {
-                throw new FileNotFoundException($"Invalid file path");
-            }
-            File.Delete(path);
+            return files;
         }
 
+        public async Task<BlobResponseDto> UploadAsync(IFormFile blob)
+        {
+            BlobResponseDto response = new();
+            BlobClient client = _filesContainer.GetBlobClient(blob.FileName);
+            await using (Stream data = blob.OpenReadStream())
+            {
+                await client.UploadAsync(data, overwrite: true);
+            }
+            response.Status = $"File {blob.FileName} upload successfully";
+            response.Error = false;
+            response.Blob.Uri = client.Uri.AbsoluteUri;
+            response.Blob.Name = client.Name;
+
+            return response;
+        }
     }
 }
