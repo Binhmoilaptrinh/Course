@@ -1,0 +1,59 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Danh mục sản phẩm";
+}
+
+<h2>Danh mục sản phẩm</h2>
+<button id="loadCategories" class="btn btn-primary">Tải danh mục</button>
+
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Mô tả</th>
+            <th>Trạng thái</th>
+        </tr>
+    </thead>
+    <tbody id="categoryTable">
+        <!-- Dữ liệu sẽ được thêm vào đây -->
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#loadCategories").click(function () {
+                $.ajax({
+                    url: "https://api.2handshop.id.vn/api/Category",
+                    type: "GET",
+                    headers: {
+                        "accept": "application/json;odata.metadata=minimal;odata.streaming=true"
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        let tableBody = $("#categoryTable");
+                        tableBody.empty(); // Xóa dữ liệu cũ
+
+                        $.each(data, function (index, category) {
+                            let row = `
+                                        <tr>
+                                            <td>${category.id}</td>
+                                            <td>${category.name}</td>
+                                            <td>${category.description}</td>
+                                            <td>${category.status == 1 ? "Hoạt động" : "Không hoạt động"}</td>
+                                        </tr>
+                                    `;
+                            tableBody.append(row);
+                        });
+                    },
+                    error: function () {
+                        alert("Lỗi khi tải danh mục.");
+                    }
+                });
+            });
+        });
+    </script>
+}
