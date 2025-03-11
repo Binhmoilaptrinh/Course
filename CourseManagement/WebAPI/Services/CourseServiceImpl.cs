@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Azure.Core;
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
@@ -16,18 +17,21 @@ namespace WebAPI.Services
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
 
-        public CourseServiceImpl(ICourseRepository courseRepository, IMapper mapper, IFileService fileService, IUserService userService)
+        public CourseServiceImpl(ICourseRepository courseRepository, 
+            IMapper mapper, IFileService fileService, IUserService userService,
+             ICategoryService categoryService)
         {
             _courseRepository = courseRepository;
             _mapper = mapper;
             _fileService = fileService;
             _userService = userService;
+            _categoryService = categoryService;
         }
 
-        public async Task<IEnumerable<CourseAdminResponseDto>> GetAllCourseAsync()
+        public IQueryable<CourseAdminResponseDto> GetAllCourse()
         {
-            var courses = await _courseRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<CourseAdminResponseDto>>(courses);
+            var courses = _courseRepository.GetAll();
+            return courses.ProjectTo<CourseAdminResponseDto>(_mapper.ConfigurationProvider);
         }
 
         public async Task<CourseAdminResponseDto> CreateCourseAsync(CourseRequestDto request)
@@ -39,8 +43,12 @@ namespace WebAPI.Services
                     throw new Exception($"Category with Id {request.CategoryId} not found");
                 }
                 var user = await _userService.GetUserByIdAsync(1);
-                string thumbnail = await ValidateFile(request.Thumbnail);
-                string previewVideo = await ValidateFile(request.PreviewVideo);
+                var thumbnailBlob = await _fileService.UploadAsync(request.Thumbnail);
+                var previewVideoBlob = await _fileService.UploadAsync(request.PreviewVideo);
+
+                string thumbnail = thumbnailBlob.Blob.Uri.ToString();
+                string previewVideo = previewVideoBlob.Blob.Uri.ToString();
+
                 var course = _mapper.Map<Course>(request);
                 course.Thumbnail = thumbnail;
                 course.PreviewVideo = previewVideo;
@@ -68,13 +76,13 @@ namespace WebAPI.Services
                 existingCourse.Updater = user;
                 if (request.Thumbnail != null)
                 {
-                    string thumbnail = await ValidateFile(request.Thumbnail);
-                    existingCourse.Thumbnail = thumbnail;
+                    var thumbnailBlob = await _fileService.UploadAsync(request.Thumbnail);
+                    existingCourse.Thumbnail = thumbnailBlob.Blob.Uri.ToString();
                 }
                 if (request.PreviewVideo != null)
                 {
-                    string previewVideo = await ValidateFile(request.PreviewVideo);
-                    existingCourse.PreviewVideo = previewVideo;
+                    var previewVideoBlob = await _fileService.UploadAsync(request.PreviewVideo);
+                    existingCourse.PreviewVideo = previewVideoBlob.Blob.Uri.ToString();
                 }
                 existingCourse.UpdatedAt = DateTime.Now;
                 var updateCourse = await _courseRepository.UpdateAsync(existingCourse);
@@ -106,16 +114,7 @@ namespace WebAPI.Services
             return _mapper.Map<CourseAdminResponseDto>(course);
         }
 
-        public async Task<string> ValidateFile(IFormFile file)
-        {
-            if (file?.Length > 512 * 1024 * 1024)
-            {
-                throw new InvalidDataException("File size should not exceed 512 MB");
-            }
-            string[] allowedFileExtentions = [".jpg", ".jpeg", ".png", ".mp4"];
-            return await _fileService.SaveFileAsync(file, allowedFileExtentions);
-        }
-
+        
         public async Task<bool> IsExistCourseByIdAsync(int id)
         {
             return await _courseRepository.IsExistByIdAsync(id);

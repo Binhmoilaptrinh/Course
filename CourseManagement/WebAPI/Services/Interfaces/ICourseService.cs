@@ -6,7 +6,7 @@ namespace WebAPI.Services.Interfaces
 {
     public interface ICourseService
     {
-        Task<IEnumerable<CourseAdminResponseDto>> GetAllCourseAsync();
+        IQueryable<CourseAdminResponseDto> GetAllCourse();
 
         Task<CourseAdminResponseDto> GetCourseByIdAsync(int id);
         Task<CourseAdminResponseDto> CreateCourseAsync(CourseRequestDto request);

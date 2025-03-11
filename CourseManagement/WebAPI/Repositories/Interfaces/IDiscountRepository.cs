@@ -1,6 +1,6 @@
 ﻿using WebAPI.DTOS.request;
-using WebAPI.DTOS.reponse;
 using WebAPI.Models;
+using WebAPI.DTOS.response;
 
 namespace WebAPI.Repositories.Interfaces
 {

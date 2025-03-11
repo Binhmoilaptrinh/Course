@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.Logging;
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
@@ -23,11 +24,11 @@ namespace WebAPI.Controllers
             _fileService = fileService;
         }
 
+        [EnableQuery]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseAdminResponseDto>>> GetAllCourseManage()
+        public IQueryable<CourseAdminResponseDto> GetAllCourseManage()
         {
-            var courses = await _courseService.GetAllCourseAsync();
-            return Ok(courses);
+            return _courseService.GetAllCourse();
         }
 
         [HttpPost]

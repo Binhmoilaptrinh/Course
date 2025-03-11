@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOS.request;
-using WebAPI.DTOS.reponse;
 using WebAPI.Services.Interfaces;
+using WebAPI.DTOS.response;
 
 namespace WebAPI.Controllers
 {

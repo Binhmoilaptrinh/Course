@@ -1,8 +1,11 @@
-﻿namespace WebAPI.Services.Interfaces
+﻿using WebAPI.DTOS.request;
+using WebAPI.DTOS.response;
+
+namespace WebAPI.Services.Interfaces
 {
     public interface IFileService
     {
-        Task<string> SaveFileAsync(IFormFile imageFile, string[] allowedFileExtensions);
-        void DeleteFile(string fileNameWithExtension);
+        Task<List<BlobDto>> ListAsync();
+        Task<BlobResponseDto> UploadAsync(IFormFile blob);
     }
 }

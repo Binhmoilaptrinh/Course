@@ -15,5 +15,6 @@ namespace WebAPI.Models
         public string QuestionText { get; set; }
 
         public Lesson Lesson { get; set; }
+        public ICollection<Answer> Answers { get; set; } = new List<Answer>();
     }
 }
