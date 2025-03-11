@@ -2,3 +2,5 @@
 obj
 PublishProfiles
 bin
+CourseManagement/WebAPI/WebAPI.csproj
+CourseManagement/WebAPI/WebAPI.csproj.user
