@@ -25,8 +25,7 @@ namespace WebAPI.Mappings
           
            
          
-            CreateMap<Course, CourseAdminResponseDto>()
-                .ForMember(dest => dest.categoryResponse, opt => opt.MapFrom(src => src.Category));
+            CreateMap<Course, CourseAdminResponseDto>();
             
 
             CreateMap<CourseRequestDto, Course>()

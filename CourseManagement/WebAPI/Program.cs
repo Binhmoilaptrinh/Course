@@ -104,12 +104,6 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
-    RequestPath = "/Resources"
-});
 
 app.UseSwagger();
 app.UseSwaggerUI();
