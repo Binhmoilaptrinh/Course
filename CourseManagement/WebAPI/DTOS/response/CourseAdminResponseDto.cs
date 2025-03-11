@@ -18,5 +18,6 @@ namespace WebAPI.DTOS.response
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         public int? LimitDay { get; set; }
+        public CategoryResponse categoryResponse { get; set; }
     }
 }
