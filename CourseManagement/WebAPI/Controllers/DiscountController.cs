@@ -2,6 +2,7 @@
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.reponse;
 using WebAPI.Services.Interfaces;
+using WebAPI.Filters;
 
 namespace WebAPI.Controllers
 {
@@ -18,6 +19,7 @@ namespace WebAPI.Controllers
 
         // Lấy danh sách Discount
         [HttpGet]
+        [AuthorizePermission("ManageDiscount")]
         public async Task<ActionResult<List<DiscountResponseDto>>> GetAll()
         {
             var discounts = await _discountService.GetAllAsync();
@@ -26,6 +28,8 @@ namespace WebAPI.Controllers
 
         // Lấy Discount theo ID
         [HttpGet("{id}")]
+        [AuthorizePermission("ManageDiscount")]
+
         public async Task<ActionResult<DiscountResponseDto>> GetById(int id)
         {
             var discount = await _discountService.GetByIdAsync(id);
@@ -34,6 +38,8 @@ namespace WebAPI.Controllers
 
         // Tạo mới Discount
         [HttpPost]
+        [AuthorizePermission("ManageDiscount")]
+
         public async Task<ActionResult<DiscountResponseDto>> Create([FromBody] DiscountRequestDto dto)
         {
             if (!ModelState.IsValid)
@@ -47,6 +53,8 @@ namespace WebAPI.Controllers
 
         // Cập nhật Discount
         [HttpPut("{id}")]
+        [AuthorizePermission("ManageDiscount")]
+
         public async Task<ActionResult<DiscountResponseDto>> Update(int id, [FromBody] DiscountRequestDto dto)
         {
             if (!ModelState.IsValid)
@@ -58,6 +66,8 @@ namespace WebAPI.Controllers
 
         // Xóa Discount
         [HttpDelete("{id}")]
+        [AuthorizePermission("ManageDiscount")]
+
         public async Task<IActionResult> Delete(int id)
         {
             return await _discountService.DeleteAsync(id) ? NoContent() : NotFound(new { message = "Discount not found" });

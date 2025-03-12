@@ -17,5 +17,23 @@ namespace WebAPI.Services
         {
             return _userRepository.GetAsync(id);
         }
+
+        public async Task<bool> VerifyEmailAsync(string token)
+        {
+            var user = await _userRepository.GetUserByVerificationTokenAsync(token);
+
+            if (user == null || user.EmailVerificationExpiry < DateTime.UtcNow)
+            {
+                return false; // Token không hợp lệ hoặc hết hạn
+            }
+
+            // Cập nhật trạng thái xác minh email
+            user.IsEmailVerify = true;
+            user.EmailVerificationToken = null; // Xóa token
+            user.EmailVerificationExpiry = null;
+
+            await _userRepository.UpdateAsync(user);
+            return true;
+        }
     }
 }

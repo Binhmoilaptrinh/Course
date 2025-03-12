@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebAPI.DTOS.reponse;
 using WebAPI.DTOS.request;
+using WebAPI.Filters;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -11,9 +13,11 @@ namespace WebAPI.Controllers
     public class StaffController : ControllerBase
     {
         private readonly IStaffService _staffService;
+        private readonly IUserService _userService;
 
-        public StaffController(IStaffService staffService)
+        public StaffController(IUserService userService, IStaffService staffService)
         {
+            _userService = userService;
             _staffService = staffService;
         }
 
@@ -25,6 +29,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("add")]
+        
         public async Task<IActionResult> AddStaff([FromBody] StaffRequestDto staffDto)
         {
             if (staffDto == null)
@@ -42,7 +47,7 @@ namespace WebAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-        
+
         [HttpPost("update")]
         public async Task<IActionResult> UpdateStaff([FromBody] StaffReponseDto staffDto)
         {
@@ -61,5 +66,19 @@ namespace WebAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("verify-email")]
+        public async Task<IActionResult> VerifyEmail(string token)
+        {
+            bool isVerified = await _userService.VerifyEmailAsync(token);
+
+            if (!isVerified)
+            {
+                return BadRequest("Invalid or expired token.");
+            }
+
+            return Ok("Email verified successfully!");
+        }
+
     }
 }

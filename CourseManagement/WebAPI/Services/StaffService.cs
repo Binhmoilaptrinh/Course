@@ -1,12 +1,16 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
 using WebAPI.DTOS.reponse;
 using WebAPI.DTOS.request;
 using WebAPI.Models;
@@ -22,14 +26,16 @@ namespace WebAPI.Services
         public readonly IMapper _mapper;
         public readonly ISendEmail _emailSender;
         public readonly IAuthenticateService _authenticateService;
+        private readonly IConfiguration _configuration;
 
-        public StaffService(IUserRepository repo, IUserRoleRepository repoUR, IMapper mapper, ISendEmail emailSender, IAuthenticateService authenticateService)
+        public StaffService(IConfiguration configuration, IUserRepository repo, IUserRoleRepository repoUR, IMapper mapper, ISendEmail emailSender, IAuthenticateService authenticateService)
         {
             _repo = repo;
             _repoUR = repoUR;
             _mapper = mapper;
             _emailSender = emailSender;
             _authenticateService = authenticateService;
+            _configuration = configuration;
         }
 
         public async Task<List<StaffReponseDto>> GetStaffReponses()
@@ -51,43 +57,50 @@ namespace WebAPI.Services
 
         public async Task<StaffReponseDto> AddStaff(StaffRequestDto staff)
         {
-
             var newUser = _mapper.Map<User>(staff);
-            var checkU = await _repo.CheckAsyncForUserName(staff.UserName);
-            if (checkU)
-            {
+
+            // Kiểm tra username & email đã tồn tại chưa
+            if (await _repo.CheckAsyncForUserName(staff.UserName))
                 throw new Exception($"User with {staff.UserName} is existed");
-            }
-            var checkE = await _repo.CheckAsyncForEmail(staff.Email);
-            if (checkE)
-            {
+            if (await _repo.CheckAsyncForEmail(staff.Email))
                 throw new Exception($"User with {staff.Email} is existed");
-            }
+
             var password = GenerateRandomPassword();
             newUser.Password = await _authenticateService.HashPasswordAsync(password);
+            newUser.IsEmailVerify = false; // Chưa xác minh email
+
+            // 🔥 Tạo token xác minh email
+            string token = GenerateVerificationToken();
+            DateTime expiry = DateTime.UtcNow.AddHours(24); // Token hết hạn sau 24 giờ
+
+            newUser.EmailVerificationToken = token;
+            newUser.EmailVerificationExpiry = expiry;
+
             var createdUser = await _repo.CreateAsync(newUser);
             if (createdUser != null)
             {
-                await _emailSender.SendEmailAsync(createdUser.Email, "Account is created", $"Here is your new password {password}");
+                string baseUrl = _configuration["AppSettings:BaseUrl"];
+                string verificationLink = $"{baseUrl}/api/staff/verify-email?token={token}";
+
+                string emailBody = $"Here is your new password: {password} <br/>" +
+                                   $"Click <a href='{verificationLink}'>here</a> to verify your email.";
+
+                await _emailSender.SendEmailAsync(createdUser.Email, "Account Created - Verify Your Email", emailBody);
 
                 // Kiểm tra role hợp lệ
-                var roleExists = await _repoUR.CheckUserRoleAsync(staff.SelectedRole);
-                if (!roleExists)
-                {
+                if (!await _repoUR.CheckUserRoleAsync(staff.SelectedRole))
                     throw new Exception($" {staff.SelectedRole} is invalid");
-                }
 
-                var userRole = await _repoUR.CreateAsync(new UserRole { UserId = createdUser.UserId, RoleId = staff.SelectedRole });
+                var userRole = await _repoUR.AddAsync(new UserRole { UserId = createdUser.UserId, RoleId = staff.SelectedRole });
                 if (userRole == null)
-                {
                     throw new Exception($" {staff.SelectedRole} is invalid");
-                }
             }
+
             var staffReponse = _mapper.Map<StaffReponseDto>(createdUser);
             staffReponse.SelectedRole = staff.SelectedRole;
             return staffReponse;
-
         }
+
 
         public async Task<StaffReponseDto> UpdateStaff(StaffReponseDto staff)
         {
@@ -145,6 +158,13 @@ namespace WebAPI.Services
             return password;
         }
 
-       
+        private string GenerateVerificationToken()
+        {
+            byte[] randomBytes = RandomNumberGenerator.GetBytes(32);
+            return Base64UrlEncoder.Encode(randomBytes);
+        }
+
+
+
     }
 }
