@@ -12,5 +12,7 @@ namespace WebAPI.Services.Interfaces
         Task<StaffReponseDto> UpdateStaff(StaffReponseDto user);
 
         Task<List<StaffReponseDto>> GetStaffReponses();
+
+
     }
 }
