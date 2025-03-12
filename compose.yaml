@@ -14,6 +14,10 @@ services:
       target: final
     ports:
       - 8085:8080
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+    volumes:
+      - ./dataprotection-keys:/home/app/.aspnet/DataProtection-Keys
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to

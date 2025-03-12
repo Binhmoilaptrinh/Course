@@ -24,9 +24,10 @@ namespace WebAPI.Mappings
             CreateMap<Course, CourseClientDTO>();
           
          
-            CreateMap<Course, CourseAdminResponseDto>();
+
             CreateMap<Course, CourseDetailResponseDto>()
                 .ForMember(dest => dest.ChapterResponse, opt => opt.MapFrom(src => src.Chapters));
+
 
             CreateMap<CourseRequestDto, Course>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null)); // Skip null values when mapping
