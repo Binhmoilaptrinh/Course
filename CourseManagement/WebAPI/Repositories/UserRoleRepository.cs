@@ -6,32 +6,47 @@ namespace WebAPI.Repositories
 {
     public class UserRoleRepository : IUserRoleRepository
     {
-        private readonly ECourseContext _courseContext;
+        private readonly ECourseContext _context;
 
         public UserRoleRepository(ECourseContext courseContext)
         {
-            _courseContext = courseContext;
+            _context = courseContext;
         }
-        public async Task<UserRole> CreateAsync(UserRole userRole)
+        public async Task<IEnumerable<UserRole>> GetAllAsync()
         {
-            _courseContext.UserRoles.Add(userRole);
-            await _courseContext.SaveChangesAsync();
-            return userRole; 
+            return await _context.Set<UserRole>().ToListAsync();
         }
 
-        public async Task<bool> CheckUserRoleAsync(int roleID)
+        public async Task<UserRole> GetByIdAsync(int id)
         {
-            var check = _courseContext.Roles.Any(e => e.RoleId == roleID);
-            await _courseContext.SaveChangesAsync();
-            return check;
+            return await _context.Set<UserRole>().FindAsync(id);
         }
 
-        public async Task<UserRole> UpdateAsync(UserRole userRole)
-        {
-            _courseContext.Entry(userRole).State = EntityState.Modified;
-            await _courseContext.SaveChangesAsync();
-            return userRole;
 
+        public async Task<UserRole> AddAsync(UserRole userRole)
+        {
+            var result = await _context.Set<UserRole>().AddAsync(userRole);
+            await _context.SaveChangesAsync();
+            return result.Entity;
         }
+
+
+
+        public async Task DeleteAsync(int id)
+        {
+            var userRole = await GetByIdAsync(id);
+            if (userRole != null)
+            {
+                _context.Set<UserRole>().Remove(userRole);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> CheckUserRoleAsync(int id)
+        {
+            return await _context.Set<UserRole>().AnyAsync(ur => ur.UserRoleId == id);
+        }
+
+        
     }
 }

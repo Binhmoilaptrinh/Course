@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Models;
 
@@ -11,9 +12,11 @@ using WebAPI.Models;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(ECourseContext))]
-    partial class ECourseContextModelSnapshot : ModelSnapshot
+    [Migration("20250311023631_add_verifyEmail_User")]
+    partial class add_verifyEmail_User
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -636,12 +639,6 @@ namespace WebAPI.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("EmailVerificationExpiry")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EmailVerificationToken")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsEmailVerify")
                         .HasColumnType("bit");
 
@@ -707,9 +704,9 @@ namespace WebAPI.Migrations
             modelBuilder.Entity("WebAPI.Models.Answer", b =>
                 {
                     b.HasOne("WebAPI.Models.Question", "Question")
-                        .WithMany("Answers")
+                        .WithMany()
                         .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Question");
                 });
@@ -726,9 +723,9 @@ namespace WebAPI.Migrations
             modelBuilder.Entity("WebAPI.Models.Chapter", b =>
                 {
                     b.HasOne("WebAPI.Models.Course", "Course")
-                        .WithMany("Chapters")
+                        .WithMany()
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("WebAPI.Models.User", "Creator")
@@ -833,7 +830,7 @@ namespace WebAPI.Migrations
             modelBuilder.Entity("WebAPI.Models.Lesson", b =>
                 {
                     b.HasOne("WebAPI.Models.Chapter", "Chapter")
-                        .WithMany("Lessons")
+                        .WithMany()
                         .HasForeignKey("ChapterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -847,7 +844,7 @@ namespace WebAPI.Migrations
                     b.HasOne("WebAPI.Models.User", "Updater")
                         .WithMany()
                         .HasForeignKey("UpdateBy")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Chapter");
 
@@ -897,9 +894,9 @@ namespace WebAPI.Migrations
             modelBuilder.Entity("WebAPI.Models.Question", b =>
                 {
                     b.HasOne("WebAPI.Models.Lesson", "Lesson")
-                        .WithMany("Questions")
+                        .WithMany()
                         .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Lesson");
@@ -962,11 +959,6 @@ namespace WebAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WebAPI.Models.Chapter", b =>
-                {
-                    b.Navigation("Lessons");
-                });
-
             modelBuilder.Entity("WebAPI.Models.Comment", b =>
                 {
                     b.Navigation("ChildComments");
@@ -974,19 +966,7 @@ namespace WebAPI.Migrations
 
             modelBuilder.Entity("WebAPI.Models.Course", b =>
                 {
-                    b.Navigation("Chapters");
-
                     b.Navigation("Discounts");
-                });
-
-            modelBuilder.Entity("WebAPI.Models.Lesson", b =>
-                {
-                    b.Navigation("Questions");
-                });
-
-            modelBuilder.Entity("WebAPI.Models.Question", b =>
-                {
-                    b.Navigation("Answers");
                 });
 #pragma warning restore 612, 618
         }
