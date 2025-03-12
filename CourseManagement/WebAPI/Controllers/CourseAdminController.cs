@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.Extensions.Logging;
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
@@ -16,19 +17,18 @@ namespace WebAPI.Controllers
     public class CourseController : Controller
     {
         private readonly ICourseService _courseService;
-        private readonly IFileService _fileService;
 
-        public CourseController(ICourseService courseService, IFileService fileService)
+        public CourseController(ICourseService courseService)
         {
             _courseService = courseService;
-            _fileService = fileService;
         }
 
         [EnableQuery]
         [HttpGet]
-        public IQueryable<CourseAdminResponseDto> GetAllCourseManage()
+        public async Task<ActionResult<IQueryable<CourseAdminResponseDto>>> Get()
         {
-            return _courseService.GetAllCourse();
+            var courses = await _courseService.GetAllCourse();
+            return Ok(courses);
         }
 
         [HttpPost]
@@ -47,7 +47,7 @@ namespace WebAPI.Controllers
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CourseAdminResponseDto>> GetCourse(int id)
+        public async Task<ActionResult<CourseDetailResponseDto>> GetCourseDetail(int id)
         {
             var courses = await _courseService.GetCourseByIdAsync(id);
             return Ok(courses);

@@ -59,5 +59,19 @@ namespace WebAPI.Repositories
                 .Include(ur => ur.User)  // Lấy thông tin từ bảng User
                 .ToListAsync();
         }
+
+        public async Task<User?> GetUserByVerificationTokenAsync(string token)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.EmailVerificationToken == token);
+        }
+
+
+        public async Task<List<UserRole>> GetUserRolesAsync(int userId)
+        {
+            return await _context.UserRoles
+                .Where(u => u.UserId == userId) 
+                .ToListAsync();
+        }
+
     }
 }

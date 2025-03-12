@@ -85,14 +85,14 @@ namespace WebAPI.Services
             return _mapper.Map<IEnumerable<LessonResponseAdmin>>(lessons);
         }
 
-        public async Task<LessonResponseAdmin> GetLessonByIdAsync(int id)
+        public async Task<LessonDetailResponseAdmin> GetLessonByIdAsync(int id)
         {
             var lesson = await _lessonRepository.GetByIdAsync(id);
             if (lesson == null)
             {
                 throw new Exception("Not found");
             }
-            return _mapper.Map<LessonResponseAdmin>(lesson);
+            return _mapper.Map<LessonDetailResponseAdmin>(lesson);
         }
     }
 }

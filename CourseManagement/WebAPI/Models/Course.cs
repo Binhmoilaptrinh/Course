@@ -36,5 +36,6 @@ namespace WebAPI.Models
         // Add this property for the one-to-many relationship
         public ICollection<Discount> Discounts { get; set; } = new List<Discount>();
 
+        public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();
     }
 }
