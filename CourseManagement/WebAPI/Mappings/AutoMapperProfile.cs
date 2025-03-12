@@ -23,18 +23,18 @@ namespace WebAPI.Mappings
             CreateMap<Category, CategoryResponse>();
             CreateMap<Course, CourseClientDTO>();
           
-           
          
-            CreateMap<Course, CourseAdminResponseDto>()
-                .ForMember(dest => dest.categoryResponse, opt => opt.MapFrom(src => src.Category));
-            
+            CreateMap<Course, CourseAdminResponseDto>();
+            CreateMap<Course, CourseDetailResponseDto>()
+                .ForMember(dest => dest.ChapterResponse, opt => opt.MapFrom(src => src.Chapters));
 
             CreateMap<CourseRequestDto, Course>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null)); // Skip null values when mapping
 
             CreateMap<ChapterRequestDto, Chapter>();
             CreateMap<Chapter, ChapterResponse>();
-
+            CreateMap<Chapter, ChapterDetailResponse>()
+               .ForMember(dest => dest.LessonResponse, opt => opt.MapFrom(src => src.Lessons));
 
             CreateMap<LessonQuizzRequestDto, Lesson>();
 
@@ -44,6 +44,8 @@ namespace WebAPI.Mappings
                 .ForMember(dest => dest.QuestionResponse, opt => opt.MapFrom(src => src.Questions));
 
             CreateMap<Lesson, LessonVideoResponseAdmin>();
+            CreateMap<Lesson, LessonDetailResponseAdmin>()
+                .ForMember(dest => dest.QuestionResponse, opt => opt.MapFrom(src => src.Questions));
 
             CreateMap<QuestionRequestDto, Question>();
             CreateMap<Question, QuestionResponse>()
@@ -53,8 +55,8 @@ namespace WebAPI.Mappings
             CreateMap<AnswerRequestDto, Answer>();
             CreateMap<Answer, AnswerResponse>();
 
-            CreateMap<Lesson, LessonResponseAdmin>()
-               .ForMember(dest => dest.QuestionResponse, opt => opt.MapFrom(src => src.Questions));
+            CreateMap<Lesson, LessonResponseAdmin>();
+              
         }
     }
 }

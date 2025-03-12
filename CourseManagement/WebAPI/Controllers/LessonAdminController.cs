@@ -34,14 +34,14 @@ namespace WebAPI.Controllers
 
         [EnableQuery]
         [HttpGet]
-        public async Task<ActionResult<LessonResponseAdmin>> GetAllLesson()
+        public async Task<ActionResult<LessonResponseAdmin>> Get()
         {
             var lessons = await _lessonService.GetAllLessonAsync();
             return Ok(lessons);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<LessonResponseAdmin>> GetLessonDetail(int id)
+        public async Task<ActionResult<LessonDetailResponseAdmin>> GetLessonDetail(int id)
         {
             var lesson = await _lessonService.GetLessonByIdAsync(id);
             return Ok(lesson);

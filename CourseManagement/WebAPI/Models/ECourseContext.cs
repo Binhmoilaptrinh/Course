@@ -76,6 +76,8 @@ namespace WebAPI.Models
                 .HasForeignKey(c => c.UpdateBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
+
+
             modelBuilder.Entity<Course>()
                 .Property(c => c.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
@@ -118,6 +120,11 @@ namespace WebAPI.Models
                 .Property(c => c.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
 
+            modelBuilder.Entity<Chapter>()
+               .HasOne(c => c.Course)
+               .WithMany(q => q.Chapters)
+               .HasForeignKey(c => c.CourseId)
+               .OnDelete(DeleteBehavior.Cascade);
             //Lessons
             modelBuilder.Entity<Lesson>()
                 .HasKey(c => c.Id);

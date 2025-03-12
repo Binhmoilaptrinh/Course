@@ -39,10 +39,9 @@ namespace WebAPI.Repositories
         //    var courses = await _context.Courses.Include(x => x.Category).ToListAsync();
         //    return courses;
         //}
-        public IQueryable<Course> GetAll()
+        public async Task<IEnumerable<Course>> GetAllAsync()
         {
-            var courses = _context.Courses.Include(x => x.Category);
-            return courses;
+            return await _context.Courses.Include(x => x.Category).ToListAsync();
         }
 
 
@@ -50,6 +49,8 @@ namespace WebAPI.Repositories
         {
             return await _context.Courses
                 .Include(x => x.Category)
+                .Include(x => x.Chapters)
+                .ThenInclude(x => x.Lessons)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
