@@ -28,10 +28,10 @@ namespace WebAPI.Services
             _categoryService = categoryService;
         }
 
-        public IQueryable<CourseAdminResponseDto> GetAllCourse()
+        public async Task<IQueryable<CourseAdminResponseDto>> GetAllCourse()
         {
-            var courses = _courseRepository.GetAll();
-            return courses.ProjectTo<CourseAdminResponseDto>(_mapper.ConfigurationProvider);
+            var courses = await _courseRepository.GetAllAsync();
+            return courses.AsQueryable().ProjectTo<CourseAdminResponseDto>(_mapper.ConfigurationProvider);
         }
 
         public async Task<CourseAdminResponseDto> CreateCourseAsync(CourseRequestDto request)
@@ -104,14 +104,14 @@ namespace WebAPI.Services
             await _courseRepository.DeleteAsync(id);
         }
 
-        public async Task<CourseAdminResponseDto> GetCourseByIdAsync(int id)
+        public async Task<CourseDetailResponseDto> GetCourseByIdAsync(int id)
         {
             var course = await _courseRepository.GetByIdAsync(id);
             if (course == null)
             {
                 throw new Exception($"Course with Id {id} not found");
             }
-            return _mapper.Map<CourseAdminResponseDto>(course);
+            return _mapper.Map<CourseDetailResponseDto>(course);
         }
 
         

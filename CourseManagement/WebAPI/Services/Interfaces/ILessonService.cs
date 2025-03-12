@@ -10,6 +10,6 @@ namespace WebAPI.Services.Interfaces
 
         Task<LessonQuizzResponseAdmin> CreateLessonQuizzAsync(LessonQuizzRequestDto request);
         Task<IEnumerable<LessonResponseAdmin>> GetAllLessonAsync();
-        Task<LessonResponseAdmin> GetLessonByIdAsync(int id);
+        Task<LessonDetailResponseAdmin> GetLessonByIdAsync(int id);
     }
 }

@@ -13,14 +13,15 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
 using WebAPI.Models;
 using WebAPI.Utilities;
+using WebAPI.DTOS.response;
 
 
 var builder = WebApplication.CreateBuilder(args);
 //odata
 var modelBuilder = new ODataConventionModelBuilder();
-modelBuilder.EntitySet<Lesson>("Lesson");
+modelBuilder.EntitySet<LessonResponseAdmin>("Lesson");
 modelBuilder.EntitySet<Chapter>("Chapter");
-modelBuilder.EntitySet<Course>("Course");
+modelBuilder.EntitySet<CourseAdminResponseDto>("Course");
 builder.Services.AddControllers().AddOData(
     options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
     .AddRouteComponents(
