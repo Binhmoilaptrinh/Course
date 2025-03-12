@@ -64,6 +64,7 @@ builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IChapterService, ChapterServiceImpl>();
 builder.Services.AddScoped<ICourseClientService, CourseClientService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IEnrollmentAdminService, EnrollmentAdminService>();
 // Đăng ký IFileService với Transient Lifetime
 builder.Services.AddTransient<IFileService, FileService>();
 
