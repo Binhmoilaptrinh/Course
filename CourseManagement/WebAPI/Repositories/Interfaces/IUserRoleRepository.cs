@@ -8,7 +8,7 @@ namespace WebAPI.Repositories.Interfaces
         Task<UserRole> GetByIdAsync(int id);
         Task<UserRole> AddAsync(UserRole userRole);
         Task DeleteAsync(int id);
-        Task<bool> CheckUserRoleAsync(int id);
+        Task<bool> CheckUserRoleAsync(int roleID, int userID);
     }
 
 }

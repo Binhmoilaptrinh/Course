@@ -10,36 +10,34 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StaffController : ControllerBase
+    public class UserController : ControllerBase
     {
-        private readonly IStaffService _staffService;
         private readonly IUserService _userService;
 
-        public StaffController(IUserService userService, IStaffService staffService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _staffService = staffService;
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllStaff()
+        public async Task<IActionResult> GetAllUser()
         {
-            var staffList = await _staffService.GetStaffReponses();
+            var staffList = await _userService.GetUserReponses();
             return Ok(staffList);
         }
 
         [HttpPost("add")]
         
-        public async Task<IActionResult> AddStaff([FromBody] StaffRequestDto staffDto)
+        public async Task<IActionResult> AddStaff([FromBody] UserRequestDto userDTO)
         {
-            if (staffDto == null)
+            if (userDTO == null)
             {
-                return BadRequest("Staff data is required");
+                return BadRequest("User data is required");
             }
 
             try
             {
-                var result = await _staffService.AddStaff(staffDto);
+                var result = await _userService.AddUser(userDTO);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -49,16 +47,16 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("update")]
-        public async Task<IActionResult> UpdateStaff([FromBody] StaffReponseDto staffDto)
+        public async Task<IActionResult> UpdateUser([FromBody] UserReponseDto userDTO)
         {
-            if (staffDto == null)
+            if (userDTO == null)
             {
                 return BadRequest("Staff data is required");
             }
 
             try
             {
-                var result = await _staffService.UpdateStaff(staffDto);
+                var result = await _userService.UpdateUser(userDTO);
                 return Ok(result);
             }
             catch (Exception ex)
