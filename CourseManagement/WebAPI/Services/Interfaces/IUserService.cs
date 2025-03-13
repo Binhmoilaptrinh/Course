@@ -1,4 +1,5 @@
-﻿using WebAPI.DTOS.response;
+﻿using WebAPI.DTOS.request;
+using WebAPI.DTOS.response;
 using WebAPI.Models;
 
 namespace WebAPI.Services.Interfaces
@@ -7,5 +8,11 @@ namespace WebAPI.Services.Interfaces
     {
         Task<User> GetUserByIdAsync(int id);
         Task<bool> VerifyEmailAsync(string token);
+
+        Task<UserReponseDto> AddUser(UserRequestDto user);
+
+        Task<UserReponseDto> UpdateUser(UserReponseDto user);
+
+        Task<List<UserReponseDto>> GetUserReponses();
     }
 }

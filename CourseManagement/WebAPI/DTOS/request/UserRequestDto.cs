@@ -3,7 +3,7 @@ using WebAPI.DTOS.Authentication;
 
 namespace WebAPI.DTOS.request
 {
-    public class StaffRequestDto
+    public class UserRequestDto
     {
 
         [Required(ErrorMessage = "Username is required")]

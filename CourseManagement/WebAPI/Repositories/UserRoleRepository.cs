@@ -42,9 +42,9 @@ namespace WebAPI.Repositories
             }
         }
 
-        public async Task<bool> CheckUserRoleAsync(int id)
+        public async Task<bool> CheckUserRoleAsync(int roleId, int userID)
         {
-            return await _context.Set<UserRole>().AnyAsync(ur => ur.UserRoleId == id);
+            return await _context.Set<UserRole>().AnyAsync(ur => ur.RoleId == roleId && ur.UserId == userID);
         }
 
         

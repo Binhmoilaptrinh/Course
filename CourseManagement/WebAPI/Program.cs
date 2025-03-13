@@ -77,7 +77,6 @@ builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.Configure<SendEmail>(builder.Configuration.GetSection("SendEmail"));
 builder.Services.AddScoped<ISendEmail, SendEmailService>();
 builder.Services.AddScoped<ICustomAuthorizationService, CustomAuthorizationService>();
-builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<PaymentHelper>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
