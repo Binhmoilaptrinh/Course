@@ -1,7 +1,10 @@
 ﻿@page
 @model WebApp.Pages.Homepage.IndexModel
 @{
+    ViewData["Title"] = "Home page";
+    Layout = "_Layout";
 }
+
 <div id="banner" class="container">
     <div class="swiper mySwiper">
         <div class="swiper-wrapper">
@@ -76,48 +79,46 @@
             <a href="/Homepage/ViewAllCourse"><button class="popular-button">View All Courses</button></a>
         </div>
         <div class="courses-container">
-            @* @if (Model.ProCourses != null && Model.ProCourses.Any()) *@
-            @* { *@
-            @if (1==1)
+            @if (Model.ProCourses != null && Model.ProCourses.Any())
             {
-                @* foreach (var course in Model.ProCourses) *@
-                @* { *@
-                    <a class="courses-item" href="/Homepage/CourseDetail/">
+                foreach (var course in Model.ProCourses)
+                {
+                    <a class="courses-item" href="/Homepage/CourseDetail/@course.Id">
                         <div class="courses-item__link">
-                            <img src="" alt="" />
+                            <img src="@course.Thumbnail" alt="@course.Title" />
                             <div class="actionHover">
                                 <button class="courses-item__btn">Xem khóa học</button>
                             </div>
                         </div>
                         <div class="course-info">
-                            <span class="course-info__type"></span>
-                            <h3 class="course-info__name"></h3>
+                            <span class="course-info__type">@course.Category</span>
+                            <h3 class="course-info__name">@course.Title</h3>
                             <div class="course-count">
                                 <div class="student-count">
                                     <i class="fa-regular fa-user"></i>
-                                    <span></span> <!-- Replace with dynamic data if available -->
+                                    <span>@course.Enrollments</span> <!-- Replace with dynamic data if available -->
                                 </div>
                                 <div class="star-count">
                                     <i class="fa-solid fa-book"></i>
-                                    <span></span> <!-- Dynamic lesson count -->
+                                    <span>@course.Lessons</span> <!-- Dynamic lesson count -->
                                 </div>
                                 <div class="price-count">
                                     <i class="fa-solid fa-dollar-sign"></i>
                                     <span>
-                                        @if (1==1)
+                                        @if (course.Price == 0)
                                         {
                                             <text>Miễn phí</text>
                                         }
                                         else
                                         {
-                                            //@course.Price.ToString("#,##0")
+                                            @course.Price.ToString("#,##0")
                                         }
                                     </span>
                                 </div>
                             </div>
                         </div>
                     </a>
-                @* } *@
+                }
             }
             else
             {
@@ -126,116 +127,116 @@
         </div>
         <button class="popular-btn__more">More Course</button>
     </div>
-    <div class="popular-courses">
-        <h2 class="courses-title">Popular courses for you</h2>
-        <div class="popular-header">
-            <p class="popular-des">Get the best course with the best price with world-class tutor</p>
-            <button class="popular-button">View All Courses</button>
-        </div>
-        @* <div class="courses-container"> *@
-        @*     @if (Model.Courses != null && Model.Courses.Any()) *@
-        @*     { *@
-        @*         foreach (var course in Model.Courses) *@
-        @*         { *@
-        @*             <a class="courses-item" href="/Homepage/CourseDetail/@course.Id"> *@
-        @*                 <div class="courses-item__link"> *@
-        @*                     <img src="@course.Thumbnail" alt="@course.Title" /> *@
-        @*                     <div class="actionHover"> *@
-        @*                         <button class="courses-item__btn">Xem khóa học</button> *@
-        @*                     </div> *@
-        @*                 </div> *@
-        @*                 <div class="course-info"> *@
-        @*                     <span class="course-info__type">@course.Category</span> *@
-        @*                     <h3 class="course-info__name">@course.Title</h3> *@
-        @*                     <div class="course-count"> *@
-        @*                         <div class="student-count"> *@
-        @*                             <i class="fa-regular fa-user"></i> *@
-        @*                             <span>@course.Enrollments</span> <!-- Replace with dynamic data if available --> *@
-        @*                         </div> *@
-        @*                         <div class="star-count"> *@
-        @*                             <i class="fa-solid fa-book"></i> *@
-        @*                             <span>@course.Lessons</span> <!-- Dynamic lesson count --> *@
-        @*                         </div> *@
-        @*                         <div class="price-count"> *@
-        @*                             <i class="fa-solid fa-dollar-sign"></i> *@
-        @*                             <span> *@
-        @*                                 @if (course.Price == 0) *@
-        @*                                 { *@
-        @*                                     <text>Miễn phí</text> *@
-        @*                                 } *@
-        @*                                 else *@
-        @*                                 { *@
-        @*                                     @course.Price.ToString("#,##0") *@
-        @*                                 } *@
-        @*                             </span> *@
-        @*                         </div> *@
-        @*                     </div> *@
-        @*                 </div> *@
-        @*             </a> *@
-        @*         } *@
-        @*     } *@
-        @*     else *@
-        @*     { *@
-        @*         <p>No courses available at this time.</p> *@
-        @*     } *@
-        @* </div> *@
-        <button class="popular-btn__more">More Course</button>
-    </div>
-    <div class="popular-courses">
-        <h2 class="courses-title">Popular courses for you</h2>
-        <div class="popular-header">
-            <p class="popular-des">Get the best course with the best price with world-class tutor</p>
-            <button class="popular-button">View All Courses</button>
-        </div>
-        @* <div class="courses-container"> *@
-        @*     @if (Model.CoursesTrend != null && Model.CoursesTrend.Any()) *@
-        @*     { *@
-        @*         foreach (var course in Model.CoursesTrend) *@
-        @*         { *@
-        @*             <a class="courses-item" href="/Homepage/CourseDetail/@course.Id"> *@
-        @*                 <div class="courses-item__link"> *@
-        @*                     <img src="@course.Thumbnail" alt="@course.Title" /> *@
-        @*                     <div class="actionHover"> *@
-        @*                         <button class="courses-item__btn">Xem khóa học</button> *@
-        @*                     </div> *@
-        @*                 </div> *@
-        @*                 <div class="course-info"> *@
-        @*                     <span class="course-info__type">@course.Category</span> *@
-        @*                     <h3 class="course-info__name">@course.Title</h3> *@
-        @*                     <div class="course-count"> *@
-        @*                         <div class="student-count"> *@
-        @*                             <i class="fa-regular fa-user"></i> *@
-        @*                             <span>@course.Enrollments</span> <!-- Replace with dynamic data if available --> *@
-        @*                         </div> *@
-        @*                         <div class="star-count"> *@
-        @*                             <i class="fa-solid fa-book"></i> *@
-        @*                             <span>@course.Lessons</span> <!-- Dynamic lesson count --> *@
-        @*                         </div> *@
-        @*                         <div class="price-count"> *@
-        @*                             <i class="fa-solid fa-dollar-sign"></i> *@
-        @*                             <span> *@
-        @*                                 @if (course.Price == 0) *@
-        @*                                 { *@
-        @*                                     <text>Miễn phí</text> *@
-        @*                                 } *@
-        @*                                 else *@
-        @*                                 { *@
-        @*                                     @course.Price.ToString("#,##0") *@
-        @*                                 } *@
-        @*                             </span> *@
-        @*                         </div> *@
-        @*                     </div> *@
-        @*                 </div> *@
-        @*             </a> *@
-        @*         } *@
-        @*     } *@
-        @*     else *@
-        @*     { *@
-        @*         <p>No courses available at this time.</p> *@
-        @*     } *@
-        @* </div> *@
-        <button class="popular-btn__more">More Course</button>
-    </div>
+    @* <div class="popular-courses"> *@
+    @*     <h2 class="courses-title">Popular courses for you</h2> *@
+    @*     <div class="popular-header"> *@
+    @*         <p class="popular-des">Get the best course with the best price with world-class tutor</p> *@
+    @*         <button class="popular-button">View All Courses</button> *@
+    @*     </div> *@
+    @*     <div class="courses-container"> *@
+    @*         @if (Model.Courses != null && Model.Courses.Any()) *@
+    @*         { *@
+    @*             foreach (var course in Model.Courses) *@
+    @*             { *@
+    @*                 <a class="courses-item" href="/Homepage/CourseDetail/@course.Id"> *@
+    @*                     <div class="courses-item__link"> *@
+    @*                         <img src="@course.Thumbnail" alt="@course.Title" /> *@
+    @*                         <div class="actionHover"> *@
+    @*                             <button class="courses-item__btn">Xem khóa học</button> *@
+    @*                         </div> *@
+    @*                     </div> *@
+    @*                     <div class="course-info"> *@
+    @*                         <span class="course-info__type">@course.Category</span> *@
+    @*                         <h3 class="course-info__name">@course.Title</h3> *@
+    @*                         <div class="course-count"> *@
+    @*                             <div class="student-count"> *@
+    @*                                 <i class="fa-regular fa-user"></i> *@
+    @*                                 <span>@course.Enrollments</span> <!-- Replace with dynamic data if available --> *@
+    @*                             </div> *@
+    @*                             <div class="star-count"> *@
+    @*                                 <i class="fa-solid fa-book"></i> *@
+    @*                                 <span>@course.Lessons</span> <!-- Dynamic lesson count --> *@
+    @*                             </div> *@
+    @*                             <div class="price-count"> *@
+    @*                                 <i class="fa-solid fa-dollar-sign"></i> *@
+    @*                                 <span> *@
+    @*                                     @if (course.Price == 0) *@
+    @*                                     { *@
+    @*                                         <text>Miễn phí</text> *@
+    @*                                     } *@
+    @*                                     else *@
+    @*                                     { *@
+    @*                                         @course.Price.ToString("#,##0") *@
+    @*                                     } *@
+    @*                                 </span> *@
+    @*                             </div> *@
+    @*                         </div> *@
+    @*                     </div> *@
+    @*                 </a> *@
+    @*             } *@
+    @*         } *@
+    @*         else *@
+    @*         { *@
+    @*             <p>No courses available at this time.</p> *@
+    @*         } *@
+    @*     </div> *@
+    @*     <button class="popular-btn__more">More Course</button> *@
+    @* </div> *@
+    @* <div class="popular-courses"> *@
+    @*     <h2 class="courses-title">Popular courses for you</h2> *@
+    @*     <div class="popular-header"> *@
+    @*         <p class="popular-des">Get the best course with the best price with world-class tutor</p> *@
+    @*         <button class="popular-button">View All Courses</button> *@
+    @*     </div> *@
+    @*     <div class="courses-container"> *@
+    @*         @if (Model.CoursesTrend != null && Model.CoursesTrend.Any()) *@
+    @*         { *@
+    @*             foreach (var course in Model.CoursesTrend) *@
+    @*             { *@
+    @*                 <a class="courses-item" href="/Homepage/CourseDetail/@course.Id"> *@
+    @*                     <div class="courses-item__link"> *@
+    @*                         <img src="@course.Thumbnail" alt="@course.Title" /> *@
+    @*                         <div class="actionHover"> *@
+    @*                             <button class="courses-item__btn">Xem khóa học</button> *@
+    @*                         </div> *@
+    @*                     </div> *@
+    @*                     <div class="course-info"> *@
+    @*                         <span class="course-info__type">@course.Category</span> *@
+    @*                         <h3 class="course-info__name">@course.Title</h3> *@
+    @*                         <div class="course-count"> *@
+    @*                             <div class="student-count"> *@
+    @*                                 <i class="fa-regular fa-user"></i> *@
+    @*                                 <span>@course.Enrollments</span> <!-- Replace with dynamic data if available --> *@
+    @*                             </div> *@
+    @*                             <div class="star-count"> *@
+    @*                                 <i class="fa-solid fa-book"></i> *@
+    @*                                 <span>@course.Lessons</span> <!-- Dynamic lesson count --> *@
+    @*                             </div> *@
+    @*                             <div class="price-count"> *@
+    @*                                 <i class="fa-solid fa-dollar-sign"></i> *@
+    @*                                 <span> *@
+    @*                                     @if (course.Price == 0) *@
+    @*                                     { *@
+    @*                                         <text>Miễn phí</text> *@
+    @*                                     } *@
+    @*                                     else *@
+    @*                                     { *@
+    @*                                         @course.Price.ToString("#,##0") *@
+    @*                                     } *@
+    @*                                 </span> *@
+    @*                             </div> *@
+    @*                         </div> *@
+    @*                     </div> *@
+    @*                 </a> *@
+    @*             } *@
+    @*         } *@
+    @*         else *@
+    @*         { *@
+    @*             <p>No courses available at this time.</p> *@
+    @*         } *@
+    @*     </div> *@
+    @*     <button class="popular-btn__more">More Course</button> *@
+    @* </div> *@
 
     <div class="comments">
         <div class="comment__header">
