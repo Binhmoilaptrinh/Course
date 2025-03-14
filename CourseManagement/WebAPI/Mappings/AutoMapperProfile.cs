@@ -2,7 +2,6 @@
 using WebAPI.DTOS.response;
 using WebAPI.DTOS.request;
 using WebAPI.Models;
-//using WebAPI.DTOS.reponse;
 
 namespace WebAPI.Mappings
 {
@@ -13,9 +12,9 @@ namespace WebAPI.Mappings
 
             CreateMap<Course, CourseAdminResponseDto>();
 
-            CreateMap<StaffRequestDto, User>();
-            CreateMap<User, StaffReponseDto>(); // Fixed naming inconsistency
-            CreateMap<StaffReponseDto, User>();
+            CreateMap<UserRequestDto, User>();
+            CreateMap<User, UserReponseDto>(); // Fixed naming inconsistency
+            CreateMap<UserReponseDto, User>();
             CreateMap<UserRoleRequest, UserRole>();
             CreateMap<UserRole, UserRoleResponseDto>();
             CreateMap<DiscountRequestDto, Discount>();

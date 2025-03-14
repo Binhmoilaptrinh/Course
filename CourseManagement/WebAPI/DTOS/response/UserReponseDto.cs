@@ -2,7 +2,7 @@
 
 namespace WebAPI.DTOS.response
 {
-    public class StaffReponseDto
+    public class UserReponseDto
     {
         public int UserId { get; set; }
 
