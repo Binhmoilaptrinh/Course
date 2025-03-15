@@ -19,6 +19,18 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapRazorPages();
+
+    // Redirect root URL ("/") to "/homepage/index"
+    endpoints.MapGet("/", async context =>
+    {
+        context.Response.Redirect("/Homepage/Index");
+    });
+});
+
 
 app.UseAuthorization();
 
