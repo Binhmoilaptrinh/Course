@@ -9,5 +9,7 @@ namespace WebAPI.Services.Interfaces
         public Task<IEnumerable<CourseClientDTO>> GetCourseListHomePageFree();
 
         public Task<IEnumerable<CourseClientDTO>> GetProCourses();
+
+        public Task<CourseDetailResponse> GetCourseDetailHomepage(int id);
     }
 }

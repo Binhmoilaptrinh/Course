@@ -54,6 +54,24 @@ namespace WebAPI.Controllers
 
             return Ok(courses);
         }
+        [HttpGet("GetCourseDetail")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CourseClientDTO>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [SwaggerOperation(
+        Summary = "Lấy danh sách khóa học pro",
+        Description = "Trả về danh sách tối đa 8 khóa học pro"
+        )]
+        public async Task<ActionResult<CourseDetailResponse>> GetCourseDetail(int id)
+        {
+            var courses = await _courseClientService.GetCourseDetailHomepage(id);
+
+            if (courses == null)
+            {
+                return NotFound("No courses found!"); // Trả về HTTP 404 nếu không có dữ liệu
+            }
+
+            return Ok(courses);
+        }
 
     }
 }

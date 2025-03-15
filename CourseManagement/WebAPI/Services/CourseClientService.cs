@@ -18,6 +18,36 @@ namespace WebAPI.Services
             _mapper = mapper;
             _context = context;
         }
+
+        public async Task<CourseDetailResponse> GetCourseDetailHomepage(int id)
+        {
+            var courseDetail = await _context.Courses.Select(c => new CourseDetailResponse
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Price = c.Price,
+                Duration = _context.Lessons
+                        .Where(l => l.Chapter.CourseId == id && l.Duration.HasValue)
+                        .Sum(l => l.Duration.Value),
+                LessonsCount = _context.Lessons.Where(l => l.Chapter.CourseId == id).Count(),
+                ChaptersCount = _context.Chapters.Where(c => c.CourseId == id).Count(),
+                Chapters = _context.Chapters.Where(c => c.CourseId == id).Select(ch => new ChapterDetailPage
+                {
+                    Id = ch.Id,
+                    Name = ch.Name,
+                    LessonsCount = _context.Lessons.Where(l => l.ChapterId == ch.Id).Count(),
+                    LessonDetail = _context.Lessons.Where(l => l.ChapterId == ch.Id).Select(a => new LessonDetail
+                    {
+                        Id = a.Id,
+                        Name = a.Name,
+                        Type = a.Type,
+                        Duration = a.Duration
+                    }).ToList()
+                }).ToList()
+            }).FirstOrDefaultAsync(x=>x.Id == id);
+            return courseDetail;
+        }
+
         //public async Task<IEnumerable<CourseClientDTO>> GetCourseListHomePageFree123()
         //{
         //    var courses = await _context.Courses.ToListAsync();
