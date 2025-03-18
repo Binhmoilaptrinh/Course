@@ -140,21 +140,9 @@
                 <span>@Model.CourseDetail.Price.ToString("#,##0")₫</span>
             }
         </h5>
-        @* @if (Model.HasAccess == 1) *@
-        @* { *@
-        @*     <!-- If the user has access, redirect them to the learning page --> *@
-        @*     <a class="course__preview-learn btn" asp-page="/Homepage/LearningCourse" asp-route-courseId="@Model.CourseDetail.Id" *@
-        @*        asp-route-lessonId="@Model.LessonId">Bắt đầu học</a> *@
-        @* } *@
-        @* else if (Model.HasAccess == 0) *@
-        @* { *@
-        @*     <!-- If the user doesn't have access, direct them to the payment page --> *@
-        @*     <a class="course__preview-learn btn" asp-page="/Homepage/PaymentConfirm" asp-route-id="@Model.CourseDetail?.Id">Đăng ký học</a> *@
-        @* } *@
-        @* else *@
-        @* { *@
-        @*     <a class="course__preview-learn btn" asp-page="/Homepage/PaymentConfirm" asp-route-id="@Model.CourseDetail?.Id">Đăng ký học lại</a> *@
-        @* } *@
+        <div id="accessButton">
+            <!-- Nút sẽ được AJAX cập nhật tại đây -->
+        </div>
          <ul> 
              <li> 
                 <i class="fa-solid fa-bars-progress"></i> 
@@ -186,6 +174,7 @@
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function showPreviewCourse() {
         let courseVideoLayer = document.querySelector('.preview__course')
@@ -200,7 +189,7 @@
         courseImgLayer.addEventListener('click', () => {
             courseVideoPre.style.display = 'block'
             courseVideoWrapp.innerHTML = `<video class="preview__course-video-play" width="560" height="315" controls autoplay>
-                                @* <source src="@Model.CourseDetail.PreviewVideo" type="video/mp4"> *@
+                                 <source src="@Model.CourseDetail.PreviewVideo" type="video/mp4"> 
                             </video>`
         })
         closeVideoPre.addEventListener('click', () => {
@@ -259,4 +248,62 @@
         }
     }
     showLessonInCurr()
+</script>
+<script>
+    $(document).ready(function () {
+        var userInfo = localStorage.getItem("userInfo");
+        if (!userInfo) {
+            // Nếu không có userInfo, hiển thị nút đăng nhập
+            $("#accessButton").html(`
+                <a class="course__preview-learn btn" href="/Authentication/Login">
+                    Đăng ký học
+                </a>
+            `);
+            return;
+        }
+        var userId = 0; // Mặc định là 0 nếu không tìm thấy userInfo
+
+        if (userInfo) {
+            try {
+                userId = JSON.parse(userInfo).userId || 0; // Lấy userId, nếu không có thì vẫn là 0
+            } catch (e) {
+                console.error("Lỗi khi đọc userInfo từ Local Storage:", e);
+            }
+        }
+
+        var courseId = @Model.CourseDetail?.Id;
+
+        $.ajax({
+            url: "https://api.2handshop.id.vn/api/Enrollment/CheckStatus",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ userId: userId, courseId: courseId }),
+            success: function (response) {
+                var hasAccess = response; // Dữ liệu trả về từ API
+                    
+                var buttonHtml = "";
+                if (hasAccess === 1) {
+                    buttonHtml = `<a class="course__preview-learn btn"
+                                        href="/Homepage/LearningCourse?courseId=${courseId}">
+                                        Bắt đầu học
+                                      </a>`;
+                } else if (hasAccess === 0) {
+                    buttonHtml = `<a class="course__preview-learn btn"
+                                        href="/Homepage/PaymentConfirm?id=${courseId}">
+                                        Đăng ký học
+                                      </a>`;
+                } else {
+                    buttonHtml = `<a class="course__preview-learn btn"
+                                        href="/Homepage/PaymentConfirm?id=${courseId}">
+                                        Đăng ký học lại
+                                      </a>`;
+                }
+
+                $("#accessButton").html(buttonHtml);
+            },
+            error: function () {
+                console.error("Lỗi khi kiểm tra quyền truy cập.");
+            }
+        });
+    });
 </script>

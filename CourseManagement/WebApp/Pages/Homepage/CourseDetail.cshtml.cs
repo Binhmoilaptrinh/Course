@@ -16,6 +16,7 @@ namespace WebApp.Pages.Homepage
         }
 
         public CourseDetailResponse CourseDetail { get; set; }
+        public int HasAccess { get; set; }
         public async Task<IActionResult> OnGetAsync(int id)
         {
             if (id <= 0)
