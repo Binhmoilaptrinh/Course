@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebAPI.DTOS.response;
 using WebAPI.Models;
 using WebAPI.Repositories.Interfaces;
 
@@ -47,6 +48,31 @@ namespace WebAPI.Repositories
             return await _context.Set<UserRole>().AnyAsync(ur => ur.RoleId == roleId && ur.UserId == userID);
         }
 
-        
+        public async Task<LoginResponseDto?> GetLoginUserById(int Id)
+        {
+            var u = await _context.Set<UserRole>()
+                                  .Include(ur => ur.Role)
+                                  .Include(ur => ur.User)
+                                  .FirstOrDefaultAsync(ur => ur.UserId == Id);
+
+            // Kiểm tra nếu u là null
+            if (u == null)
+            {
+                return null; // hoặc throw Exception nếu muốn xử lý lỗi
+            }
+
+            // Khởi tạo đúng cách
+            LoginResponseDto loginDto = new LoginResponseDto
+            {
+                UserId = u.UserId,
+                UserName = u.User.Username,
+                Email = u.User.Email,
+                RoleId = u.RoleId,
+                RoleName = u.Role.RoleName
+            };
+
+            return loginDto;
+        }
+
     }
 }

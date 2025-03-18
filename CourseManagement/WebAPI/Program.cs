@@ -17,18 +17,20 @@ using WebAPI.Services;
 using WebAPI.Services.Interfaces;
 using WebAPI.DTOS;
 
-var builder = WebApplication.CreateBuilder(args);
-//odata
-var modelBuilder = new ODataConventionModelBuilder();
-modelBuilder.EntitySet<LessonResponseAdmin>("Lesson");
-modelBuilder.EntitySet<Chapter>("Chapter");
-modelBuilder.EntitySet<CourseAdminResponseDto>("Course");
-builder.Services.AddControllers().AddOData(
-    options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
-    .AddRouteComponents(
-    "odata",
-        modelBuilder.GetEdmModel())
-);
+    var builder = WebApplication.CreateBuilder(args);
+    //odata
+    var modelBuilder = new ODataConventionModelBuilder();
+    modelBuilder.EntitySet<LessonResponseAdmin>("Lesson");
+    modelBuilder.EntitySet<Chapter>("Chapter");
+    modelBuilder.EntitySet<CourseAdminResponseDto>("Course");
+    modelBuilder.EntitySet<UserReponseDto>("User");
+
+    builder.Services.AddControllers().AddOData(
+        options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
+        .AddRouteComponents(
+        "odata",
+            modelBuilder.GetEdmModel())
+    );
 
 // 🛠 Inject IConfiguration
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);

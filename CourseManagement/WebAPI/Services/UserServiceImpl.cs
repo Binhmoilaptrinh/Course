@@ -120,10 +120,20 @@ namespace WebAPI.Services
             return staffResponse;
         }
 
-        public Task<User> GetUserByIdAsync(int id)
+        public async Task<UserReponseDto> GetUserByIdAsync(int id)
         {
-            return _userRepository.GetAsync(id);
+            var user = await _userRepository.GetAsync(id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            // Ánh xạ entity User sang DTO
+            var userResponse = _mapper.Map<UserReponseDto>(user);
+            return userResponse;
         }
+
 
         public async Task<List<UserReponseDto>> GetUserReponses()
         {
@@ -181,5 +191,14 @@ namespace WebAPI.Services
             return Base64UrlEncoder.Encode(randomBytes);
         }
 
+        Task<User> IUserService.GetUserByIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserReponseDto> GetUserResponseByIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

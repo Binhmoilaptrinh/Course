@@ -1,0 +1,71 @@
+﻿@page "{id}"
+@model WebApp.Pages.Admin.User.UpdateModel
+@{
+    Layout = "_ManagementLayout";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Cập nhật thông tin người dùng</h2>
+
+    <form id="updateForm">
+        <input type="hidden" id="userId" />
+
+        <div class="mb-3">
+            <label for="userName" class="form-label">Tên người dùng</label>
+            <input type="text" class="form-control" id="userName" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+        <a href="/Admin/User/List" class="btn btn-secondary">Quay lại</a>
+    </form>
+
+    <div id="message" class="mt-3"></div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const userId = window.location.pathname.split('/').pop();
+        document.getElementById("userId").value = userId;
+
+        async function fetchUserDetails() {
+            try {
+                const response = await fetch(`/api/User/${userId}`);
+                if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu user");
+                const user = await response.json();
+                document.getElementById("userName").value = user.userName;
+                document.getElementById("email").value = user.email;
+            } catch (error) {
+                document.getElementById("message").innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+            }
+        }
+
+        document.getElementById("updateForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const updatedUser = {
+                userId: userId,
+                userName: document.getElementById("userName").value,
+                email: document.getElementById("email").value
+            };
+
+            try {
+                const response = await fetch(`/api/User/update`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updatedUser)
+                });
+                if (!response.ok) throw new Error("Cập nhật thất bại!");
+                document.getElementById("message").innerHTML = `<div class="alert alert-success">Cập nhật thành công!</div>`;
+                await fetchUserDetails();
+            } catch (error) {
+                document.getElementById("message").innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+            }
+        });
+
+        await fetchUserDetails();
+    });
+</script>

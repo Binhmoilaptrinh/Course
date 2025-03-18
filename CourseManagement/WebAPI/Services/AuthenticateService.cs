@@ -5,7 +5,10 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WebAPI.DTOS.Authentication;
+using WebAPI.DTOS.request;
+using WebAPI.DTOS.response;
 using WebAPI.Models;
+using WebAPI.Repositories.Interfaces;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Services
@@ -13,25 +16,28 @@ namespace WebAPI.Services
     public class AuthenticateService : IAuthenticateService
     {
         private readonly ECourseContext _eCourseContext;
+        private readonly IUserRepository _userRepository;
+        private readonly IUserRoleRepository _userRoleRepository;
         private readonly IConfiguration _configuration;
         public readonly ISendEmail _emailSender;
 
-        public AuthenticateService(ECourseContext eCourseContext, IConfiguration configuration, ISendEmail emailSender)
+        public AuthenticateService(ECourseContext eCourseContext, IUserRepository userRepository, IUserRoleRepository userRoleRepository, IConfiguration configuration, ISendEmail emailSender)
         {
             _eCourseContext = eCourseContext;
+            _userRepository = userRepository;
+            _userRoleRepository = userRoleRepository;
             _configuration = configuration;
             _emailSender = emailSender;
         }
 
-
-        public async Task<string> LoginAsync(LoginModel login)
+        public async Task<LoginResponseDto> LoginAsync(LoginRequestDto login)
         {
             if (login == null)
             {
                 throw new ArgumentNullException(nameof(login));
             }
 
-            var user = await _eCourseContext.Users.FirstOrDefaultAsync(u => u.Username == login.Username);
+            var user = await _userRepository.GetUserAsyncForUserName(login.Username);
 
             if (user == null || !await VerifyPasswordAsync(login.Password, user.Password))
             {
@@ -40,13 +46,14 @@ namespace WebAPI.Services
 
             if (!user.IsEmailVerify)
             {
-                return "Email is not verified to login";
+                return null;
             }
 
             var userRoles = await _eCourseContext.UserRoles
                 .Where(x => x.UserId == user.UserId)
                 .Select(x => x.Role.RoleName)
                 .ToListAsync();
+            
 
             string secret = _configuration["JwtSettings:secretKey"];
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -72,10 +79,66 @@ namespace WebAPI.Services
                 Issuer = _configuration["JwtSettings:validIssuer"],
                 Audience = _configuration["JwtSettings:validAudience"]
             };
-
+            LoginResponseDto loginResponse = await _userRoleRepository.GetLoginUserById(user.UserId);
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            loginResponse.Token = tokenHandler.WriteToken(token);
+            loginResponse.Success = true;
+
+            return loginResponse;
         }
+
+    //    public async Task<string> LoginAsync(LoginModel login)
+    //    {
+    //        if (login == null)
+    //        {
+    //            throw new ArgumentNullException(nameof(login));
+    //        }
+
+    //        var user = await _eCourseContext.Users.FirstOrDefaultAsync(u => u.Username == login.Username);
+
+    //        if (user == null || !await VerifyPasswordAsync(login.Password, user.Password))
+    //        {
+    //            return null; // Trả về null nếu username không tồn tại hoặc mật khẩu không khớp
+    //        }
+
+    //        if (!user.IsEmailVerify)
+    //        {
+    //            return "Email is not verified to login";
+    //        }
+
+    //        var userRoles = await _eCourseContext.UserRoles
+    //            .Where(x => x.UserId == user.UserId)
+    //            .Select(x => x.Role.RoleName)
+    //            .ToListAsync();
+
+    //        string secret = _configuration["JwtSettings:secretKey"];
+    //        var tokenHandler = new JwtSecurityTokenHandler();
+    //        var key = Encoding.UTF8.GetBytes(secret);
+
+    //        var claims = new List<Claim>
+    //{
+    //    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // ✅ Thêm UserId
+    //    new Claim(JwtRegisteredClaimNames.Sub, login.Username),
+    //};
+
+    //        // ✅ Thêm nhiều Roles vào Claims
+    //        foreach (var role in userRoles)
+    //        {
+    //            claims.Add(new Claim(ClaimTypes.Role, role));
+    //        }
+
+    //        var tokenDescriptor = new SecurityTokenDescriptor
+    //        {
+    //            Subject = new ClaimsIdentity(claims),
+    //            Expires = DateTime.UtcNow.AddMinutes(30), // ✅ Tăng thời gian hết hạn
+    //            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256),
+    //            Issuer = _configuration["JwtSettings:validIssuer"],
+    //            Audience = _configuration["JwtSettings:validAudience"]
+    //        };
+
+    //        var token = tokenHandler.CreateToken(tokenDescriptor);
+    //        return tokenHandler.WriteToken(token);
+    //    }
 
 
 
@@ -163,5 +226,6 @@ namespace WebAPI.Services
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)); // Token 32 bytes
         }
 
+        
     }
 }
