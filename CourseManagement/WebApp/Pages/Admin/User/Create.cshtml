@@ -1,0 +1,70 @@
+﻿@page
+@model WebApp.Pages.Admin.User.CreateModel
+@{
+    Layout = "_ManagementLayout";
+}
+
+<div class="popular-courses">
+    <h2 class="courses-title mt-5 px-5">New staff</h2>
+    <div class="popular-header px-5">
+        <p class="popular-des">Làm khác để làm tốt</p>
+    </div>
+
+    <div class="container mt-5">
+        <div class="courses-container"></div>
+        <div class="courses-item learned-false index-1">
+            <div class="course-info">
+                <h2>Nhân viên</h2>
+
+                <div id="message" class="text-danger mb-3"></div> <!-- Hiển thị thông báo -->
+
+                <form id="userForm">
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="userName" placeholder="Enter your username">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter your email address">
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-control" id="role">
+                            <option value="">Select a role</option>
+                            <option value="1">Admin</option>
+                            <option value="2">Staff</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-signin" onclick="submitForm()">Add new</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function submitForm() {
+        var userData = {
+            UserName: $("#userName").val(),
+            Email: $("#email").val(),
+            SelectedRole: $("#role").val()
+        };
+
+        $.ajax({
+            url: "https://api.2handshop.id.vn/api/User/Add",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(userData),
+            success: function (response) {
+                $("#message").text("Thêm nhân viên thành công!").css("color", "green");
+                $("#userForm")[0].reset();
+            },
+            error: function (xhr) {
+                var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : "Có lỗi xảy ra!";
+                $("#message").text(errorMessage).css("color", "red");
+            }
+        });
+    }
+</script>
