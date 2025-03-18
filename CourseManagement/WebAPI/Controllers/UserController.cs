@@ -48,7 +48,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpPost("update")]
+        [HttpPut("update")]
         public async Task<IActionResult> UpdateUser([FromBody] UserReponseDto userDTO)
         {
             if (userDTO == null)
