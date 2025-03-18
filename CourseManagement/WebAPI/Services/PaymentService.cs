@@ -9,6 +9,8 @@ using WebAPI.Utilities;
 using Net.payOS.Types;
 using WebAPI.DTOS.request;
 using WebAPI.Repositories.Interfaces;
+using WebAPI.DTOS.response;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace WebAPI.Services
 {
@@ -25,7 +27,7 @@ namespace WebAPI.Services
             _enrollmentService = enrollmentService;
         }
 
-        public async Task<string> CreatePaymentUrl(int courseId, int userId)
+        public async Task<CoursePayment> CreatePaymentUrl(int courseId, int userId)
         {
             var course = await _eCourseContext.Courses
                 .FirstOrDefaultAsync(x => x.Id == courseId);
@@ -51,8 +53,20 @@ namespace WebAPI.Services
             {
                 new ItemData(course.Title, price, 1) // Assuming 1 quantity per course
             };
-
-            return await _paymentHelper.GetLinkAsync(orderCode, price, items);
+            var coursePay = new CoursePayment()
+            {
+                Title = course.Title,
+                Thumbnail = course.Thumbnail,
+                Description = course.Description,   
+                Duration = _eCourseContext.Lessons
+                        .Where(l => l.Chapter.CourseId == courseId && l.Duration.HasValue)
+                        .Sum(l => l.Duration.Value),
+                LessonCount = _eCourseContext.Lessons.Where(l => l.Chapter.CourseId == courseId).Count(),
+                Price = course.Price,
+                Url = await _paymentHelper.GetLinkAsync(orderCode, price, items)
+            };
+            return coursePay;
+            
         }
 
 
