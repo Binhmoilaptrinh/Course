@@ -62,7 +62,7 @@ namespace WebAPI.Services
                         .Where(l => l.Chapter.CourseId == courseId && l.Duration.HasValue)
                         .Sum(l => l.Duration.Value),
                 LessonCount = _eCourseContext.Lessons.Where(l => l.Chapter.CourseId == courseId).Count(),
-                Price = course.Price,
+                Price = price,
                 Url = await _paymentHelper.GetLinkAsync(orderCode, price, items)
             };
             return coursePay;
