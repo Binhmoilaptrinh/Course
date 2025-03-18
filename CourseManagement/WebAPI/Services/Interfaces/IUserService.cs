@@ -8,12 +8,12 @@ namespace WebAPI.Services.Interfaces
     {
         Task<User> GetUserByIdAsync(int id);
         Task<UserReponseDto> GetUserResponseByIdAsync(int id);
-        Task<bool> VerifyEmailAsync(string token);
-
+        
         Task<UserReponseDto> AddUser(UserRequestDto user);
 
         Task<UserReponseDto> UpdateUser(UserReponseDto user);
 
         Task<List<UserReponseDto>> GetUserReponses();
+        Task<bool> VerifyEmailAsync(string token);
     }
 }

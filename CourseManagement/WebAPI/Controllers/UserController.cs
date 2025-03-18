@@ -70,7 +70,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            var userResponse = await _userService.GetUserByIdAsync(id);
+            var userResponse = await _userService.GetUserResponseByIdAsync(id);
 
             if (userResponse == null)
             {
