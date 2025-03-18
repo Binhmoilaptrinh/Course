@@ -40,7 +40,7 @@
 
         async function fetchUsers() {
             try {
-                const response = await fetch("/api/User/all");
+                const response = await fetch("https://api.2handshop.id.vn/api/User/all");
                 if (!response.ok) throw new Error("Lỗi HTTP: " + response.status);
                 const users = await response.json();
                 renderUsers(users);
