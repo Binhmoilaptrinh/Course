@@ -155,24 +155,24 @@
         @* { *@
         @*     <a class="course__preview-learn btn" asp-page="/Homepage/PaymentConfirm" asp-route-id="@Model.CourseDetail?.Id">Đăng ký học lại</a> *@
         @* } *@
-        @* <ul> *@
-        @*     <li> *@
-        @*         <i class="fa-solid fa-bars-progress"></i> *@
-        @*         <span>Trình độ cơ bản</span> *@
-        @*     </li> *@
-        @*     <li> *@
-        @*         <i class="fa-solid fa-film"></i> *@
-        @*         <span>Tổng số @Model.CourseDetail.Lessons bài học</span> *@
-        @*     </li> *@
-        @*     <li> *@
-        @*         <i class="fa-solid fa-clock"></i> *@
-        @*         <span>@ConvertToTimeFormat(Model.CourseDetail.Durations)</span> *@
-        @*     </li> *@
-        @*     <li> *@
-        @*         <i class="fa-solid fa-battery-three-quarters"></i> *@
-        @*         <span>Học mọi thứ, mọi nơi</span> *@
-        @*     </li> *@
-        @* </ul> *@
+         <ul> 
+             <li> 
+                <i class="fa-solid fa-bars-progress"></i> 
+              <span>Trình độ cơ bản</span> 
+             </li> 
+            <li> 
+                 <i class="fa-solid fa-film"></i> 
+                 <span>Tổng số @Model.CourseDetail.LessonsCount bài học</span>
+             </li> 
+             <li> 
+                 <i class="fa-solid fa-clock"></i> 
+                 <span>@ConvertToTimeFormat(Model.CourseDetail.Duration)</span> 
+             </li> 
+             <li> 
+                 <i class="fa-solid fa-battery-three-quarters"></i> 
+                <span>Học mọi thứ, mọi nơi</span> 
+             </li> 
+         </ul> 
     </div>
 </div>
 <div class="preview__course">
