@@ -4,6 +4,7 @@ namespace WebAPI.DTOS.response
 {
     public class UserReponseDto
     {
+        [Key]
         public int UserId { get; set; }
 
         [Required(ErrorMessage = "Username is required")]

@@ -5,6 +5,7 @@ using WebAPI.DTOS.response;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Filters;
 using WebAPI.Services.Interfaces;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace WebAPI.Controllers
 {
@@ -20,10 +21,11 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllUser()
+        [EnableQuery] // Cho phép sử dụng OData query
+        public ActionResult<IQueryable<UserReponseDto>> GetUsers()
         {
-            var staffList = await _userService.GetUserReponses();
-            return Ok(staffList);
+            var users = _userService.GetUserReponses().Result.AsQueryable();
+            return Ok(users);
         }
 
         [HttpPost("add")]
@@ -64,6 +66,21 @@ namespace WebAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var userResponse = await _userService.GetUserByIdAsync(id);
+
+            if (userResponse == null)
+            {
+                return NotFound(new { message = $"User with ID {id} not found" });
+            }
+
+            return Ok(userResponse);
+        }
+
+
 
         [HttpGet("verify-email")]
         public async Task<IActionResult> VerifyEmail(string token)
