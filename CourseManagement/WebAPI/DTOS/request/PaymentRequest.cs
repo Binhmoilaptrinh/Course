@@ -10,4 +10,10 @@ namespace WebAPI.DTOS.request
         [JsonIgnore]
         public bool IsSuccess { get; set; }
     }
+
+    public class ConfirmRequest
+    {
+        public int CourseId { get; set; }
+        public int UserId { get; set; }
+    }
 }

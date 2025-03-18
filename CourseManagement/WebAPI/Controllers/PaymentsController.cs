@@ -21,9 +21,9 @@ namespace WebAPI.Controllers
             _enrollmentService = enrollmentService;
         }
         [HttpPost("CreatePayment")]
-        public async Task<ActionResult<LessonProgress>> CreatePayment(int courseId, int userId)
+        public async Task<ActionResult<LessonProgress>> CreatePayment(ConfirmRequest request)
         {
-            var lessonProgress = await _paymentService.CreatePaymentUrl(courseId, userId);
+            var lessonProgress = await _paymentService.CreatePaymentUrl(request.CourseId, request.UserId);
             return Ok(lessonProgress);
         }
         [HttpPost("UpdateSuccess")]

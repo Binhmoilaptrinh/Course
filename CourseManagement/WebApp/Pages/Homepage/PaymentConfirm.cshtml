@@ -1,0 +1,105 @@
+﻿@page 
+@model WebApp.Pages.Homepage.PaymentConfirmModel
+    Layout = "_Layout";
+}
+
+<div class="container mt-50 py-5">
+    <!-- Course Information -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header text-center bg-primary text-white">
+                    <h2 id="courseTitle">Loading...</h2>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5><i class="fa-solid fa-book"></i> Course Description</h5>
+                            <p id="courseDescription">Loading...</p>
+                        </div>
+                        <img id="courseThumbnail" src="" alt="Course Thumbnail" class="img-fluid img-thumbnail" style="width: 200px; height: auto;">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <i class="fa-solid fa-clock fa-2x text-primary"></i>
+                            <p><strong>Duration</strong></p>
+                            <p id="courseDuration">Loading...</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="fa-solid fa-book-open fa-2x text-primary"></i>
+                            <p><strong>Total Lessons</strong></p>
+                            <p id="courseLessons">Loading...</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="fa-solid fa-dollar-sign fa-2x text-primary"></i>
+                            <p><strong>Price</strong></p>
+                            <p id="coursePrice">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <button id="payButton" class="btn btn-success btn-lg">
+                        <i class="fa-solid fa-credit-card"></i> Proceed to Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Lấy courseId từ Razor Page URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = parseInt(urlParams.get('id')) || 0;
+
+        // Lấy userId từ localStorage
+        let userInfo = localStorage.getItem("userInfo");
+        let userId = 0;
+
+        if (userInfo) {
+            try {
+                userId = JSON.parse(userInfo).userId || 0;
+            } catch (e) {
+                console.error("Lỗi khi đọc userInfo từ localStorage:", e);
+            }
+        }
+
+        // Nếu chưa đăng nhập, hiển thị nút đăng nhập
+        if (userId === 0) {
+            $("#payButton").text("Đăng nhập để thanh toán").removeClass("btn-success").addClass("btn-primary").click(function () {
+                window.location.href = "/Authentication/Login";
+            });
+            return;
+        }
+
+        // Gọi API lấy thông tin khóa học và điều hướng đến thanh toán
+        $.ajax({
+            url: "https://api.2handshop.id.vn/api/Payments/CreatePayment",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ courseId: courseId, userId: userId }),
+            success: function (response) {
+                $("#courseTitle").text(response.title);
+                $("#courseDescription").text(response.description);
+                $("#courseThumbnail").attr("src", response.thumbnail);
+                $("#courseDuration").text(`${Math.floor(response.duration / 3600)} giờ ${Math.floor((response.duration % 3600) / 60)} phút ${response.duration % 60} giây`);
+                $("#courseLessons").text(response.lessonCount + " bài học");
+                $("#coursePrice").text(response.price.toLocaleString("vi-VN") + " VND");
+
+                // Gắn sự kiện thanh toán
+                $("#payButton").click(function () {
+                    if (response != null && response.url) {
+                        window.location.href = response.url;
+                    } else {
+                        alert("Lỗi khi tạo thanh toán!");
+                    }
+                });
+            },
+            error: function () {
+                alert("Không thể tải thông tin khóa học.");
+            }
+        });
+    });
+</script>

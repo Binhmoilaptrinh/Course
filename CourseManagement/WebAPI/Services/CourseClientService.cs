@@ -25,6 +25,8 @@ namespace WebAPI.Services
             {
                 Id = c.Id,
                 Title = c.Title,
+                ThumbnailImage = c.Thumbnail,
+                PreviewVideo = c.PreviewVideo,
                 Price = c.Price,
                 Duration = _context.Lessons
                         .Where(l => l.Chapter.CourseId == id && l.Duration.HasValue)
