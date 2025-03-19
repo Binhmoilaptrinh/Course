@@ -34,6 +34,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<CourseAdminResponseDto>> CreateCourse([FromForm] CourseRequestDto course)
         {
+            Console.WriteLine(course);
             var courses = await _courseService.CreateCourseAsync(course);
             return Ok(courses);
         }

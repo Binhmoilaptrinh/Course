@@ -14,9 +14,14 @@ using Microsoft.OData.ModelBuilder;
 using WebAPI.Models;
 using WebAPI.Utilities;
 using WebAPI.DTOS.response;
+using PdfSharp.Charting;
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 512 * 1024 * 1024 ;
+});
 //odata
 var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<LessonResponseAdmin>("Lesson");
