@@ -1,9 +1,8 @@
-<<<<<<< HEAD
-﻿var builder = WebApplication.CreateBuilder(args);
-=======
-﻿using Microsoft.AspNetCore.Http.Features;
+
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
+
 // Đăng ký HttpClient
 builder.Services.AddHttpClient();
 builder.Services.Configure<FormOptions>(options =>

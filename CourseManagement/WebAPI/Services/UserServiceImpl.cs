@@ -42,9 +42,15 @@ namespace WebAPI.Services
             return userResponse;
         }
 
-        public Task<User> GetUserByIdAsync(int id)
+        public async  Task<User> GetUserByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var user = await _userRepository.GetAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
+
+            return user;
         }
         public async Task<UserReponseDto> AddUser(UserRequestDto user)
         {
