@@ -8,6 +8,7 @@ using Microsoft.OData.ModelBuilder;
 using WebAPI.Models;
 using WebAPI.Utilities;
 using WebAPI.DTOS.response;
+using PdfSharp.Charting;
 
 using System.Text;
 using WebAPI.Extensions;
@@ -16,22 +17,24 @@ using WebAPI.Repositories.Interfaces;
 using WebAPI.Services;
 using WebAPI.Services.Interfaces;
 using WebAPI.DTOS;
+using Microsoft.AspNetCore.Http.Features;
 
-    var builder = WebApplication.CreateBuilder(args);
-    //odata
-    var modelBuilder = new ODataConventionModelBuilder();
-    modelBuilder.EntitySet<LessonResponseAdmin>("Lesson");
-    modelBuilder.EntitySet<Chapter>("Chapter");
-    modelBuilder.EntitySet<CourseAdminResponseDto>("Course");
-    modelBuilder.EntitySet<UserReponseDto>("User");
-
-    builder.Services.AddControllers().AddOData(
-        options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
-        .AddRouteComponents(
-        "odata",
-            modelBuilder.GetEdmModel())
-    );
-
+var builder = WebApplication.CreateBuilder(args);
+var modelBuilder = new ODataConventionModelBuilder();
+modelBuilder.EntitySet<LessonResponseAdmin>("Lesson");
+modelBuilder.EntitySet<Chapter>("Chapter");
+modelBuilder.EntitySet<CourseAdminResponseDto>("Course");
+modelBuilder.EntitySet<UserReponseDto>("User");
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 512 * 1024 * 1024;
+});
+builder.Services.AddControllers().AddOData(
+    options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
+    .AddRouteComponents(
+    "odata",
+        modelBuilder.GetEdmModel())
+);
 // 🛠 Inject IConfiguration
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
