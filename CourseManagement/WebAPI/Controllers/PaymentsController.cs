@@ -26,8 +26,8 @@ namespace WebAPI.Controllers
             var lessonProgress = await _paymentService.CreatePaymentUrl(request.CourseId, request.UserId);
             return Ok(lessonProgress);
         }
-        [HttpPost("UpdateSuccess")]
-        public async Task<ActionResult<Payment>> UpdateSuccess([FromBody] PaymentRequest request)
+
+        /*public async Task<ActionResult<Payment>> UpdateSuccess([FromBody] PaymentRequest request)
         {
             request.IsSuccess = true;
             var payment = await _paymentService.UpdatePayment(request);
@@ -53,13 +53,12 @@ namespace WebAPI.Controllers
             }
 
             return Ok(payment);
-        }
+        }*/
 
-        [HttpPost("UpdateFail")]
-        public async Task<ActionResult<Payment>> UpdateFail([FromBody] PaymentRequest request)
+        [HttpPost("UpdateSuccess")]
+        public async Task<ActionResult<Payment>> UpdateSuccess(long orderCode)
         {
-            request.IsSuccess = false;
-            var payment = await _paymentService.UpdatePayment(request);
+            var payment = await _paymentService.UpdatePayment(orderCode);
             return Ok(payment);
         }
     }

@@ -33,6 +33,7 @@ namespace WebAPI.Services
                 UserId = enrollmentRequest.UserId,
                 CourseId = enrollmentRequest.CourseId,
                 Progress = 0,
+                Status = 1,
                 EnrollmentDate = DateTime.Now,
                 ExpiredDate = DateTime.Now.AddDays((double)limitedDate)
             };
