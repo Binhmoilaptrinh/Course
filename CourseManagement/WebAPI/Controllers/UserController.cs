@@ -48,7 +48,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpPost("update")]
+        [HttpPut("update")]
         public async Task<IActionResult> UpdateUser([FromBody] UserReponseDto userDTO)
         {
             if (userDTO == null)
@@ -70,7 +70,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            var userResponse = await _userService.GetUserByIdAsync(id);
+            var userResponse = await _userService.GetUserResponseByIdAsync(id);
 
             if (userResponse == null)
             {

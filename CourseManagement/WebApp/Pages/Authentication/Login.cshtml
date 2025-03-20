@@ -80,11 +80,10 @@
 
     <script>
         $(document).ready(function () {
-            console.log("jQuery is ready!"); // Kiểm tra jQuery có hoạt động không
+            console.log("jQuery is ready!");
 
-            // Bắt sự kiện click của nút Sign In
             $(document).on("click", ".btn-signin", function (e) {
-                e.preventDefault(); // Ngăn form gửi đi mặc định
+                e.preventDefault();
 
                 var username = $("#user").val();
                 var password = $("#password").val();
@@ -94,15 +93,15 @@
                     return;
                 }
 
-                console.log("Sending API request..."); // Debug kiểm tra
+                console.log("Sending API request...");
 
                 $.ajax({
                     url: "https://api.2handshop.id.vn/api/Authentication/login",
                     type: "POST",
                     contentType: "application/json",
-                    data: JSON.stringify({ username: username, password: password }), // Chỉnh đúng key API yêu cầu
+                    data: JSON.stringify({ username: username, password: password }),
                     success: function (response) {
-                        console.log("API response:", response); // Debug response
+                        console.log("API response:", response);
                         alert("Login successful!");
 
                         // Lưu token vào LocalStorage
@@ -113,23 +112,36 @@
                             userId: response.userId,
                             userName: response.userName,
                             email: response.email,
-                            role: response.role
+                            roleId: response.roleId,  // ✅ Lưu RoleId
+                            roleName: response.roleName // ✅ Lưu RoleName
                         }));
 
-                        window.location.href = "/Admin/User/List"; // Chuyển hướng sau khi đăng nhập
+                                // Kiểm tra role để chuyển hướng
+                            if (response.roleId == 1) {
+                                window.location.href = "/Admin/User/List"; // Admin vào trang quản lý user
+                            } else if (response.roleId == 2) {
+                                window.location.href = "/HomePage/Index"; // Staff vào dashboard riêng
+                            } else {
+                                window.location.href = "/HomePage/Index"; // User thường vào HomePage
+                            }
+
                     },
                     error: function (xhr, status, error) {
-                        console.error("Error:", xhr.responseText); // Debug lỗi
+                        console.error("Error:", xhr.responseText);
                         if (xhr.status === 401) {
                             alert("Invalid username or password.");
                         } else {
                             alert("An error occurred: " + xhr.responseText);
                         }
                     }
+
+
                 });
             });
         });
     </script>
+
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
