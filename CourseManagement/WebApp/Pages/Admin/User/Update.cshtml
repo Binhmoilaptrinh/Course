@@ -48,14 +48,14 @@
         document.getElementById("updateForm").addEventListener("submit", async function (event) {
             event.preventDefault();
             const updatedUser = {
-                id: userId,  // Đảm bảo khớp với DTO bên backend
+                userId: userId,  // Đảm bảo khớp với DTO bên backend
                 userName: document.getElementById("userName").value.trim(),
                 email: document.getElementById("email").value.trim()
             };
 
             try {
-                const response = await fetch(`https://api.2handshop.id.vn/api/User/update`, {
-                    method: "POST",
+                const response = await fetch(`https://localhost:7256/api/User/update`, {
+                    method: "PUT",
                     headers: {
                         "Content-Type": "application/json"
                     },

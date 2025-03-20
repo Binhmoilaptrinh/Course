@@ -61,7 +61,7 @@
                     <div class="courses-item">
                         <img src="${user.avatar || 'default-avatar.png'}" class="user-avatar" alt="Avatar" />
                         <h3>${user.userName}</h3>
-                        <p>Vai trò: ${user.role || 'Không xác định'}</p>
+                        <p>Vai trò: ${user.roleName || 'Không xác định'}</p>
                         <a href="./Update/${user.userId}" class="btn btn-warning">Sửa</a>
                         <a href="./Delete?id=${user.userId}" class="btn btn-danger">Xóa</a>
                     </div>`;
