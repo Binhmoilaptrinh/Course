@@ -7,6 +7,6 @@ namespace WebAPI.Services.Interfaces
     public interface IPaymentService
     {
         Task<CoursePayment> CreatePaymentUrl(int courseId, int userId);
-        Task<Payment> UpdatePayment(PaymentRequest request);
+        Task<Payment> UpdatePayment(long orderCode);
     }
 }

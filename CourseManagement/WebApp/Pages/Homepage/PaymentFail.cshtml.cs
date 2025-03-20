@@ -5,7 +5,7 @@ namespace WebApp.Pages.Homepage
 {
     public class PaymentFailModel : PageModel
     {
-        public void OnGet()
+        public void OnGet(int id)
         {
         }
     }

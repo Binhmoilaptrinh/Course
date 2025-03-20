@@ -83,7 +83,7 @@ namespace WebApp.Pages.Admin.Course
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToPage("/Admin/Course/CourseManageModel");
+                return RedirectToPage("/Admin/Course/CourseManage");
             }
             else
             {

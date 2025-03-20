@@ -22,7 +22,7 @@ namespace WebAPI.Utilities
         public  async Task<string> GetLinkAsync(long orderCode, int price, List<ItemData> items)
         {
             PayOS payOS = new(_clientId, _apiKey, _checksumKey);
-            string cancelUrl = "https://localhost:7282/Homepage/PaymentSuccess";
+            string cancelUrl = $"https://localhost:7282/Homepage/PaymentSuccess";
             string returnUrl = "https://localhost:7256/Homepage/PaymentFail";
             PaymentData paymentData = new PaymentData(orderCode, price, "Thanh toan don hang",
                 items, cancelUrl, returnUrl);

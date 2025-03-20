@@ -65,29 +65,52 @@ namespace WebAPI.Services
                 Price = price,
                 Url = await _paymentHelper.GetLinkAsync(orderCode, price, items)
             };
+            Payment pay = new Payment()
+            {
+                Amount = (decimal)course.Price,
+                PaymentDate = DateTime.Now,
+                TransactionId = orderCode.ToString(),
+                IsSuccessful = false,
+                UserId = userId,
+                Status = 0,
+                PaymentMethod = "PayOS",
+                CourseId = courseId
+            };
+            _eCourseContext.Payments.Add(pay);
+            await _eCourseContext.SaveChangesAsync();
             return coursePay;
             
         }
 
 
 
-        public async Task<Payment> UpdatePayment(PaymentRequest request)
+        public async Task<Payment> UpdatePayment(long orderCode)
         {
-            var course = await _eCourseContext.Courses.FirstOrDefaultAsync(x => x.Id == request.CourseId);
-            Payment pay = new Payment()
+            var payment = await _eCourseContext.Payments.FirstOrDefaultAsync(x => x.TransactionId == orderCode.ToString());
+            payment.IsSuccessful = true;
+            payment.Status = 1;
+            payment.PaymentDate = DateTime.Now;
+            _eCourseContext.Payments.Update(payment);
+            
+            var enroll = new EnrollmentRequestDto
             {
-                Amount = (decimal)course.Price,
-                PaymentDate = DateTime.Now,
-                TransactionId = request.OrderCode.ToString(),
-                IsSuccessful = request.IsSuccess,
-                UserId = request.UserId,
-                Status = request.IsSuccess ? 1 : 0,
-                PaymentMethod = "PayOS",
-                CourseId = request.CourseId
+                UserId = payment.UserId,
+                CourseId = payment.CourseId,
             };
-            _eCourseContext.Payments.Add(pay);
+
+            // Kiểm tra trạng thái Enrollment
+            int enrollmentStatus = await _enrollmentService.CheckStatusEnrollment(enroll);
+
+            if (enrollmentStatus == 0)
+            {
+                await _enrollmentService.EnrollCourse(enroll);
+            }
+            else if (enrollmentStatus == 2)
+            {
+                await _enrollmentService.UpdateEnrollmentStatus(enroll); 
+            }
             await _eCourseContext.SaveChangesAsync();
-            return pay;
+            return payment;
         }
     }
 }
