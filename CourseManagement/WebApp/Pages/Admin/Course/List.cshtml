@@ -1,5 +1,8 @@
 ﻿@page
-@model WebApp.Pages.Admin.Course.CourseManageModel
+@model WebApp.Pages.Admin.Course.ListModel
+@{
+    Layout = "_ManagementLayout";
+}
 <div class="popular-courses">
     <h2 class="courses-title mt-5 px-5">Điều hành khóa học</h2>
     <div class="popular-header px-5">
@@ -126,7 +129,7 @@
            for (let i = 0; i < courses.length; i++) {
                         let course = courses[i];
                         html += `
-                           <a class="courses-item text-decoration-none learned-false index-1" href="/Admin/Courses/Detail/${course.Id}">
+                           <a class="courses-item text-decoration-none learned-false index-1" href="/Admin/Course/Detail/${course.Id}">
                     <div class="courses-item__link">
                         <img src="${course.Thumbnail}" alt="Course Thumbnail" style="height: 200px;" />
                         <div class="actionHover">

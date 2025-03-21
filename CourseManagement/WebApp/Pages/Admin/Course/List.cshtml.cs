@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace WebApp.Pages.Admin.Course
 {
-    public class CourseManageModel : PageModel
+    public class ListModel : PageModel
     {
         public async Task<IActionResult> OnGet()
         {
