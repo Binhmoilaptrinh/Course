@@ -24,7 +24,7 @@ namespace WebApp.Pages.Homepage
             }
 
             // Call the API to update payment status
-            var response = await _httpClient.PostAsync($"https://api.2handshop.id.vn/api/UpdateSuccess?orderCode={orderCode}", null);
+            var response = await _httpClient.PostAsync($"https://api.2handshop.id.vn/api/Payments/UpdateSuccess?orderCode={orderCode}", null);
 
             if (!response.IsSuccessStatusCode)
             {

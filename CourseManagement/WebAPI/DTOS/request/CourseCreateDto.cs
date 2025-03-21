@@ -4,6 +4,7 @@ namespace WebAPI.DTOS.request
 {
     public class CourseRequestDto
     {
+        public int CreateBy { get; set; }
         public string Title { get; set; }
         public int CategoryId { get; set; }
         public double Price { get; set; }

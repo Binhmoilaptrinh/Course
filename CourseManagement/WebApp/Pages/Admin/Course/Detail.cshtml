@@ -1,0 +1,61 @@
+﻿@page "{id:int}"
+@model WebApp.Pages.Admin.Course.DetailModel
+@{
+    Layout = "_ManagementLayout";
+}
+<div class="popular-courses">
+    <h2 class="courses-title mt-5 px-5">Điều hành khóa học</h2>
+    <div class="popular-header px-5">
+        <p class="popular-des">Học sáng tạo, thành công vượt trội</p>
+        <a class="ms-5 text-decoration-none fs-2 p-0 back__page-btn" href="/Admin/Course/List">
+            <span><i class="fa-solid fa-caret-left"></i></span>
+            <span class="">List</span>
+        </a>
+        <!-- <button class="popular-button">Add course</button> -->
+    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    <div class="row px-5 ">
+        <div class="col-md-4">
+            <img src="@Model.CourseDetail.Thumbnail"
+                 alt="Khóa Học" class="img-fluid rounded">
+        </div>
+        <div class="col-md-8">
+            <div class="">
+                <h3 style="display: inline-block;" class="mb-3">Số người đã tham gia khóa học: 0 người</h3>
+                <div style="display:inline" class="h4">
+                    <a style="display:inline; text-decoration:none" asp-page="/Admin/Enrollment/ManageEnrollment" asp-route-id="1">- Chi tiết</a>
+                </div>
+                <h2 class="mb-3">Tên Khóa Học:@Model.CourseDetail.Title</h2>
+                <p class="fs-3"><strong>Thể loại:</strong>@Model.CourseDetail.CategoryId </p>
+                <p class="fs-3"><strong>Số bài:</strong>0 </p>
+                <p class="fs-3"><strong>Số người học:</strong> 0 </p>
+                <p class="fs-3"><strong>Giá tiền:</strong>@Model.CourseDetail.Price.ToString("#,##0")  VNĐ</p>
+                <p class="fs-3"><strong>Trạng thái khóa học:</strong>@Model.CourseDetail.Status</p>
+                 <a href="/Admin/Courses/Update/@Model.CourseDetail.Id" class="btn btn-primary fs-4 px-4 py-2">Chỉnh sửa</a>
+
+
+            </div>
+        </div>
+    </div>
+    @functions {
+        public string ConvertToTimeFormat(double? duration)
+        {
+            if (duration == null || duration <= 0)
+            {
+                return "00:00:00";
+            }
+
+            TimeSpan time = TimeSpan.FromSeconds(duration.Value);
+
+            return string.Format("{0:D2}:{1:D2}:{2:D2}",
+            (int)time.TotalHours,
+            time.Minutes,
+            time.Seconds);
+        }
+    }
+    

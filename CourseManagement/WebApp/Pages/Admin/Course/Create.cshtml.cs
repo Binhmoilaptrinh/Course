@@ -38,15 +38,8 @@ namespace WebApp.Pages.Admin.Course
         }
 
         public async Task<IActionResult> OnPostAsync(IFormFile PreviewVideo, IFormFile Thumbnail, string Title, 
-            decimal Price, int Cate, int Limit, string Desc)
+            decimal Price, int Cate, int Limit, string Desc, int CreateBy)
         {
-            Console.WriteLine(PreviewVideo);
-            Console.WriteLine(Thumbnail);
-            Console.WriteLine(Title);
-            Console.WriteLine(Price);
-            Console.WriteLine(Cate);
-            Console.WriteLine(Limit);
-            Console.WriteLine(Desc);
 
             using var requestContent = new MultipartFormDataContent();
 
@@ -75,6 +68,7 @@ namespace WebApp.Pages.Admin.Course
             requestContent.Add(new StringContent(Title ?? ""), "Title");
             requestContent.Add(new StringContent("pending"), "Status");
             requestContent.Add(new StringContent(Price.ToString()), "Price");
+            requestContent.Add(new StringContent(CreateBy.ToString()), "CreateBy");
             requestContent.Add(new StringContent(Cate.ToString()), "CategoryId");
             requestContent.Add(new StringContent(Limit.ToString()), "LimitDay");
             requestContent.Add(new StringContent(Desc ?? ""), "Description");
@@ -83,7 +77,7 @@ namespace WebApp.Pages.Admin.Course
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToPage("/Admin/Course/CourseManage");
+                return RedirectToPage("/Admin/Course/List");
             }
             else
             {

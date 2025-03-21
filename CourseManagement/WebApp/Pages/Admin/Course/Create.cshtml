@@ -1,5 +1,8 @@
 ﻿@page
 @model WebApp.Pages.Admin.Course.CreateModel
+@{
+    Layout = "_ManagementLayout";
+}
 <div class="popular-courses">
     <div class="mt-5">
         <a class="ms-5 text-decoration-none fs-2 p-0 back__page-btn" href="./List">
@@ -25,6 +28,7 @@
             <!-- video form -->
             <form id="createForm" method="POST" style="margin: 20px;" enctype="multipart/form-data">
                 <label class="form-label fs-4">Video giới thiệu</label>
+                <input type="hidden" id="createdBy" name="CreatedBy">
                 <div class="mb-3 box-upload_file">
                     <div id="dropArea" class="drop-area">
                         <input type="file" id="videoUpload" name="PreviewVideo" accept="video/*" class="file-input" style="display: none;">
@@ -99,6 +103,14 @@
     </div>
 </div>
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Lấy userId từ localStorage và gán vào input hidden
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        if (userInfo && userInfo.userId) {
+            document.getElementById('createdBy').value = userInfo.userId;
+        }
+    });
+
     // Khu vực upload video
     const dropArea = document.getElementById('dropArea');
     const fileInput = document.getElementById('videoUpload');
