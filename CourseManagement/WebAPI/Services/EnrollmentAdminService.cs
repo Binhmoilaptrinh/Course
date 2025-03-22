@@ -1,0 +1,33 @@
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI.DTOS.request;
+using WebAPI.DTOS.response;
+using WebAPI.Models;
+using WebAPI.Repositories.Interfaces;
+using WebAPI.Services.Interfaces;
+
+namespace WebAPI.Services
+{
+    public class EnrollmentAdminService : IEnrollmentAdminService
+    {
+        private readonly ECourseContext _eCourseContext;
+        public EnrollmentAdminService(ECourseContext eCourseContext)
+        {
+            _eCourseContext = eCourseContext;
+        }
+
+        public int AmountEnroll(int courseId)
+        {
+            return _eCourseContext.Enrollments.Where(er => er.CourseId == courseId).Count();
+        }
+
+        public async Task<IEnumerable<Enrollment>> GetEnrollmentList()
+        {
+            return await _eCourseContext.Enrollments.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Enrollment>> GetListCustomerEnrollmentByUserId(int userId)
+        {
+            return await _eCourseContext.Enrollments.Include(c => c.Course).Where(x => x.UserId == userId).ToListAsync();
+        }
+    }
+}

@@ -9,6 +9,8 @@ using WebAPI.Utilities;
 using Net.payOS.Types;
 using WebAPI.DTOS.request;
 using WebAPI.Repositories.Interfaces;
+using WebAPI.DTOS.response;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace WebAPI.Services
 {
@@ -25,7 +27,7 @@ namespace WebAPI.Services
             _enrollmentService = enrollmentService;
         }
 
-        public async Task<string> CreatePaymentUrl(int courseId, int userId)
+        public async Task<CoursePayment> CreatePaymentUrl(int courseId, int userId)
         {
             var course = await _eCourseContext.Courses
                 .FirstOrDefaultAsync(x => x.Id == courseId);
@@ -51,29 +53,64 @@ namespace WebAPI.Services
             {
                 new ItemData(course.Title, price, 1) // Assuming 1 quantity per course
             };
-
-            return await _paymentHelper.GetLinkAsync(orderCode, price, items);
-        }
-
-
-
-        public async Task<Payment> UpdatePayment(PaymentRequest request)
-        {
-            var course = await _eCourseContext.Courses.FirstOrDefaultAsync(x => x.Id == request.CourseId);
+            var coursePay = new CoursePayment()
+            {
+                Title = course.Title,
+                Thumbnail = course.Thumbnail,
+                Description = course.Description,   
+                Duration = _eCourseContext.Lessons
+                        .Where(l => l.Chapter.CourseId == courseId && l.Duration.HasValue)
+                        .Sum(l => l.Duration.Value),
+                LessonCount = _eCourseContext.Lessons.Where(l => l.Chapter.CourseId == courseId).Count(),
+                Price = price,
+                Url = await _paymentHelper.GetLinkAsync(orderCode, price, items)
+            };
             Payment pay = new Payment()
             {
                 Amount = (decimal)course.Price,
                 PaymentDate = DateTime.Now,
-                TransactionId = request.OrderCode.ToString(),
-                IsSuccessful = request.IsSuccess,
-                UserId = request.UserId,
-                Status = request.IsSuccess ? 1 : 0,
+                TransactionId = orderCode.ToString(),
+                IsSuccessful = false,
+                UserId = userId,
+                Status = 0,
                 PaymentMethod = "PayOS",
-                CourseId = request.CourseId
+                CourseId = courseId
             };
             _eCourseContext.Payments.Add(pay);
             await _eCourseContext.SaveChangesAsync();
-            return pay;
+            return coursePay;
+            
+        }
+
+
+
+        public async Task<Payment> UpdatePayment(long orderCode)
+        {
+            var payment = await _eCourseContext.Payments.FirstOrDefaultAsync(x => x.TransactionId == orderCode.ToString());
+            payment.IsSuccessful = true;
+            payment.Status = 1;
+            payment.PaymentDate = DateTime.Now;
+            _eCourseContext.Payments.Update(payment);
+            
+            var enroll = new EnrollmentRequestDto
+            {
+                UserId = payment.UserId,
+                CourseId = payment.CourseId,
+            };
+
+            // Kiểm tra trạng thái Enrollment
+            int enrollmentStatus = await _enrollmentService.CheckStatusEnrollment(enroll);
+
+            if (enrollmentStatus == 0)
+            {
+                await _enrollmentService.EnrollCourse(enroll);
+            }
+            else if (enrollmentStatus == 2)
+            {
+                await _enrollmentService.UpdateEnrollmentStatus(enroll); 
+            }
+            await _eCourseContext.SaveChangesAsync();
+            return payment;
         }
     }
 }

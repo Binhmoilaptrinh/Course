@@ -121,8 +121,7 @@ img {
 .pagination-btn:hover {
     background-color: rgba(112, 121, 134, 0.473);
 }
-
-        .pagination-btn:hover a {
+  .pagination-btn:hover a {
             color: #fff;
         }
 

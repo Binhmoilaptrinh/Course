@@ -7,6 +7,8 @@ using System;
 using Microsoft.AspNetCore.Authorization;
 using WebAPI.DTOS;
 using WebAPI.DTOS.Authentication;
+using WebAPI.DTOS.request;
+using WebAPI.DTOS.response;
 
 namespace WebAPI.Controllers
 {
@@ -40,28 +42,32 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel login)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto login)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest("Invalid request");
+                return BadRequest(new { message = "Invalid request" });
             }
 
             try
             {
-                var token = await _authService.LoginAsync(login);
-                if (token == null)
+                var response = await _authService.LoginAsync(login);
+
+                if (response == null || !response.Success)
                 {
-                    return Unauthorized("Invalid credentials");
+                    return Unauthorized(new { message = response?.Message ?? "Invalid credentials" });
                 }
 
-                return Ok(new { token });
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
+
+
+
 
     }
 }

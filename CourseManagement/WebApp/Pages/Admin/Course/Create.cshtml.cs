@@ -38,51 +38,52 @@ namespace WebApp.Pages.Admin.Course
         }
 
         public async Task<IActionResult> OnPostAsync(IFormFile PreviewVideo, IFormFile Thumbnail, string Title, 
-            decimal Price, int Cate, int Limit, string Desc)
+            decimal Price, int Cate, int Limit, string Desc, int CreateBy)
         {
-            Console.WriteLine(PreviewVideo);
-            Console.WriteLine(Thumbnail);
-            Console.WriteLine(Title);
-            Console.WriteLine(Price);
-            Console.WriteLine(Cate);
-            Console.WriteLine(Limit);
-            Console.WriteLine(Desc);
 
-            var requestContent = new MultipartFormDataContent();
+            using var requestContent = new MultipartFormDataContent();
 
             if (PreviewVideo != null)
             {
-                var stream = PreviewVideo.OpenReadStream();
-                var videoContent = new StreamContent(stream);
-                videoContent.Headers.ContentType = new MediaTypeHeaderValue(PreviewVideo.ContentType);
-                requestContent.Add(videoContent, "PreviewVideo", PreviewVideo.FileName);
+                byte[] data;
+                using (var br = new BinaryReader(PreviewVideo.OpenReadStream()))
+                {
+                    data = br.ReadBytes((int)PreviewVideo.OpenReadStream().Length);
+                }
+                ByteArrayContent bytes = new ByteArrayContent(data);
+                requestContent.Add(bytes, "PreviewVideo", PreviewVideo.FileName);
             }
 
             if (Thumbnail != null)
             {
-                var stream = Thumbnail.OpenReadStream();
-                var imageContent = new StreamContent(stream);
-                imageContent.Headers.ContentType = new MediaTypeHeaderValue(Thumbnail.ContentType);
-                requestContent.Add(imageContent, "Thumbnail", Thumbnail.FileName);
+                byte[] data;
+                using (var br = new BinaryReader(Thumbnail.OpenReadStream()))
+                {
+                    data = br.ReadBytes((int)Thumbnail.OpenReadStream().Length);
+                }
+                ByteArrayContent bytes = new ByteArrayContent(data);
+                requestContent.Add(bytes, "Thumbnail", Thumbnail.FileName);
             }
 
-            requestContent.Add(new StringContent(Title), "Title");
+            requestContent.Add(new StringContent(Title ?? ""), "Title");
+            requestContent.Add(new StringContent("pending"), "Status");
             requestContent.Add(new StringContent(Price.ToString()), "Price");
-            requestContent.Add(new StringContent(Cate.ToString()), "Cate");
-            requestContent.Add(new StringContent(Limit.ToString()), "Limit");
-            requestContent.Add(new StringContent(Desc), "Desc");
+            requestContent.Add(new StringContent(CreateBy.ToString()), "CreateBy");
+            requestContent.Add(new StringContent(Cate.ToString()), "CategoryId");
+            requestContent.Add(new StringContent(Limit.ToString()), "LimitDay");
+            requestContent.Add(new StringContent(Desc ?? ""), "Description");
 
-            var response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/Course", requestContent);
-
+            using var response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/Course", requestContent);
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToPage("/Admin/Course/CourseManageModel"); // Chuyển hướng nếu thành công
+                return RedirectToPage("/Admin/Course/List");
             }
             else
             {
-                ModelState.AddModelError("", "Lỗi khi gửi dữ liệu đến API.");
-                return RedirectToPage();
+                string errorMessage = await response.Content.ReadAsStringAsync();
+                ModelState.AddModelError("", "Lỗi khi gửi dữ liệu đến API: " + errorMessage);
+                return Page();
             }
 
             //using (var content = new MultipartFormDataContent())

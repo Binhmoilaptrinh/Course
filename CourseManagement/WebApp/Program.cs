@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http.Features;
+
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
+
 // Đăng ký HttpClient
 builder.Services.AddHttpClient();
 builder.Services.Configure<FormOptions>(options =>
@@ -9,6 +11,8 @@ builder.Services.Configure<FormOptions>(options =>
 });
 // Add services to the container.
 builder.Services.AddRazorPages();
+// Đăng ký HttpClient
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
@@ -24,6 +28,18 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapRazorPages();
+
+    // Redirect root URL ("/") to "/homepage/index"
+    endpoints.MapGet("/", async context =>
+    {
+        context.Response.Redirect("/Homepage/Index");
+    });
+});
+
 
 app.UseAuthorization();
 

@@ -1,13 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using WebAPI.Extensions;
-using Microsoft.AspNetCore.Http.Features;
-using WebAPI.Services.Interfaces;
-using WebAPI.Services;
-using WebAPI.Repositories.Interfaces;
-using WebAPI.Repositories;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using WebAPI.DTOS;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
@@ -16,33 +10,58 @@ using WebAPI.Utilities;
 using WebAPI.DTOS.response;
 using PdfSharp.Charting;
 
+using System.Text;
+using WebAPI.Extensions;
+using WebAPI.Repositories;
+using WebAPI.Repositories.Interfaces;
+using WebAPI.Services;
+using WebAPI.Services.Interfaces;
+using WebAPI.DTOS;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.Configure<FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 512 * 1024 * 1024 ;
-});
-//odata
 var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<LessonResponseAdmin>("Lesson");
 modelBuilder.EntitySet<Chapter>("Chapter");
 modelBuilder.EntitySet<CourseAdminResponseDto>("Course");
+modelBuilder.EntitySet<UserReponseDto>("User");
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 512 * 1024 * 1024;
+});
 builder.Services.AddControllers().AddOData(
     options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
     .AddRouteComponents(
     "odata",
         modelBuilder.GetEdmModel())
 );
-
-// Inject IConfiguration
+// 🛠 Inject IConfiguration
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
-// Add services to the container.
+// 🛠 Cấu hình Database
 builder.Services.ConfigureSqlContext(builder.Configuration);
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = "/Login";
-});
+
+// 🛠 Cấu hình Authentication với JWT
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = Encoding.UTF8.GetBytes(jwtSettings["secretKey"]);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings["validIssuer"],
+            ValidateAudience = true,
+            ValidAudience = jwtSettings["validAudience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 // 🛠 Đăng ký AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
@@ -50,15 +69,19 @@ builder.Services.AddAutoMapper(typeof(Program));
 // 🛠 Đăng ký Repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
+builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
-builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
 
 // 🛠 Đăng ký Service
 builder.Services.Configure<SendEmail>(builder.Configuration.GetSection("SendEmail"));
 builder.Services.AddScoped<ISendEmail, SendEmailService>();
-builder.Services.AddScoped<IStaffService, StaffService>();
+builder.Services.AddScoped<ICustomAuthorizationService, CustomAuthorizationService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<PaymentHelper>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
@@ -70,9 +93,7 @@ builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IChapterService, ChapterServiceImpl>();
 builder.Services.AddScoped<ICourseClientService, CourseClientService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
-// Đăng ký IFileService với Transient Lifetime
 builder.Services.AddTransient<IFileService, FileService>();
-
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IUserService, UserServiceImpl>();
 builder.Services.AddTransient<IChapterRepository, ChapterRepository>();
@@ -89,8 +110,6 @@ builder.Services.AddTransient<IQuestionService, QuestionServiceImpl>();
 builder.Services.AddAutoMapper(typeof(Program));
 
 
-// Cấu hình CORS
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", policy =>
@@ -101,11 +120,37 @@ builder.Services.AddCors(options =>
     });
 });
 
+// 🛠 Thêm Controllers
 builder.Services.AddControllers();
 
-// Cấu hình Swagger/OpenAPI
+// 🛠 Cấu hình Swagger hỗ trợ JWT
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Description = "Nhập 'Bearer <token>'",
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -116,8 +161,9 @@ app.UseCors("AllowAllOrigins");
 
 app.UseSwaggerUI();
 
+// 🛠 Thêm Authentication và Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();

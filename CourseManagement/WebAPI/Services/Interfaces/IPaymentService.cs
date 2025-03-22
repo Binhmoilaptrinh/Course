@@ -1,11 +1,12 @@
 ﻿using WebAPI.DTOS.request;
+using WebAPI.DTOS.response;
 using WebAPI.Models;
 
 namespace WebAPI.Services.Interfaces
 {
     public interface IPaymentService
     {
-        Task<string> CreatePaymentUrl(int courseId, int userId);
-        Task<Payment> UpdatePayment(PaymentRequest request);
+        Task<CoursePayment> CreatePaymentUrl(int courseId, int userId);
+        Task<Payment> UpdatePayment(long orderCode);
     }
 }
