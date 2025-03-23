@@ -12,10 +12,12 @@ namespace WebAPI.Controllers
     public class CertificateController : ControllerBase
     {
         private readonly IFileService _fileService;
+        private readonly ICertificateService _certificateService;
 
-        public CertificateController(IFileService fileService)
+        public CertificateController(IFileService fileService,ICertificateService certificateService)
         {
             _fileService = fileService;
+            _certificateService = certificateService;
         }
 
         [HttpPost]
@@ -23,6 +25,12 @@ namespace WebAPI.Controllers
         {
             var categories = await _fileService.GenerateAndUploadCertificateAsync(request);
             return Ok(categories);
+        }
+        [HttpGet]
+        public async Task<ActionResult<string>> GetCertificateUrl(int enrollmentId)
+        {
+            var certificateUrl = await _certificateService.GetCertificateUrl(enrollmentId);
+            return Ok(certificateUrl);
         }
     }
 }

@@ -81,6 +81,7 @@ builder.Services.AddScoped<ICustomAuthorizationService, CustomAuthorizationServi
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<PaymentHelper>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
+builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ICourseLearningService, CourseLearningService>();
 builder.Services.AddScoped<ICategoryService, CategoryServiceImpl>();
