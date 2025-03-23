@@ -60,5 +60,11 @@ namespace WebAPI.Controllers
             var courses = await _courseService.GetCourseDetailAdmin(id);
             return Ok(courses);
         }
+        [HttpGet("Chapters/{id}")]
+        public async Task<ActionResult<CourseDetailAdmin>> GetChaptersAdmin(int id)
+        {
+            var chapters = await _courseService.GetChapters(id);
+            return Ok(chapters);
+        }
     }
 }
