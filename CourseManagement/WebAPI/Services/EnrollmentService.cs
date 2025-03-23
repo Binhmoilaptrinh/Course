@@ -44,8 +44,10 @@ namespace WebAPI.Services
 
         public async Task<List<MyCourseResponse>> GetEnrollmentsAsync(int userId)
         {
-            var myCourse = await _eCourseContext.Enrollments.Include(x => x.Course).ThenInclude(y => y.Category).Where(a=>a.UserId == userId).Select(z => new MyCourseResponse
+            var myCourse = await _eCourseContext.Enrollments.Include(b=>b.User).Include(x => x.Course).ThenInclude(y => y.Category).Where(a=>a.UserId == userId).Select(z => new MyCourseResponse
             {
+                EnrollmentId = z.Id, 
+                UserName = z.User.Username,
                 Title = z.Course.Title,
                 ThumbnailImage = z.Course.Thumbnail,
                 Category = z.Course.Category.Name,

@@ -94,14 +94,14 @@
                 authSection.innerHTML = `
                         <div class="nav_menu-user-account">
                             <div class="account-image">
-                                <img id="accountImage" src="" alt="Profile Picture">
+                                <img id="accountImage" src="${userInfo.avatar}" alt="Profile Picture">
                             </div>
                             <div id="userNav" class="user-nav">
                                 <ul class="p-0">
                                     <a class="d-flex align-items-center text-decoration-none" href="/Homepage/Profile">
                                         <div>
                                             <div>
-                                                <img src="" alt="User Avatar">
+                                                        <img src="${userInfo.avatar}" alt="User Avatar">
                                             </div>
                                         </div>
                                         <div class="ms-4">
@@ -118,7 +118,7 @@
                                     <hr>
                                     <ul class="p-0">
                                         <li>
-                                            <a class="fs-4 text-muted text-decoration-none" href="/Homepage/MyCourse">Khóa học của tôi</a>
+                                                    <a class="fs-4 text-muted text-decoration-none" href="/Homepage/MyCourse/${userInfo.userId}">Khóa học của tôi</a>
                                         </li>
                                     </ul>
                                     <hr>
