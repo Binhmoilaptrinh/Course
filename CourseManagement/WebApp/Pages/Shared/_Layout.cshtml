@@ -83,37 +83,59 @@
         <i class="fa-sharp fa-solid fa-shuttle-space icon-scroll"></i>
     </a>
 
-    <
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const userInfo = JSON.parse(localStorage.getItem("userInfo"));
             const authSection = document.getElementById("authSection");
 
             if (userInfo) {
-                // If user is logged in (exists in storage)
+                // Populate user account section with stored user data
                 authSection.innerHTML = `
                         <div class="nav_menu-user-account">
-                            <div class="account-image" id="accountImage">
-                                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
-                                     alt="Profile Picture">
+                            <div class="account-image">
+                                <img id="accountImage" src="" alt="Profile Picture">
                             </div>
-                            <div class="user-nav" id="userNav">
+                            <div id="userNav" class="user-nav">
                                 <ul class="p-0">
-                                    <li>
-                                        <a class="fs-4 text-muted text-decoration-none" href="/Homepage/Profile">Thông tin của tôi</a>
-                                    </li>
-                                    <li>
-                                        <a class="fs-4 text-muted text-decoration-none" href="/Homepage/MyCourse">Khóa học của tôi</a>
-                                    </li>
-                                    <li>
-                                        <a class="fs-4 text-muted text-decoration-none" href="#" onclick="logout()">Đăng xuất</a>
-                                    </li>
+                                    <a class="d-flex align-items-center text-decoration-none" href="/Homepage/Profile">
+                                        <div>
+                                            <div>
+                                                <img src="" alt="User Avatar">
+                                            </div>
+                                        </div>
+                                        <div class="ms-4">
+                                                    <span class="fw-bold fs-4 text-dark">${userInfo.userName}</span>
+                                                    <div class="fs-5 text-muted">${userInfo.email || ''}</div>
+                                        </div>
+                                    </a>
+                                    <hr>
+                                    <ul class="p-0">
+                                        <li>
+                                            <a class="fs-4 text-muted text-decoration-none" href="/Homepage/Profile">Trang cá nhân</a>
+                                        </li>
+                                    </ul>
+                                    <hr>
+                                    <ul class="p-0">
+                                        <li>
+                                            <a class="fs-4 text-muted text-decoration-none" href="/Homepage/MyCourse">Khóa học của tôi</a>
+                                        </li>
+                                    </ul>
+                                    <hr>
+                                    <ul class="p-0">
+                                        <li class="py-2">
+                                            <a href="/Homepage/Editprofile" class="fs-4 text-muted text-decoration-none">Cài đặt</a>
+                                        </li>
+                                        <li class="py-2">
+                                            <a href="#" onclick="logout()" class="fs-4 text-muted text-decoration-none">Đăng xuất</a>
+                                        </li>
+                                    </ul>
                                 </ul>
                             </div>
                         </div>
                     `;
             } else {
-                // If user is NOT logged in (not in storage)
+                // If user is NOT logged in
                 authSection.innerHTML = `
                         <a href="/Authentication/Signup" class="text-decoration-none register-btn d-none d-md-block"> Đăng ký</a>
                         <a href="/Authentication/Login" class="text-decoration-none login-btn" style="border-radius: 15px;">Đăng nhập</a>
@@ -138,6 +160,7 @@
             window.location.href = "/Authentication/Login"; // Redirect after logout
         }
     </script>
+
 
 
 
