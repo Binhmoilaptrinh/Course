@@ -50,6 +50,11 @@ WORKDIR /app
 
 RUN apk add icu-libs
 
+RUN apk add --no-cache ttf-dejavu fontconfig
+
+RUN apk add --no-cache ttf-liberation ttf-freefont
+
+
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # Copy everything needed to run the app from the "build" stage.
