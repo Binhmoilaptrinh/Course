@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using WebAPI.DTOS.response;
+using WebAPI.Models;
 
 namespace WebApp.Pages.Homepage
 {
@@ -28,13 +30,32 @@ namespace WebApp.Pages.Homepage
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();
                 MyCourseResponse = JsonSerializer.Deserialize<List<MyCourseResponse>>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                foreach (var enrollment in MyCourseResponse)
+                {
+                    if (enrollment.Progress == 100)
+                    {
+                        var apiUrlCertificate = $"https://api.2handshop.id.vn/api/Enrollment/GetMyCourse?userId={id}";
+                        var responseCertificate = await _httpClient.GetAsync(apiUrl);
 
+                        if (certificate == null)
+                        {
+                            // Generate and upload if the certificate doesn't exist
+                            Certificate certi = await _fileService.GenerateAndUploadCertificateAsync(enrollment.Id, enrollment.User.UserName, enrollment.Course.Title);
+                            CertificateUrls[enrollment.Id] = certi.CertificateUrl;
+                        }
+                        else
+                        {
+                            CertificateUrls[enrollment.Id] = certificate;
+                        }
+                    }
+                }
                 return Page();
             }
             else
             {
                 return NotFound(); 
             }
+
         }
     }
 }
