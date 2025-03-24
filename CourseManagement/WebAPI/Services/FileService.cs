@@ -13,6 +13,7 @@ using System.Drawing;
 using System.Xml.Linq;
 using WebAPI.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
+using PdfSharp.Fonts;
 
 namespace WebAPI.Services
 {
@@ -150,6 +151,9 @@ namespace WebAPI.Services
 
         public async Task<Certificate> GenerateAndUploadCertificateAsync(CertificateRequest cer)
         {
+            // Đăng ký bộ font tùy chỉnh
+            GlobalFontSettings.FontResolver = new CustomFontResolver();
+
             // Step 1: Generate the Certificate PDF
             string certificateName = $"Certificate_{cer.EnrollmentID}_{DateTime.UtcNow.Ticks}.pdf";
             byte[] pdfBytes = GenerateCertificatePdf(cer.UserName, cer.CourseName, DateTime.UtcNow);
