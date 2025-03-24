@@ -151,8 +151,11 @@ namespace WebAPI.Services
 
         public async Task<Certificate> GenerateAndUploadCertificateAsync(CertificateRequest cer)
         {
-            // Đăng ký bộ font tùy chỉnh
-            GlobalFontSettings.FontResolver = new CustomFontResolver();
+            if (GlobalFontSettings.FontResolver == null)
+            {
+                GlobalFontSettings.FontResolver = new CustomFontResolver();
+            }
+
 
             // Step 1: Generate the Certificate PDF
             string certificateName = $"Certificate_{cer.EnrollmentID}_{DateTime.UtcNow.Ticks}.pdf";
