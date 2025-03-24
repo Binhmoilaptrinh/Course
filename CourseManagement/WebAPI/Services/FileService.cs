@@ -68,6 +68,10 @@ namespace WebAPI.Services
         }
         public byte[] GenerateCertificatePdf(string userName, string courseName, DateTime issueDate)
         {
+            if (GlobalFontSettings.FontResolver == null)
+            {
+                GlobalFontSettings.FontResolver = new CustomFontResolver();
+            }
             using (MemoryStream stream = new MemoryStream())
             {
                 // Create a new PDF document
@@ -151,10 +155,7 @@ namespace WebAPI.Services
 
         public async Task<Certificate> GenerateAndUploadCertificateAsync(CertificateRequest cer)
         {
-            if (GlobalFontSettings.FontResolver == null)
-            {
-                GlobalFontSettings.FontResolver = new CustomFontResolver();
-            }
+            
 
 
             // Step 1: Generate the Certificate PDF
