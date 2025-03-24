@@ -14,6 +14,9 @@ using System.Xml.Linq;
 using WebAPI.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 using PdfSharp.Fonts;
+using MigraDoc.DocumentObjectModel;
+using MigraDoc.Rendering;
+using MigraDoc.DocumentObjectModel.Tables;
 
 namespace WebAPI.Services
 {
@@ -68,96 +71,104 @@ namespace WebAPI.Services
         }
         public byte[] GenerateCertificatePdf(string userName, string courseName, DateTime issueDate)
         {
-            if (GlobalFontSettings.FontResolver == null)
-            {
-                GlobalFontSettings.FontResolver = new CustomFontResolver();
-            }
+            // Create a new document
+            Document document = new Document();
+            Section section = document.AddSection();
+
+            // Set page size and margins
+            section.PageSetup.PageFormat = PageFormat.A4;
+            section.PageSetup.TopMargin = Unit.FromCentimeter(1.5);
+            section.PageSetup.BottomMargin = Unit.FromCentimeter(1.5);
+            section.PageSetup.LeftMargin = Unit.FromCentimeter(1.5);
+            section.PageSetup.RightMargin = Unit.FromCentimeter(1.5);
+
+            // 🎨 Create a Border Using a Table
+            Table borderTable = section.AddTable();
+            borderTable.Borders.Width = 5; // Thick Border
+            borderTable.Borders.Color = Colors.Gold;
+            borderTable.Borders.Distance = 10; // Adds spacing from content
+
+            borderTable.AddColumn(Unit.FromCentimeter(18)); // Corrected column width
+
+            Row row = borderTable.AddRow();
+            Cell cell = row.Cells[0];
+
+            cell.Shading.Color = Colors.White;
+            cell.Format.Alignment = ParagraphAlignment.Center;
+            cell.Format.SpaceBefore = 10;
+            cell.Format.SpaceAfter = 10;
+
+            // 🏆 Title (Removed unsupported emoji)
+            Paragraph title = cell.AddParagraph("CERTIFICATE OF ACHIEVEMENT");
+            title.Format.Font.Size = 32;
+            title.Format.Font.Bold = true;
+            title.Format.Font.Color = Colors.DarkBlue;
+            title.Format.Alignment = ParagraphAlignment.Center;
+            title.Format.SpaceAfter = 15;
+
+            // ✨ Recipient Name
+            Paragraph name = cell.AddParagraph(userName);
+            name.Format.Font.Size = 26;
+            name.Format.Font.Bold = true;
+            name.Format.Font.Color = Colors.DarkRed;
+            name.Format.Alignment = ParagraphAlignment.Center;
+            name.Format.SpaceAfter = 10;
+
+            // 📜 Course Name
+            Paragraph course = cell.AddParagraph();
+            FormattedText formattedCourse = course.AddFormattedText($"has successfully completed the course:\n\"{courseName}\"", TextFormat.Italic);
+            course.Format.Font.Size = 20;
+            course.Format.Alignment = ParagraphAlignment.Center;
+            course.Format.SpaceAfter = 15;
+
+            // 📅 Issue Date
+            Paragraph date = cell.AddParagraph($"Date Issued: {issueDate:dd MMMM yyyy}");
+            date.Format.Font.Size = 16;
+            date.Format.Alignment = ParagraphAlignment.Center;
+            date.Format.SpaceAfter = 20;
+
+            // ✍ Signature (Added more spacing)
+            Paragraph signature = cell.AddParagraph("__________________________");
+            signature.Format.Font.Size = 14;
+            signature.Format.Alignment = ParagraphAlignment.Right;
+            signature.Format.SpaceBefore = 20;
+            signature.Format.SpaceAfter = 5;
+
+            // ✍ Signature Name
+            Paragraph signatureName = cell.AddParagraph("Phạm Thanh Bình");
+            signatureName.Format.Font.Size = 16;
+            signatureName.Format.Font.Bold = true;
+            signatureName.Format.Font.Color = Colors.DarkSlateBlue;
+            signatureName.Format.Alignment = ParagraphAlignment.Right;
+            signatureName.Format.SpaceAfter = 5;
+
+            // ✍ Designation (Italicized)
+            Paragraph designation = cell.AddParagraph("Course Director");
+            designation.Format.Font.Size = 14;
+            designation.Format.Font.Italic = true;
+            designation.Format.Alignment = ParagraphAlignment.Right;
+            designation.Format.SpaceAfter = 15;
+
+            // Render the PDF
+            PdfDocumentRenderer renderer = new PdfDocumentRenderer(true);
+            renderer.Document = document;
+            renderer.RenderDocument();
+
+            // Save to memory stream
             using (MemoryStream stream = new MemoryStream())
             {
-                // Create a new PDF document
-                PdfDocument document = new PdfDocument();
-                document.Info.Title = "Certificate of Completion";
-
-                // Add a page to the document
-                PdfPage page = document.AddPage();
-                page.Size = PdfSharp.PageSize.A4;
-
-                // Create an XGraphics object for drawing
-                XGraphics gfx = XGraphics.FromPdfPage(page);
-
-                // Set up fonts
-                XFont titleFont = new XFont("Arial", 36, XFontStyleEx.Bold);
-                XFont nameFont = new XFont("Arial", 28, XFontStyleEx.Bold);
-                XFont courseFont = new XFont("Arial", 20, XFontStyleEx.BoldItalic);
-                XFont contentFont = new XFont("Arial", 16, XFontStyleEx.Regular);
-                XFont footerFont = new XFont("Arial", 12, XFontStyleEx.Italic);
-
-                // Background color with gradient for a premium look
-                XLinearGradientBrush backgroundBrush = new XLinearGradientBrush(
-                    new XRect(0, 0, page.Width, page.Height),
-                    XColor.FromArgb(255, 240, 248, 255),
-                    XColor.FromArgb(255, 176, 224, 230),
-                    XLinearGradientMode.Vertical);
-                gfx.DrawRectangle(backgroundBrush, 0, 0, page.Width, page.Height);
-
-                // Add a decorative border
-                XPen borderPen = new XPen(XColors.Gold, 4);
-                gfx.DrawRectangle(borderPen, 20, 20, page.Width - 40, page.Height - 40);
-
-                // Draw a thin inner border for additional decoration
-                XPen innerBorderPen = new XPen(XColors.Gray, 2);
-                gfx.DrawRectangle(innerBorderPen, 30, 30, page.Width - 60, page.Height - 60);
-
-                // Draw the title text with shadow for depth
-                gfx.DrawString("CERTIFICATE OF COMPLETION", titleFont, XBrushes.DarkBlue,
-                    new XRect(0, 150, page.Width, 40), XStringFormats.Center);
-
-                // Draw recipient's name with a prominent font
-                gfx.DrawString(userName, nameFont, XBrushes.Black,
-                    new XRect(0, 220, page.Width, 40), XStringFormats.Center);
-
-                // Add course completion text with line breaks for spacing
-                gfx.DrawString("has successfully completed the online course:", contentFont, XBrushes.Black,
-                    new XRect(0, 270, page.Width, 20), XStringFormats.Center);
-
-                // Draw course name in a stylish font with bold and italics
-                gfx.DrawString(courseName, courseFont, XBrushes.DarkBlue,
-                    new XRect(0, 310, page.Width, 30), XStringFormats.Center);
-
-                // Add decorative text for commitment statement
-                gfx.DrawString("This achievement demonstrates dedication and commitment to personal growth.",
-                    contentFont, XBrushes.DarkGray, new XRect(0, 360, page.Width, 20), XStringFormats.Center);
-
-                // Issue date and signature line
-                gfx.DrawString($"Date Issued: {issueDate:dd MMMM yyyy}", contentFont, XBrushes.Black,
-                    new XRect(40, page.Height - 120, page.Width - 80, 20), XStringFormats.TopLeft);
-
-                // Add an authorized signature
-                gfx.DrawString("Signature: Phạm Thanh Bình", footerFont, XBrushes.Black,
-                    new XRect(40, page.Height - 80, page.Width - 80, 20), XStringFormats.TopLeft);
-
-                // Draw an organization footer with a small logo (optional)
-                gfx.DrawString("Authorized by: Your Organization", footerFont, XBrushes.Black,
-                    new XRect(40, page.Height - 50, page.Width - 80, 20), XStringFormats.TopLeft);
-
-                // Add a watermark in the center of the certificate
-                XFont watermarkFont = new XFont("Arial", 72, XFontStyleEx.BoldItalic);
-                gfx.DrawString("Achieved", watermarkFont, new XSolidBrush(XColor.FromArgb(50, 192, 192, 192)),
-                    new XRect(0, page.Height / 2 - 50, page.Width, 100), XStringFormats.Center);
-
-                // Save the document to the stream
-                document.Save(stream, false);
+                renderer.PdfDocument.Save(stream, false);
                 return stream.ToArray();
             }
-
-
         }
+
+
+
+
+
 
         public async Task<Certificate> GenerateAndUploadCertificateAsync(CertificateRequest cer)
         {
-            
-
-
             // Step 1: Generate the Certificate PDF
             string certificateName = $"Certificate_{cer.EnrollmentID}_{DateTime.UtcNow.Ticks}.pdf";
             byte[] pdfBytes = GenerateCertificatePdf(cer.UserName, cer.CourseName, DateTime.UtcNow);

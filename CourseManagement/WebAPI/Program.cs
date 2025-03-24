@@ -21,7 +21,6 @@ using Microsoft.AspNetCore.Http.Features;
 using PdfSharp.Fonts;
 
 var builder = WebApplication.CreateBuilder(args);
-GlobalFontSettings.FontResolver = new CustomFontResolver();
 var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<LessonResponseAdmin>("Lesson");
 modelBuilder.EntitySet<Chapter>("Chapter");
