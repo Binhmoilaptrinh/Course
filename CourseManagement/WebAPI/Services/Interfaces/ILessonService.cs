@@ -8,6 +8,10 @@ namespace WebAPI.Services.Interfaces
     {
         Task<LessonVideoResponseAdmin> CreateLessonVideoAsync(LessonVideoRequestDto request);
 
+        Task<LessonVideoResponseAdmin> UpdateLessonVideoAsync(int id, LessonVideoUpdateDto request);
+
+        Task<LessonQuizzResponseAdmin> UpdateLessonQuizzAsync(int id, LessonQuizzUpdateDto request);
+
         Task<LessonQuizzResponseAdmin> CreateLessonQuizzAsync(LessonQuizzRequestDto request);
         Task<IEnumerable<LessonResponseAdmin>> GetAllLessonAsync();
         Task<LessonDetailResponseAdmin> GetLessonByIdAsync(int id);

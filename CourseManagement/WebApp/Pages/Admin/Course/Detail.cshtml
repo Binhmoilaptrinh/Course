@@ -143,14 +143,14 @@
                                 @foreach (var lesson in chapter.LessonResponse)
                                 {
                                     <div class="manage__learning_lesson learning__lesson-item video-index-0-0 ">
-                                        <a class="text-decoration-none" href="/Admin/Course/Lesson/@lesson.Id">
+                                        <a class="text-decoration-none" href="/Admin/Course/Lesson?lessonId=@lesson.Id">
                                             <h5 class="learning__lesson-item-name">1. @lesson.Name</h5>
                                             <p class="learning__lesson-item-time mb-0">@ConvertToTimeFormat(lesson.Duration)</p>
                                         </a>
                                     </div>
                                 }
                                 <div class="">
-                                    <a class="learning__lesson-item learning_lesson-add text-decoration-none d-block fs-5 mb-0 text-white w-100" href="/Admin/Course/Lesson/@chapter.Id">Add more</a>
+                                    <a class="learning__lesson-item learning_lesson-add text-decoration-none d-block fs-5 mb-0 text-white w-100" href="/Admin/Course/Lesson?chapterId=@chapter.Id">Add more</a>
                                 </div>
                             </div>
                         </li>

@@ -1,12 +1,9 @@
 ﻿namespace WebAPI.DTOS.request
 {
-    public class LessonVideoRequestDto
+    public class LessonVideoUpdateDto
     {
         public int UserId { get; set; }
         public string Name { get; set; }
-
-        public int ChapterId { get; set; }
-
         public IFormFile? Video { get; set; }
         public string Status { get; set; }
 

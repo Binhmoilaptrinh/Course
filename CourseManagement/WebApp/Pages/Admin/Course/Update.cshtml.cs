@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using WebAPI.DTOS.response;
@@ -76,7 +76,7 @@ namespace WebApp.Pages.Admin.Course
             requestContent.Add(new StringContent(Limit.ToString()), "LimitDay");
             requestContent.Add(new StringContent(Desc ?? ""), "Description");
             Console.WriteLine(requestContent);
-            using var response = await _httpClient.PutAsync("http://localhost:5000/api/Course/" + CourseId, requestContent);
+            using var response = await _httpClient.PostAsync("http://localhost:5000/api/Course/" + CourseId, requestContent);
 
             if (response.IsSuccessStatusCode)
             {

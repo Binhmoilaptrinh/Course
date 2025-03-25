@@ -25,10 +25,24 @@ namespace WebAPI.Controllers
             return CreatedAtAction(nameof(GetLessonDetail), new { id = lesson.Id }, lesson);
         }
 
+        [HttpPut("update/video/{id}")]
+        public async Task<ActionResult<LessonVideoResponseAdmin>> UpdateLessonVideo(int id, [FromForm] LessonVideoUpdateDto request)
+        {
+            var lesson = await _lessonService.UpdateLessonVideoAsync(id, request);
+            return CreatedAtAction(nameof(GetLessonDetail), new { id = lesson.Id }, lesson);
+        }
+
         [HttpPost("add/quizz")]
         public async Task<ActionResult<LessonQuizzResponseAdmin>> CreateLessonQuizz([FromBody] LessonQuizzRequestDto request)
         {
             var lesson = await _lessonService.CreateLessonQuizzAsync(request);
+            return CreatedAtAction(nameof(GetLessonDetail), new { id = lesson.Id }, lesson);
+        }
+
+        [HttpPut("update/quizz/{id}")]
+        public async Task<ActionResult<LessonQuizzResponseAdmin>> UpdateLessonQuizz(int id, [FromBody] LessonQuizzUpdateDto request)
+        {
+            var lesson = await _lessonService.UpdateLessonQuizzAsync(id, request);
             return CreatedAtAction(nameof(GetLessonDetail), new { id = lesson.Id }, lesson);
         }
 
