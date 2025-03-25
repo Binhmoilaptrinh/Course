@@ -183,12 +183,12 @@
                                 <i class="fa-solid fa-calendar"></i>
                                 <span>Ngày hết hạn: @(enrollment.ExpiredDate?.ToString("dd/MM/yyyy") ?? "Không xác định")</span>
                             </div>
-                            @*@if (Model.CertificateUrls.ContainsKey(enrollment.Id))
+                            @if (Model.CertificateUrls.ContainsKey(enrollment.EnrollmentId))
                             {
-                                <a class="course-status" href="@Model.CertificateUrls[enrollment.Id]" target="_blank" download>
+                                <a class="course-status" href="@Model.CertificateUrls[enrollment.EnrollmentId]" target="_blank" download>
                                     Tải chứng chỉ PDF
                                 </a>
-                            }*@
+                            }
                         </div>
                     </div>
                 </div>

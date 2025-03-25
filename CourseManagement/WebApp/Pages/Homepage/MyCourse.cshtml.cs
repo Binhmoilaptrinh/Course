@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
+using System.Text;
 using System.Text.Json;
 using WebAPI.DTOS.response;
 using WebAPI.Models;
@@ -10,12 +10,15 @@ namespace WebApp.Pages.Homepage
     public class MyCourseModel : PageModel
     {
         private readonly HttpClient _httpClient;
+
         public MyCourseModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public List<MyCourseResponse> MyCourseResponse { get; set; }
+        public List<MyCourseResponse> MyCourseResponse { get; set; } = new();
+        public Dictionary<int, string> CertificateUrls { get; set; } = new();
+
         public async Task<IActionResult> OnGetAsync(int id)
         {
             if (id <= 0)
@@ -26,36 +29,69 @@ namespace WebApp.Pages.Homepage
             var apiUrl = $"https://api.2handshop.id.vn/api/Enrollment/GetMyCourse?userId={id}";
             var response = await _httpClient.GetAsync(apiUrl);
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                var jsonResponse = await response.Content.ReadAsStringAsync();
-                MyCourseResponse = JsonSerializer.Deserialize<List<MyCourseResponse>>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                foreach (var enrollment in MyCourseResponse)
-                {
-                    if (enrollment.Progress == 100)
-                    {
-                        var apiUrlCertificate = $"https://api.2handshop.id.vn/api/Enrollment/GetMyCourse?userId={id}";
-                        var responseCertificate = await _httpClient.GetAsync(apiUrl);
+                return NotFound();
+            }
 
-                        if (certificate == null)
-                        {
-                            // Generate and upload if the certificate doesn't exist
-                            Certificate certi = await _fileService.GenerateAndUploadCertificateAsync(enrollment.Id, enrollment.User.UserName, enrollment.Course.Title);
-                            CertificateUrls[enrollment.Id] = certi.CertificateUrl;
-                        }
-                        else
-                        {
-                            CertificateUrls[enrollment.Id] = certificate;
-                        }
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            MyCourseResponse = JsonSerializer.Deserialize<List<MyCourseResponse>>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+
+            foreach (var enrollment in MyCourseResponse)
+            {
+                if (enrollment.Progress == 100)
+                {
+                    var certificateUrl = await GetCertificateUrlAsync(enrollment.EnrollmentId);
+
+                    if (certificateUrl == null)
+                    {
+                        certificateUrl = await CreateCertificateAsync(enrollment);
+                    }
+
+                    if (!string.IsNullOrEmpty(certificateUrl))
+                    {
+                        CertificateUrls[enrollment.EnrollmentId] = certificateUrl;
                     }
                 }
-                return Page();
-            }
-            else
-            {
-                return NotFound(); 
             }
 
+            return Page();
+        }
+
+        private async Task<string?> GetCertificateUrlAsync(int enrollmentId)
+        {
+            var apiUrlCertificate = $"https://api.2handshop.id.vn/api/Certificate?enrollmentId={enrollmentId}";
+            var response = await _httpClient.GetAsync(apiUrlCertificate);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+
+            return null;
+        }
+
+        private async Task<string?> CreateCertificateAsync(MyCourseResponse enrollment)
+        {
+            var createCertificateUrl = "https://api.2handshop.id.vn/api/Certificate";
+            var certificateRequest = new
+            {
+                enrollmentID = enrollment.EnrollmentId,
+                userName = enrollment.UserName,
+                courseName = enrollment.Title
+            };
+
+            var jsonContent = new StringContent(JsonSerializer.Serialize(certificateRequest), Encoding.UTF8, "application/json");
+            var postResponse = await _httpClient.PostAsync(createCertificateUrl, jsonContent);
+
+            if (postResponse.IsSuccessStatusCode)
+            {
+                var createdCertResponse = await postResponse.Content.ReadAsStringAsync();
+                var createdCertificate = JsonSerializer.Deserialize<Certificate>(createdCertResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return createdCertificate?.CertificateUrl;
+            }
+
+            return null;
         }
     }
 }
