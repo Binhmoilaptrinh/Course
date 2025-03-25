@@ -253,7 +253,6 @@
     $(document).ready(function () {
         var userInfo = localStorage.getItem("userInfo");
         if (!userInfo) {
-            // Nếu không có userInfo, hiển thị nút đăng nhập
             $("#accessButton").html(`
                 <a class="course__preview-learn btn" href="/Authentication/Login">
                     Đăng ký học
@@ -261,11 +260,11 @@
             `);
             return;
         }
-        var userId = 0; // Mặc định là 0 nếu không tìm thấy userInfo
 
+        var userId = 0;
         if (userInfo) {
             try {
-                userId = JSON.parse(userInfo).userId || 0; // Lấy userId, nếu không có thì vẫn là 0
+                userId = JSON.parse(userInfo).userId || 0;
             } catch (e) {
                 console.error("Lỗi khi đọc userInfo từ Local Storage:", e);
             }
@@ -273,36 +272,51 @@
 
         var courseId = @Model.CourseDetail?.Id;
 
+        // Gọi API để lấy lessonId
         $.ajax({
-            url: "https://api.2handshop.id.vn/api/Enrollment/CheckStatus",
+            url: "https://api.2handshop.id.vn/api/CourseLearning/latest-lesson",
             type: "POST",
-            contentType: "application/json",
+            contentType: "application/json;odata.metadata=minimal;odata.streaming=true",
             data: JSON.stringify({ userId: userId, courseId: courseId }),
-            success: function (response) {
-                var hasAccess = response; // Dữ liệu trả về từ API
-                    
-                var buttonHtml = "";
-                if (hasAccess === 1 || hasAccess === 3) {
-                    buttonHtml = `<a class="course__preview-learn btn"
-                                            href="/Homepage/LearningCourse?courseId=${courseId}&&userId=${userId}">
-                                        Bắt đầu học
-                                      </a>`;
-                } else if (hasAccess === 0) {
-                    buttonHtml = `<a class="course__preview-learn btn"
-                                        href="/Homepage/PaymentConfirm?id=${courseId}">
-                                        Đăng ký học
-                                      </a>`;
-                } else {
-                    buttonHtml = `<a class="course__preview-learn btn"
-                                        href="/Homepage/PaymentConfirm?id=${courseId}">
-                                        Đăng ký học lại
-                                      </a>`;
-                }
+            success: function (latestLessonResponse) {
+                var lessonId = latestLessonResponse || 0; // Lấy lessonId từ phản hồi
 
-                $("#accessButton").html(buttonHtml);
+                // Gọi API CheckStatus sau khi có lessonId
+                $.ajax({
+                    url: "https://api.2handshop.id.vn/api/Enrollment/CheckStatus",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ userId: userId, courseId: courseId }),
+                    success: function (response) {
+                        var hasAccess = response;
+
+                        var buttonHtml = "";
+                        if (hasAccess === 1 || hasAccess === 3 || @Model.CourseDetail.Price == 0) {
+                            buttonHtml = `<a class="course__preview-learn btn"
+                                            href="/Homepage/LearningCourse?courseId=${courseId}&userId=${userId}&lessonId=${lessonId}">
+                                            Bắt đầu học
+                                          </a>`;
+                        } else if (hasAccess === 0) {
+                            buttonHtml = `<a class="course__preview-learn btn"
+                                            href="/Homepage/PaymentConfirm?id=${courseId}">
+                                            Đăng ký học
+                                          </a>`;
+                        } else {
+                            buttonHtml = `<a class="course__preview-learn btn"
+                                            href="/Homepage/PaymentConfirm?id=${courseId}">
+                                            Đăng ký học lại
+                                          </a>`;
+                        }
+
+                        $("#accessButton").html(buttonHtml);
+                    },
+                    error: function () {
+                        console.error("Lỗi khi kiểm tra quyền truy cập.");
+                    }
+                });
             },
             error: function () {
-                console.error("Lỗi khi kiểm tra quyền truy cập.");
+                console.error("Lỗi khi lấy lessonId từ API latest-lesson.");
             }
         });
     });
