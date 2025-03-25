@@ -19,6 +19,7 @@ using WebAPI.Services.Interfaces;
 using WebAPI.DTOS;
 using Microsoft.AspNetCore.Http.Features;
 using PdfSharp.Fonts;
+using WebAPI.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 var modelBuilder = new ODataConventionModelBuilder();
