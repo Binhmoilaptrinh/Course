@@ -88,5 +88,30 @@ namespace WebAPI.Services
             }).FirstOrDefaultAsync(x => x.LessonId == lessonId && x.UserId == userId);
             return lessonProgress;
         }
+
+        public async Task<int> GetLatestLesson(LessonProgressLatest lessonProgress)
+        {
+            // Get all lesson IDs in the specified course
+            var lessonIdsInCourse = await _eCourseContext.Courses
+                .Where(f => f.Id == lessonProgress.CourseId)
+                .SelectMany(c => c.Chapters.SelectMany(ch => ch.Lessons.Select(l => l.Id)))
+                .ToListAsync();
+
+            if (!lessonIdsInCourse.Any())
+            {
+                return 0; // Or throw an exception if no lessons exist
+            }
+
+            // Find the latest lesson the user has progressed in this course
+            var lessonLatest = await _eCourseContext.LessonProgresses
+                .Where(lp => lp.UserId == lessonProgress.UserId && lessonIdsInCourse.Contains(lp.LessonId))
+                .OrderByDescending(lp => lp.LessonId) // Assuming there's a LastAccessed field
+                .Select(lp => lp.LessonId)
+                .FirstOrDefaultAsync();
+
+            // If no progress exists, return the first lesson in the course
+            return lessonLatest > 0 ? lessonLatest : lessonIdsInCourse.First();
+        }
+
     }
 }

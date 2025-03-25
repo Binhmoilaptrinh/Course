@@ -282,9 +282,9 @@
                 var hasAccess = response; // Dữ liệu trả về từ API
                     
                 var buttonHtml = "";
-                if (hasAccess === 1) {
+                if (hasAccess === 1 || hasAccess === 3) {
                     buttonHtml = `<a class="course__preview-learn btn"
-                                        href="/Homepage/LearningCourse?courseId=${courseId}">
+                                            href="/Homepage/LearningCourse?courseId=${courseId}&&userId=${userId}">
                                         Bắt đầu học
                                       </a>`;
                 } else if (hasAccess === 0) {
