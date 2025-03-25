@@ -74,6 +74,8 @@ builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddHostedService<EnrollmentStatusUpdater>();
+
 
 // 🛠 Đăng ký Service
 builder.Services.Configure<SendEmail>(builder.Configuration.GetSection("SendEmail"));

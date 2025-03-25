@@ -92,6 +92,12 @@
             if (userInfo) {
                 // Populate user account section with stored user data
                 authSection.innerHTML = `
+                                <div class="">
+                                <a href="/Homepage/MyCourse" class="nav_menu-myLearn text-decoration-none">Khóa học của tôi</a>
+                            </div>
+                            <div class="nav_menu-user-notifi">
+                                <i class="fa-solid fa-bell"></i>
+                            </div>
                         <div class="nav_menu-user-account">
                             <div class="account-image">
                                 <img id="accountImage" src="${userInfo.avatar}" alt="Profile Picture">
