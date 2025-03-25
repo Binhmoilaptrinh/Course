@@ -23,6 +23,31 @@ namespace WebAPI.Controllers
             var lessonProgress = await _enrollmentService.GetEnrollmentsAsync(userId);
             return Ok(lessonProgress);
         }
+        [HttpPost]
+        public async Task<IActionResult> EnrollCourseFree([FromBody] EnrollmentRequestDto requestDto)
+        {
+            if (requestDto == null)
+            {
+                return BadRequest("Invalid request data.");
+            }
+
+            try
+            {
+                var isEnrolled = await _enrollmentService.EnrollCourse(requestDto);
+
+                if (!isEnrolled)
+                {
+                    return BadRequest("Enrollment failed. The course might not exist or has restrictions.");
+                }
+
+                return Ok(new { Success = true, Message = "Enrollment successful." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while enrolling in the course: {ex.Message}");
+            }
+        }
+
         [HttpPost("CheckStatus")]
         public async Task<ActionResult<int>> CheckStatus(EnrollmentRequestDto requestDto)
         {
