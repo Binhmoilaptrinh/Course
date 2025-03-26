@@ -17,6 +17,6 @@ namespace WebAPI.Services.Interfaces
 
         Task<bool> IsExistCourseByIdAsync(int id);
         Task<CourseDetailAdmin> GetCourseDetailAdmin(int id);
-        Task<List<ChapterDTO>> GetChapters(int courseId);
+        Task<List<ChapterDTO>> GetChapters(int courseId,int userId);
     }
 }

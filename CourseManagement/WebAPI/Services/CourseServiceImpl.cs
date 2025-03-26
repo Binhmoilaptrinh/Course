@@ -144,7 +144,7 @@ namespace WebAPI.Services
             return courseDetail;
         }
 
-        public async Task<List<ChapterDTO>> GetChapters(int courseId)
+        public async Task<List<ChapterDTO>> GetChapters(int courseId, int userId)
         {
             var chapters = await _courseContext.Chapters
                 .Include(c => c.Lessons)
@@ -160,13 +160,18 @@ namespace WebAPI.Services
                     {
                         Id = l.Id,
                         Name = l.Name,
-                        Duration = l.Duration
+                        Duration = l.Duration,
+                        IsPassed = _courseContext.LessonProgresses
+                            .Where(y => y.LessonId == l.Id && y.UserId == userId)
+                            .Select(a => a.Passing == 1)
+                            .FirstOrDefault() // Returns false if no record is found
                     }).ToList()
                 })
                 .ToListAsync(); // Return a list of chapters
 
             return chapters;
         }
+
 
     }
 }
