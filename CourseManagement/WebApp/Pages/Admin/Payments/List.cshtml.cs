@@ -1,0 +1,49 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using WebAPI.DTOS.response;
+using WebAPI.Models;
+using WebAPI.Services.Interfaces;
+using X.PagedList;
+using X.PagedList.Extensions;
+    
+namespace WebApp.Pages.Admin.Payments
+{
+    public class ListModel : PageModel
+    {
+        private readonly IPaymentService _paymentService;
+        
+        public ListModel(IPaymentService paymentService)
+        {
+            _paymentService = paymentService;
+            
+        }
+        public List<PaymentListResponse> Payments { get; set; }
+
+
+        public IPagedList<PaymentListResponse> PagedPayments { get; set; }
+
+        public string CurrentFilter { get; set; } = "";
+        public string CurrentSort { get; set; }
+        public int? PageSize { get; set; }
+        public int? PageNo { get; set; }
+
+        public int? TotalPage { get; set; }
+        public async Task OnGetAsync(DateTime? fromDate, DateTime? toDate, string orderNumber, int? status, int? pageNo, int? pageSize)
+        {
+            pageNo ??= 1;
+            pageSize ??= 5;
+
+            var paymentsQuery = await _paymentService.SearchPaymentsAsync(fromDate, toDate, orderNumber, status);
+
+            PagedPayments = paymentsQuery.ToPagedList((int)pageNo, (int)pageSize);
+
+            int totalItems = paymentsQuery.Count();
+            int morePage = totalItems % pageSize != 0 ? 1 : 0;
+            TotalPage = (totalItems / pageSize) + morePage;
+
+            PageNo = pageNo;
+            PageSize = pageSize;
+        }
+    }
+}

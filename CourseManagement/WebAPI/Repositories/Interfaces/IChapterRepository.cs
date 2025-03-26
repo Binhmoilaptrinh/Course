@@ -10,5 +10,7 @@ namespace WebAPI.Repositories.Interfaces
 
         Task<IEnumerable<Chapter>> GetAllAsync();
         Task<Chapter> GetByIdAsync(int id);
+
+        Task DeleteAsync(int id);
     }
 }

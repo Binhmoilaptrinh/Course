@@ -19,6 +19,7 @@ namespace WebApp.Pages.Homepage
         }
         public LessonProgressResponse LessonProgressResponse { get; set; }
         public List<ChapterDTO> Chapters { get; set; } = new List<ChapterDTO>();
+        public int CourseId { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int courseId, int lessonId, int userId)
         {
@@ -79,6 +80,7 @@ namespace WebApp.Pages.Homepage
 
             try
             {
+                CourseId = courseId;
                 LessonProgressResponse = JsonSerializer.Deserialize<LessonProgressResponse>(
                     progressContent,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }

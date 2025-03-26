@@ -12,5 +12,7 @@ namespace WebAPI.Services.Interfaces
 
         Task<IEnumerable<ChapterResponse>> GetAllChapterAsync();
         Task<ChapterResponse> GetChapterByIdAsync(int id);
+
+        Task DeleteChapterById(int id);
     }
 }

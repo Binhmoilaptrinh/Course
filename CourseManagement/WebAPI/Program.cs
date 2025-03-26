@@ -94,6 +94,7 @@ builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IChapterService, ChapterServiceImpl>();
 builder.Services.AddScoped<ICourseClientService, CourseClientService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IEnrollmentAdminService, EnrollmentAdminService>();
 builder.Services.AddTransient<IFileService, FileService>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IUserService, UserServiceImpl>();

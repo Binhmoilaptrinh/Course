@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
 using WebAPI.Models;
@@ -34,7 +36,6 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<CourseAdminResponseDto>> CreateCourse([FromForm] CourseRequestDto course)
         {
-            Console.WriteLine(course);
             var courses = await _courseService.CreateCourseAsync(course);
             return Ok(courses);
         }
@@ -61,9 +62,9 @@ namespace WebAPI.Controllers
             return Ok(courses);
         }
         [HttpGet("Chapters/{id}")]
-        public async Task<ActionResult<List<ChapterDTO>>> GetChaptersAdmin(int id)
+        public async Task<ActionResult<List<ChapterDTO>>> GetChaptersAdmin(int id,int userId)
         {
-            var chapters = await _courseService.GetChapters(id);
+            var chapters = await _courseService.GetChapters(id, userId);
             return Ok(chapters);
         }
     }

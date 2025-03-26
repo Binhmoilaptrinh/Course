@@ -1,8 +1,12 @@
+﻿using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
+using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
+using WebAPI.Services.Interfaces;
 
 namespace WebApp.Pages.Admin.Course
 {
@@ -16,27 +20,82 @@ namespace WebApp.Pages.Admin.Course
         }
         [BindProperty]
         public List<ChapterDTO> Chapters { get; set; } = new List<ChapterDTO>();
-        public CourseDetailAdmin CourseDetail { get; set; }
+        public CourseDetailResponseDto CourseDetail { get; set; }
         public async Task<IActionResult> OnGetAsync(int id)
         {
             if (id <= 0)
             {
-                return BadRequest(); // Tr? v? l?i n?u id kh�ng h?p l?
+                return BadRequest(); // Tr? v? l?i n?u id không h?p l?
             }
 
-            var apiUrl = $"https://api.2handshop.id.vn/api/Course/Detail/{id}";
+            var apiUrl = $"https://api.2handshop.id.vn/api/Course/{id}";
             var response = await _httpClient.GetAsync(apiUrl);
 
             if (response.IsSuccessStatusCode)
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                CourseDetail = JsonSerializer.Deserialize<CourseDetailAdmin>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                CourseDetail = JsonSerializer.Deserialize<CourseDetailResponseDto>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 return Page();
             }
             else
             {
                 return NotFound(); 
+            }
+        }
+
+        public async Task<IActionResult> OnPostAsync(int courseId, List<string> oldChapterName, List<int> oldChapterId, List<string> newChaptersName)
+        {
+            //update chapter
+            for (int i = 0; i< oldChapterId.Count(); i++)
+            {
+                ChapterRequestDto chapter = new ChapterRequestDto
+                {
+                    Name = oldChapterName[i],
+                    Status = "Active",
+                    CourseId = courseId
+                };
+                using var jsonContent = new StringContent(JsonSerializer.Serialize(chapter), Encoding.UTF8, "application/json");
+
+                using var response = await _httpClient.PutAsync("https://api.2handshop.id.vn/api/Chapter/" + oldChapterId[i], jsonContent);
+            }
+
+            //add chapter
+            //update chapter
+            foreach (var name in newChaptersName)
+            {
+                ChapterRequestDto chapter = new ChapterRequestDto
+                {
+                    Name = name,
+                    Status = "Active",
+                    CourseId = courseId
+                };
+                using var jsonContent = new StringContent(JsonSerializer.Serialize(chapter),  Encoding.UTF8, "application/json");
+
+                using var response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/Chapter", jsonContent);
+                if (!response.IsSuccessStatusCode)
+                {
+                    TempData["ErrorMessage"] = "Lỗi khi save chapter!";
+                    return Redirect("/Admin/Course/Detail/" + courseId);
+                }
+            }
+
+            TempData["SuccessMessage"] = "Save chapter thành công!";
+            return Redirect("/Admin/Course/Detail/" + courseId);
+        }
+
+        public async Task<IActionResult> OnGetDeleteChapter(int chapterId, int courseId)
+        {
+            using var response = await _httpClient.DeleteAsync("http://localhost:5000/api/Chapter/" + chapterId);
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Đã xóa thành công chapter";
+                return Redirect("/Admin/Course/Detail/" + courseId);
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Xóa chapter thất bại.";
+                return Redirect("/Admin/Course/Detail/" + courseId);
             }
         }
     }

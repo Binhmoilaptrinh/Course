@@ -343,7 +343,7 @@
         @for (int j = 0; j < Model.Chapters[i].Lessons.Count; j++)
         {
             numLesson++;
-            if (Model.Chapters[i].Lessons[j].IsPass ?? false)
+            if (Model.Chapters[i].Lessons[j].IsPassed)
             {
                 numPass++;
             }
@@ -359,7 +359,7 @@
                class="prev_page-btn">
                 <i class="fa-solid fa-chevron-left"></i>
             </a>
-            <div class="header__course-title">@Model.CurrentLesson.Name</div>
+            <div class="header__course-title">@*@Model.CurrentLesson.Name*@</div>
             <div class="header__learning-progress">
                 <div class="header__learning-progress-percent">
                     <div class="circular-progress" style="background: conic-gradient(red 0deg, rgb(77, 79, 80) @deg);">

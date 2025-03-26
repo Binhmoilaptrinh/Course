@@ -6,6 +6,8 @@ namespace WebAPI.Repositories.Interfaces
     {
         Task<Lesson> CreateAsync(Lesson lesson);
 
+        Task<Lesson> UpdateAsync(Lesson lesson);
+
         Task<IEnumerable<Lesson>> GetAllAsync();
 
         Task<Lesson> GetByIdAsync(int id);
