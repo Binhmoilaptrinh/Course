@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WebAPI.DTOS.response;
 using WebAPI.Models;
 using WebAPI.Services.Interfaces;
 
@@ -15,14 +16,29 @@ namespace WebAPI.Controllers
             _enrollmentAdminService = enrollmentAdminService;
         }
 
-        [HttpGet(Name = "GetEnrollmentList")]
+        [HttpGet("GetEnrollmentList")]
         public async Task<IActionResult> GetEnrollmentList()
         {
             var enrollments = await _enrollmentAdminService.GetEnrollmentList();
             return Ok(enrollments);
         }
 
-        [HttpGet("{userId}")]
+        [HttpGet("GetEnrollmentListByCourseId/{courseId}")]
+        public async Task<ActionResult<IEnumerable<EnrollmentResponseDTO>>> GetEnrollmentListByCourseId(int courseId)
+        {
+            try
+            {
+                var enrollments = await _enrollmentAdminService.GetEnrollmentListByCourseId(courseId);
+                if(enrollments == null || enrollments.Count() == 0)
+                    return NotFound("No enrollments found for this course.");
+                return Ok(enrollments);
+            } catch (Exception e)
+            {
+                return StatusCode(500, "Internal Server Error: " + e.Message);
+            }
+        }
+
+        [HttpGet("EnrollmentListByUserId/{userId}")]
         public async Task<ActionResult<IEnumerable<Enrollment>>> EnrollmentListByCourseId(int userId)
         {
             try

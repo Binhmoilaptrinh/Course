@@ -68,7 +68,10 @@ namespace WebAPI.Repositories
                 UserName = u.User.Username,
                 Email = u.User.Email,
                 RoleId = u.RoleId,
-                RoleName = u.Role.RoleName
+                RoleName = u.Role.RoleName,
+                Avatar = u.User.Avatar,
+                Bio = u.User.Bio,
+                PhoneNumber = u.User.PhoneNumber
             };
 
             return loginDto;

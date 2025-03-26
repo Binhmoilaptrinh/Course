@@ -13,6 +13,7 @@ using System.Drawing;
 using System.Xml.Linq;
 using WebAPI.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
+using PdfSharp.Fonts;
 
 namespace WebAPI.Services
 {
@@ -67,6 +68,7 @@ namespace WebAPI.Services
         }
         public byte[] GenerateCertificatePdf(string userName, string courseName, DateTime issueDate)
         {
+
             using (MemoryStream stream = new MemoryStream())
             {
                 // Create a new PDF document
@@ -81,11 +83,11 @@ namespace WebAPI.Services
                 XGraphics gfx = XGraphics.FromPdfPage(page);
 
                 // Set up fonts
-                XFont titleFont = new XFont("Arial", 36, XFontStyleEx.Bold);
-                XFont nameFont = new XFont("Arial", 28, XFontStyleEx.Bold);
-                XFont courseFont = new XFont("Arial", 20, XFontStyleEx.BoldItalic);
-                XFont contentFont = new XFont("Arial", 16, XFontStyleEx.Regular);
-                XFont footerFont = new XFont("Arial", 12, XFontStyleEx.Italic);
+                XFont titleFont = new XFont("Verdana", 36, XFontStyleEx.Bold);
+                XFont nameFont = new XFont("Verdana", 28, XFontStyleEx.Bold);
+                XFont courseFont = new XFont("Verdana", 20, XFontStyleEx.BoldItalic);
+                XFont contentFont = new XFont("Verdana", 16, XFontStyleEx.Regular);
+                XFont footerFont = new XFont("Verdana", 12, XFontStyleEx.Italic);
 
                 // Background color with gradient for a premium look
                 XLinearGradientBrush backgroundBrush = new XLinearGradientBrush(
@@ -136,7 +138,7 @@ namespace WebAPI.Services
                     new XRect(40, page.Height - 50, page.Width - 80, 20), XStringFormats.TopLeft);
 
                 // Add a watermark in the center of the certificate
-                XFont watermarkFont = new XFont("Arial", 72, XFontStyleEx.BoldItalic);
+                XFont watermarkFont = new XFont("Verdana", 72, XFontStyleEx.BoldItalic);
                 gfx.DrawString("Achieved", watermarkFont, new XSolidBrush(XColor.FromArgb(50, 192, 192, 192)),
                     new XRect(0, page.Height / 2 - 50, page.Width, 100), XStringFormats.Center);
 

@@ -10,5 +10,6 @@ namespace WebAPI.Services.Interfaces
         Task<LessonProgressResponse> GetLessonProgress(int lessonId, int userId);
         Task<LessonProgress> EnrollLesson(LessonEnroll enroll);
         Task<LessonProgress> UpdateProgressLesson(ProgressLessonUpdate progress);
+        Task<int> GetLatestLesson(LessonProgressLatest lessonProgress);
     }
 }

@@ -33,6 +33,12 @@ namespace WebAPI.Controllers
             var lessonProgress = await _courseLearningService.GetLessonProgress(lessonId, userId);
             return Ok(lessonProgress);
         }
+        [HttpPost("latest-lesson")]
+        public async Task<ActionResult<int>> GetLatestLEsson(LessonProgressLatest lessonProgress)
+        {
+            var latestLesson = await _courseLearningService.GetLatestLesson(lessonProgress);
+            return Ok(latestLesson);
+        }
 
         // Enroll in a lesson
         [HttpPost("enroll")]

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Azure.Core;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
@@ -142,5 +143,36 @@ namespace WebAPI.Services
             }).FirstOrDefaultAsync(x => x.CourseId == id);
             return courseDetail;
         }
+
+        public async Task<List<ChapterDTO>> GetChapters(int courseId, int userId)
+        {
+            var chapters = await _courseContext.Chapters
+                .Include(c => c.Lessons)
+                .Where(x => x.CourseId == courseId)
+                .Select(x => new ChapterDTO
+                {
+                    Id = x.Id,
+                    CourseId = courseId,
+                    Name = x.Name,
+                    LessonCount = x.Lessons.Count,
+                    Duration = x.Lessons.Sum(l => l.Duration),
+                    Lessons = x.Lessons.Select(l => new LessonDTO
+                    {
+                        Id = l.Id,
+                        Name = l.Name,
+                        Duration = l.Duration,
+                        Type = l.Type,
+                        IsPassed = _courseContext.LessonProgresses
+                            .Where(y => y.LessonId == l.Id && y.UserId == userId)
+                            .Select(a => a.Passing == 1)
+                            .FirstOrDefault() // Returns false if no record is found
+                    }).ToList()
+                })
+                .ToListAsync(); // Return a list of chapters
+
+            return chapters;
+        }
+
+
     }
 }

@@ -112,5 +112,44 @@ namespace WebAPI.Services
             await _eCourseContext.SaveChangesAsync();
             return payment;
         }
+
+
+        public async Task<List<PaymentListResponse>> SearchPaymentsAsync(DateTime? fromDate, DateTime? toDate, string orderNumber, int? status)
+        {
+            var query = _eCourseContext.Payments.AsQueryable();
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(p => p.PaymentDate >= fromDate.Value);
+            }
+
+            if (toDate.HasValue)
+            {
+                query = query.Where(p => p.PaymentDate <= toDate.Value);
+            }
+
+            if (!string.IsNullOrEmpty(orderNumber))
+            {
+                query = query.Where(p => p.TransactionId.Contains(orderNumber));
+            }
+
+            if (status.HasValue)
+            {
+                query = query.Where(p => p.Status == status.Value);
+            }
+
+            return await query.Select(p => new PaymentListResponse
+            {
+                Id = p.Id,
+                Amount = p.Amount,
+                PaymentDate = p.PaymentDate,
+                TransactionId = p.TransactionId,
+                IsSuccessful = p.IsSuccessful,
+                CourseId = p.CourseId,
+                UserId = p.UserId,
+                PaymentMethod = p.PaymentMethod,
+                Status = p.Status
+            }).ToListAsync();
+        }
     }
 }

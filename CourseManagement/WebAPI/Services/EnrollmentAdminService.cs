@@ -25,6 +25,21 @@ namespace WebAPI.Services
             return await _eCourseContext.Enrollments.ToListAsync();
         }
 
+        public async Task<IEnumerable<EnrollmentResponseDTO>> GetEnrollmentListByCourseId(int courseId)
+        {
+            return await _eCourseContext.Enrollments.Where(x => x.CourseId == courseId).Select(x => new EnrollmentResponseDTO
+            {
+                EnrollmentId = x.Id,
+                CourseId = x.CourseId,
+                UserName = x.User.Username,
+                avatar = x.User.Avatar ?? "Empty Avatar",
+                EnrollmentDate = x.EnrollmentDate,
+                Progress = x.Progress,
+                Status = x.Status,
+                ExpiredDate = x.ExpiredDate
+            }).ToListAsync();
+        }
+
         public async Task<IEnumerable<Enrollment>> GetListCustomerEnrollmentByUserId(int userId)
         {
             return await _eCourseContext.Enrollments.Include(c => c.Course).Where(x => x.UserId == userId).ToListAsync();

@@ -1,4 +1,5 @@
-﻿using WebAPI.Models;
+﻿using WebAPI.DTOS.response;
+using WebAPI.Models;
 
 namespace WebAPI.Services.Interfaces
 {
@@ -9,5 +10,6 @@ namespace WebAPI.Services.Interfaces
         Task<IEnumerable<Enrollment>> GetEnrollmentList();
         int AmountEnroll(int courseId);
         //Task<List<EnrollmentDto>> EnrollmentListByCourseId(int courseId);
+        Task<IEnumerable<EnrollmentResponseDTO>> GetEnrollmentListByCourseId(int courseId);
     }
 }

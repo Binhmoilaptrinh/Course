@@ -18,6 +18,8 @@ namespace WebApp.Pages.Admin.Course
         {
             _httpClient = httpClient;
         }
+        [BindProperty]
+        public List<ChapterDTO> Chapters { get; set; } = new List<ChapterDTO>();
         public CourseDetailResponseDto CourseDetail { get; set; }
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -84,7 +86,7 @@ namespace WebApp.Pages.Admin.Course
 
         public async Task<IActionResult> OnGetDeleteChapter(int chapterId, int courseId)
         {
-            using var response = await _httpClient.DeleteAsync("http://localhost:5000/api/Chapter/" + chapterId);
+            using var response = await _httpClient.DeleteAsync("https://api.2handshop.id.vn/api/Chapter/" + chapterId);
             if (response.IsSuccessStatusCode)
             {
                 TempData["SuccessMessage"] = "Đã xóa thành công chapter";

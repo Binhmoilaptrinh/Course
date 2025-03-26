@@ -7,6 +7,9 @@
         public string Password { get; set; }
         public string? Email { get; set; }
         public bool IsEmailVerify { get; set; } // Thêm xác minh Email
+        public string? Avatar { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Bio { get; set; }
 
         // Thêm mới
         public string? EmailVerificationToken { get; set; } // Token xác minh email

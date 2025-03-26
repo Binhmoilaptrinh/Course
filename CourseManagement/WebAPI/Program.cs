@@ -18,6 +18,8 @@ using WebAPI.Services;
 using WebAPI.Services.Interfaces;
 using WebAPI.DTOS;
 using Microsoft.AspNetCore.Http.Features;
+using PdfSharp.Fonts;
+using WebAPI.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 var modelBuilder = new ODataConventionModelBuilder();
@@ -25,10 +27,6 @@ modelBuilder.EntitySet<LessonResponseAdmin>("Lesson");
 modelBuilder.EntitySet<Chapter>("Chapter");
 modelBuilder.EntitySet<CourseAdminResponseDto>("Course");
 modelBuilder.EntitySet<UserReponseDto>("User");
-builder.Services.Configure<FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 512 * 1024 * 1024;
-});
 builder.Services.AddControllers().AddOData(
     options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
     .AddRouteComponents(
@@ -77,6 +75,8 @@ builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddHostedService<EnrollmentStatusUpdater>();
+
 
 // 🛠 Đăng ký Service
 builder.Services.Configure<SendEmail>(builder.Configuration.GetSection("SendEmail"));
@@ -85,6 +85,7 @@ builder.Services.AddScoped<ICustomAuthorizationService, CustomAuthorizationServi
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<PaymentHelper>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
+builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ICourseLearningService, CourseLearningService>();
 builder.Services.AddScoped<ICategoryService, CategoryServiceImpl>();
@@ -93,6 +94,7 @@ builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IChapterService, ChapterServiceImpl>();
 builder.Services.AddScoped<ICourseClientService, CourseClientService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IEnrollmentAdminService, EnrollmentAdminService>();
 builder.Services.AddTransient<IFileService, FileService>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IUserService, UserServiceImpl>();
