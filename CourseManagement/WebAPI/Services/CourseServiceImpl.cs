@@ -161,6 +161,7 @@ namespace WebAPI.Services
                         Id = l.Id,
                         Name = l.Name,
                         Duration = l.Duration,
+                        Type = l.Type,
                         IsPassed = _courseContext.LessonProgresses
                             .Where(y => y.LessonId == l.Id && y.UserId == userId)
                             .Select(a => a.Passing == 1)

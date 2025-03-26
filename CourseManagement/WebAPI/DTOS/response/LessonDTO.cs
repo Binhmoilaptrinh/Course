@@ -8,5 +8,6 @@ namespace WebAPI.DTOS.response
         public string Name { get; set; }
         public double? Duration { get; set; }
         public bool IsPassed { get; set; }
+        public string Type { get; set; }
     }
 }

@@ -72,11 +72,11 @@ namespace WebApp.Pages.Admin.Course
 
             if (LessonId == 0)
             {
-                response = await _httpClient.PostAsync("http://localhost:5000/api/Lesson/add/video", requestContent);
+                response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/Lesson/add/video", requestContent);
             }
             else
             {
-                response = await _httpClient.PutAsync("http://localhost:5000/api/Lesson/update/video/" + LessonId, requestContent);
+                response = await _httpClient.PutAsync("https://api.2handshop.id.vn/api/Lesson/update/video/" + LessonId, requestContent);
             }
 
 

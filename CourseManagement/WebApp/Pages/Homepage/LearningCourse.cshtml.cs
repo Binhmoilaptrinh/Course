@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WebAPI.DTOS.request;
@@ -17,11 +18,15 @@ namespace WebApp.Pages.Homepage
         {
             _httpClient = httpClient;
         }
+
         public LessonProgressResponse LessonProgressResponse { get; set; }
         public List<ChapterDTO> Chapters { get; set; } = new List<ChapterDTO>();
+        public LessonDetailResponseAdmin CurrentLesson { get; set; }
         public int CourseId { get; set; }
+        public LessonProgress ProgressLesson { get; set; }
+        public bool IsDoingQuizz { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int courseId, int lessonId, int userId)
+        public async Task<IActionResult> OnGetAsync(int courseId, int lessonId, int userId, string quizz = "")
         {
             var checkStatusDto = new EnrollmentRequestDto { UserId = userId, CourseId = courseId };
 
@@ -57,50 +62,104 @@ namespace WebApp.Pages.Homepage
             var progressResponse = await _httpClient.GetAsync($"https://api.2handshop.id.vn/api/CourseLearning/lesson-progress?lessonId={lessonId}&userId={userId}");
             var progressContent = await progressResponse.Content.ReadAsStringAsync();
 
-            if (string.IsNullOrWhiteSpace(progressContent))
-            {
-                // Call EnrollLesson API if progress is empty
-                var enrollLessonRequest = new LessonEnroll { UserId = userId, LessonId = lessonId };
-                var enrollLessonResponse = await _httpClient.PostAsJsonAsync("https://api.2handshop.id.vn/api/CourseLearning/enroll", enrollLessonRequest);
-
-                if (!enrollLessonResponse.IsSuccessStatusCode)
-                {
-                    return BadRequest("Failed to enroll in the lesson.");
-                }
-
-                // Retry fetching lesson progress
-                progressResponse = await _httpClient.GetAsync($"https://api.2handshop.id.vn/api/CourseLearning/lesson-progress?lessonId={lessonId}&userId={userId}");
-                progressContent = await progressResponse.Content.ReadAsStringAsync();
-
-                if (string.IsNullOrWhiteSpace(progressContent))
-                {
-                    return BadRequest("Lesson progress response is still empty after enrollment.");
-                }
-            }
-
             try
             {
                 CourseId = courseId;
+
+                // First, fetch the current lesson
+                var lessonResponse = await _httpClient.GetAsync($"https://api.2handshop.id.vn/api/Lesson/{lessonId}");
+                if (!lessonResponse.IsSuccessStatusCode)
+                {
+                    return BadRequest("Failed to fetch current lesson.");
+                }
+
+                var lessonContent = await lessonResponse.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(lessonContent))
+                {
+                    return BadRequest("Lesson content is empty.");
+                }
+
+                CurrentLesson = JsonSerializer.Deserialize<LessonDetailResponseAdmin>(
+                    lessonContent,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                // Handle Video and Quizz types right after getting CurrentLesson
+                if (CurrentLesson.Type.Equals("Video"))
+                {
+                    if (string.IsNullOrWhiteSpace(progressContent))
+                    {
+                        // Call EnrollLesson API if progress is empty
+                        var enrollLessonRequest = new LessonEnroll { UserId = userId, LessonId = lessonId };
+                        var enrollLessonResponse = await _httpClient.PostAsJsonAsync("https://api.2handshop.id.vn/api/CourseLearning/enroll", enrollLessonRequest);
+
+                        if (!enrollLessonResponse.IsSuccessStatusCode)
+                        {
+                            return BadRequest("Failed to enroll in the lesson.");
+                        }
+                    }
+                }
+                if (CurrentLesson.Type.Equals("Quizz"))
+                {
+                    if (string.IsNullOrWhiteSpace(progressContent) && quizz.Equals("start")) //start
+                    {
+                        var enrollLessonRequest = new LessonEnroll { UserId = userId, LessonId = lessonId };
+                        var enrollLessonResponse = await _httpClient.PostAsJsonAsync("https://api.2handshop.id.vn/api/CourseLearning/enroll", enrollLessonRequest);
+
+                        if (!enrollLessonResponse.IsSuccessStatusCode)
+                        {
+                            return BadRequest("Failed to enroll in the lesson.");
+                        }
+
+                        IsDoingQuizz = true;
+                    }
+
+                    if (ProgressLesson != null && quizz.Equals("resume")) // resume
+                    {
+                        if (!validateTime(ProgressLesson.UpdatedAt ?? ProgressLesson.CreatedAt, ProgressLesson.CountDoing ?? 1))
+                        {
+                            TempData["messQuizz"] = "B?n không ?? ?i?u ki?n ?? làm bài quizz này";
+                        }
+                        else
+                        {
+                            ProgressLesson.CountDoing = ProgressLesson.CountDoing++;
+                        }
+                    }
+                }
+
+
                 LessonProgressResponse = JsonSerializer.Deserialize<LessonProgressResponse>(
                     progressContent,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 );
 
+
+                // Fetch chapters
                 var apiUrl = $"https://api.2handshop.id.vn/api/Course/Chapters/{courseId}";
                 var response = await _httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var jsonResponse = await response.Content.ReadAsStringAsync();
-                    Chapters = JsonSerializer.Deserialize<List<ChapterDTO>>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    Chapters = JsonSerializer.Deserialize<List<ChapterDTO>>(jsonResponse,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 }
             }
             catch (JsonException)
             {
-                return BadRequest("Invalid JSON format in lesson progress response.");
+                return BadRequest("Invalid JSON format in response.");
             }
 
             return Page();
+        }
+        public bool validateTime(DateTime lastDate, int count)
+        {
+            //quy dinh m?i l?n làm quizz s? t?ng lên 5p
+            TimeSpan requiredInterval = TimeSpan.FromMinutes(count * 1);
+
+            DateTime currentDate = DateTime.Now;
+
+            return (currentDate - lastDate) >= requiredInterval;
         }
 
     }

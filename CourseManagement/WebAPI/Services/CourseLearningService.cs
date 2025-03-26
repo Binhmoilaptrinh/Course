@@ -37,7 +37,11 @@ namespace WebAPI.Services
         {
             var progressLesson = await _eCourseContext.LessonProgresses.FirstOrDefaultAsync(x => x.LessonId == progress.LessonId && x.UserId == progress.UserId);
             progressLesson.ProgressPercentage = progress.ProgressPercentage;
-            progressLesson.Passing = progress.Passing;
+            var passing = await _eCourseContext.Lessons.Where(x => x.Id == progress.LessonId).Select(x => x.Passing).FirstOrDefaultAsync();
+            if (progressLesson.ProgressPercentage > passing)
+            {
+                progressLesson.Passing = 1;
+            }    
             _eCourseContext.Update(progressLesson);
             await _eCourseContext.SaveChangesAsync();
             return progressLesson;
