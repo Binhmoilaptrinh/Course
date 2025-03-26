@@ -25,7 +25,7 @@ namespace WebApp.Pages.Admin.Course
             {
                 return Page();
             }
-            var response = await _httpClient.GetAsync("http://localhost:5000/api/Course/Detail/" + id);
+            var response = await _httpClient.GetAsync("https://api.2handshop.id.vn/api/Course/Detail/" + id);
             var cateResponse = await _httpClient.GetAsync("https://api.2handshop.id.vn/api/Category");
             var options = new JsonSerializerOptions
             {
@@ -76,7 +76,7 @@ namespace WebApp.Pages.Admin.Course
             requestContent.Add(new StringContent(Limit.ToString()), "LimitDay");
             requestContent.Add(new StringContent(Desc ?? ""), "Description");
             Console.WriteLine(requestContent);
-            using var response = await _httpClient.PostAsync("http://localhost:5000/api/Course/" + CourseId, requestContent);
+            using var response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/Course/" + CourseId, requestContent);
 
             if (response.IsSuccessStatusCode)
             {
