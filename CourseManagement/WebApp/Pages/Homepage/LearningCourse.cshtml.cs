@@ -1,12 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using MigraDoc.DocumentObjectModel;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
 using WebAPI.Models;
+using WebAPI.Services.Interfaces;
 
 namespace WebApp.Pages.Homepage
 {
@@ -25,7 +30,8 @@ namespace WebApp.Pages.Homepage
         public int CourseId { get; set; }
         public int UserId { get; set; }
         public LessonProgress ProgressLesson { get; set; }
-        public bool IsDoingQuizz { get; set; }
+        [BindProperty]
+        public bool IsDoingQuizz { get; set; } = false;
 
         public async Task<IActionResult> OnGetAsync(int courseId, int lessonId, int userId, string quizz = "")
         {
@@ -60,9 +66,16 @@ namespace WebApp.Pages.Homepage
             }
 
             // 3. Fetch Lesson Progress
-            var progressResponse = await _httpClient.GetAsync($"https://api.2handshop.id.vn/api/CourseLearning/lesson-progress?lessonId={lessonId}&userId={userId}");
+            var progressResponse = await _httpClient.GetAsync($"https://api.2handshop.id.vn/api/CourseLearning/lesson-progress?lessonId={lessonId}&userId={userId}");//
             var progressContent = await progressResponse.Content.ReadAsStringAsync();
-
+            if(!progressContent.IsValueNullOrEmpty())
+            {
+                ProgressLesson = JsonSerializer.Deserialize<LessonProgress>(
+                    progressContent,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+            }
+            
             try
             {
                 CourseId = courseId;
@@ -118,14 +131,15 @@ namespace WebApp.Pages.Homepage
                         IsDoingQuizz = true;
                     }
 
-                    if (string.IsNullOrWhiteSpace(progressContent) != null && quizz.Equals("resume")) // resume
+                    if (ProgressLesson != null && quizz.Equals("resume")) // resume
                     {
                         if (!validateTime(ProgressLesson.UpdatedAt ?? ProgressLesson.CreatedAt, ProgressLesson.CountDoing ?? 1))
                         {
-                            TempData["messQuizz"] = "B?n kh�ng ?? ?i?u ki?n ?? l�m b�i quizz n�y";
+                            TempData["messQuizz"] = "B?n không ?? ?i?u ki?n ?? làm bài quizz này";
                         }
                         else
                         {
+                            IsDoingQuizz = true;
                             ProgressLesson.CountDoing = ProgressLesson.CountDoing++;
                         }
                     }
@@ -161,13 +175,93 @@ namespace WebApp.Pages.Homepage
         }
         public bool validateTime(DateTime lastDate, int count)
         {
-            //quy dinh m?i l?n l�m quizz s? t?ng l�n 5p
-            TimeSpan requiredInterval = TimeSpan.FromMinutes(count * 1);
+            //quy dinh m?i l?n làm quizz s? t?ng lên 5p
+            //TimeSpan requiredInterval = TimeSpan.FromMinutes(count * 1);
 
-            DateTime currentDate = DateTime.Now;
+            //DateTime currentDate = DateTime.Now;
 
-            return (currentDate - lastDate) >= requiredInterval;
+            //return (currentDate - lastDate) >= requiredInterval;
+            return true;
         }
 
+
+        public async Task<IActionResult> OnPostAsync(int courseId, int lessonId, int userId, List<int> AnswerId)
+        {
+            double mark = 0;
+            double max = 10;
+
+            // First, fetch the current lesson
+            var lessonResponse = await _httpClient.GetAsync($"https://api.2handshop.id.vn/api/Lesson/{lessonId}");
+            if (!lessonResponse.IsSuccessStatusCode)
+            {
+                return BadRequest("Failed to fetch current lesson.");
+            }
+
+            var lessonContent = await lessonResponse.Content.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(lessonContent))
+            {
+                return BadRequest("Lesson content is empty.");
+            }
+
+            CurrentLesson = JsonSerializer.Deserialize<LessonDetailResponseAdmin>(
+                lessonContent,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
+
+            Console.WriteLine(CurrentLesson);
+
+            // Lấy danh sách các câu hỏi trong bài học từ cơ sở dữ liệu
+            var questionList = CurrentLesson.QuestionResponse;
+
+            foreach (var question in questionList)
+            {
+                var answerIds = question.AnswerResponse
+                  .Where(x => x.IsCorrect == true)
+                  .Select(x => x.Id).ToList();
+
+                foreach (var item in answerIds)
+                {
+                    if (AnswerId.Contains(int.Parse(item + "")))
+                    {
+                        if (answerIds.Count() == 1)
+                        {
+                            mark += max / questionList.Count;
+                            break;
+                        }
+                        else
+                        {
+                            mark += (max / questionList.Count) / answerIds.Count;
+                        }
+                        AnswerId = AnswerId.Where(x => x != item).ToList();
+                    }
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine("Score = " + mark);
+
+            var progressLessonUpdate = new ProgressLessonUpdate
+            {
+                LessonId = lessonId,
+                UserId = userId,
+                ProgressPercentage = (float)mark
+            };
+            using var jsonContent = new StringContent(JsonSerializer.Serialize(progressLessonUpdate), Encoding.UTF8, "application/json");
+            var option = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/CourseLearning/update-progress", jsonContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["messQuizz"] = "Nộp bài thành công";
+            }
+            else
+            {
+                TempData["messQuizz"] = "Nộp bài thất bại!";
+            }
+            return Redirect("?courseId=" + courseId + "&lessonId=" + lessonId+ "&userId="+userId);
+        }
     }
 }

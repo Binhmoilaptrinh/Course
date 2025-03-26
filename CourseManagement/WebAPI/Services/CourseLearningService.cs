@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
 using WebAPI.Models;
@@ -41,7 +42,12 @@ namespace WebAPI.Services
             if (progressLesson.ProgressPercentage > passing)
             {
                 progressLesson.Passing = 1;
-            }    
+            }
+            progressLesson.CountDoing = progressLesson.CountDoing + 1;
+            if (progressLesson.ProgressPercentage > progressLesson.HighestMark)
+            {
+                progressLesson.HighestMark = progressLesson.ProgressPercentage;
+            }
             _eCourseContext.Update(progressLesson);
             await _eCourseContext.SaveChangesAsync();
             return progressLesson;
@@ -87,8 +93,11 @@ namespace WebAPI.Services
                 UserId = y.UserId,
                 Status = y.Status,
                 ProgressPercentage = y.ProgressPercentage,
+                HighestMark = y.HighestMark,
                 Passing = y.Passing,
-                CountDoing = y.CountDoing
+                CountDoing = y.CountDoing,
+                CreatedAt = y.CreatedAt,
+                UpdatedAt = y.UpdatedAt
             }).FirstOrDefaultAsync(x => x.LessonId == lessonId && x.UserId == userId);
             return lessonProgress;
         }
