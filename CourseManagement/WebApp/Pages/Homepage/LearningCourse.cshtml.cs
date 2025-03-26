@@ -23,6 +23,7 @@ namespace WebApp.Pages.Homepage
         public List<ChapterDTO> Chapters { get; set; } = new List<ChapterDTO>();
         public LessonDetailResponseAdmin CurrentLesson { get; set; }
         public int CourseId { get; set; }
+        public int UserId { get; set; }
         public LessonProgress ProgressLesson { get; set; }
         public bool IsDoingQuizz { get; set; }
 
@@ -66,6 +67,8 @@ namespace WebApp.Pages.Homepage
             {
                 CourseId = courseId;
 
+                UserId = userId;
+
                 // First, fetch the current lesson
                 var lessonResponse = await _httpClient.GetAsync($"https://api.2handshop.id.vn/api/Lesson/{lessonId}");
                 if (!lessonResponse.IsSuccessStatusCode)
@@ -85,7 +88,7 @@ namespace WebApp.Pages.Homepage
                 );
 
                 // Handle Video and Quizz types right after getting CurrentLesson
-                if (CurrentLesson.Type.Equals("Video"))
+                if (CurrentLesson.Type.Equals("video"))
                 {
                     if (string.IsNullOrWhiteSpace(progressContent))
                     {
@@ -99,8 +102,9 @@ namespace WebApp.Pages.Homepage
                         }
                     }
                 }
-                if (CurrentLesson.Type.Equals("Quizz"))
+                if (CurrentLesson.Type.Equals("quizz"))
                 {
+                    
                     if (string.IsNullOrWhiteSpace(progressContent) && quizz.Equals("start")) //start
                     {
                         var enrollLessonRequest = new LessonEnroll { UserId = userId, LessonId = lessonId };
@@ -114,7 +118,7 @@ namespace WebApp.Pages.Homepage
                         IsDoingQuizz = true;
                     }
 
-                    if (ProgressLesson != null && quizz.Equals("resume")) // resume
+                    if (string.IsNullOrWhiteSpace(progressContent) != null && quizz.Equals("resume")) // resume
                     {
                         if (!validateTime(ProgressLesson.UpdatedAt ?? ProgressLesson.CreatedAt, ProgressLesson.CountDoing ?? 1))
                         {
@@ -127,15 +131,18 @@ namespace WebApp.Pages.Homepage
                     }
                 }
 
+                if (!string.IsNullOrWhiteSpace(progressContent))
+                {
+                    LessonProgressResponse = JsonSerializer.Deserialize<LessonProgressResponse>(
+                   progressContent,
+                   new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+                }
 
-                LessonProgressResponse = JsonSerializer.Deserialize<LessonProgressResponse>(
-                    progressContent,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                );
 
 
                 // Fetch chapters
-                var apiUrl = $"https://api.2handshop.id.vn/api/Course/Chapters/{courseId}";
+                var apiUrl = $"https://api.2handshop.id.vn/api/Course/Chapters/{courseId}?userId={userId}";
                 var response = await _httpClient.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
