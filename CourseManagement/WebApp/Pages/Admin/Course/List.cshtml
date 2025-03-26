@@ -91,7 +91,7 @@
         const searchTxt = document.querySelector('input[name="searchTxt"]').value;
         const category = document.getElementById('categoryFilter').value;
         pageSize = pageSizeValue;
-        orderby = sortBy
+        orderby = sortBy?sortBy:"Id asc"
        console.log({
             pageSize: pageSize,
             sortBy: sortBy || "",

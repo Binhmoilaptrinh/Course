@@ -1,45 +1,47 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Net.Http.Headers;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using WebAPI.DTOS.response;
 using System.Text.Json;
-using WebAPI.Models;
 
 namespace WebApp.Pages.Admin.Course
 {
-    public class Category
-    {
-        public int id { get; set; }
-        public string name { get; set; }
-    }
-    public class CreateModel : PageModel
+    public class UpdateModel : PageModel
     {
         private readonly HttpClient _httpClient;
 
-        public CreateModel(HttpClient httpClient)
+        public UpdateModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
-
+        [BindProperty]
+        public CourseDetailAdmin CourseDetail { get; set; }
+        [BindProperty]
         public List<Category> Categories { get; set; }
 
-        public async Task<IActionResult> OnGet()
+        public async Task<IActionResult> OnGet(int? id)
         {
-            var response = await _httpClient.GetAsync("https://api.2handshop.id.vn/api/Category");
-            if (response.IsSuccessStatusCode)
+            if(id == null)
             {
-                var jsonString = await response.Content.ReadAsStringAsync();
-                Categories = JsonSerializer.Deserialize<List<Category>>(jsonString);
+                return Page();
             }
-            else
+            var response = await _httpClient.GetAsync("http://localhost:5000/api/Course/Detail/" + id);
+            var cateResponse = await _httpClient.GetAsync("https://api.2handshop.id.vn/api/Category");
+            var options = new JsonSerializerOptions
             {
-                Categories = new List<Category>();
-            }
+                PropertyNameCaseInsensitive = true
+            };
+            var jsonString = await response.Content.ReadAsStringAsync();
+                CourseDetail = JsonSerializer.Deserialize<CourseDetailAdmin>(jsonString, options);
 
+                var cateJsonString = await cateResponse.Content.ReadAsStringAsync();
+                Categories = JsonSerializer.Deserialize<List<Category>>(cateJsonString, options);
+            Console.WriteLine(CourseDetail);
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(IFormFile PreviewVideo, IFormFile Thumbnail, string Title, 
-            decimal Price, int Cate, int Limit, string Desc, int CreateBy)
+        public async Task<IActionResult> OnPostAsync(IFormFile PreviewVideo, IFormFile Thumbnail, string Title,
+            decimal Price, int Cate, int Limit, string Desc, int CourseId, int UpdateBy)
         {
 
             using var requestContent = new MultipartFormDataContent();
@@ -69,22 +71,22 @@ namespace WebApp.Pages.Admin.Course
             requestContent.Add(new StringContent(Title ?? ""), "Title");
             requestContent.Add(new StringContent("pending"), "Status");
             requestContent.Add(new StringContent(Price.ToString()), "Price");
-            requestContent.Add(new StringContent(CreateBy.ToString()), "UserId");
+            requestContent.Add(new StringContent(UpdateBy.ToString()), "UserId");
             requestContent.Add(new StringContent(Cate.ToString()), "CategoryId");
             requestContent.Add(new StringContent(Limit.ToString()), "LimitDay");
             requestContent.Add(new StringContent(Desc ?? ""), "Description");
-
-            using var response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/Course", requestContent);
+            Console.WriteLine(requestContent);
+            using var response = await _httpClient.PostAsync("http://localhost:5000/api/Course/" + CourseId, requestContent);
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToPage("/Admin/Course/List");
+                TempData["SuccessMessage"] = "Cập nhật khóa học thành công!";
+                return Redirect("?id="+ CourseId);
             }
             else
             {
-                string errorMessage = await response.Content.ReadAsStringAsync();
-                ModelState.AddModelError("", "Lỗi khi gửi dữ liệu đến API: " + errorMessage);
-                return Page();
+                TempData["ErrorMessage"] = "Cập nhật khóa học thất bại!";
+                return Redirect("?id=" + CourseId);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using WebAPI.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI.Models;
 using WebAPI.Repositories.Interfaces;
 
 namespace WebAPI.Repositories
@@ -15,6 +16,18 @@ namespace WebAPI.Repositories
         public async Task<Question> AddQuestionAsync(Question question)
         {
             _context.Questions.Add(question);
+            await _context.SaveChangesAsync();
+            return question;
+        }
+
+        public async Task<Question> GetQuestionByIdAsync(int id)
+        {
+            return await _context.Questions.FindAsync(id);
+        }
+
+        public async Task<Question> UpdateQuestionAsync(Question question)
+        {
+            _context.Entry(question).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return question;
         }

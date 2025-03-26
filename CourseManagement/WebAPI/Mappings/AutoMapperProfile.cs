@@ -41,6 +41,10 @@ namespace WebAPI.Mappings
 
             CreateMap<LessonVideoRequestDto, Lesson>();
 
+            CreateMap<LessonQuizzUpdateDto, Lesson>();
+
+            CreateMap<LessonVideoUpdateDto, Lesson>();
+
             CreateMap<Lesson, LessonQuizzResponseAdmin>()
                 .ForMember(dest => dest.QuestionResponse, opt => opt.MapFrom(src => src.Questions));
 
@@ -49,11 +53,14 @@ namespace WebAPI.Mappings
                 .ForMember(dest => dest.QuestionResponse, opt => opt.MapFrom(src => src.Questions));
 
             CreateMap<QuestionRequestDto, Question>();
+            CreateMap<QuestionUpdateDto, Question>();
+
             CreateMap<Question, QuestionResponse>()
                 .ForMember(dest => dest.AnswerResponse, opt => opt.MapFrom(src => src.Answers));
 
 
             CreateMap<AnswerRequestDto, Answer>();
+            CreateMap<AnswerUpdateDto, Answer>();
             CreateMap<Answer, AnswerResponse>();
 
             CreateMap<Lesson, LessonResponseAdmin>();

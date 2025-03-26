@@ -37,6 +37,15 @@ namespace WebAPI.Services
             return _mapper.Map<ChapterResponse>(chapterCreated);
         }
 
+        public async Task DeleteChapterById(int id)
+        {
+            if (await _chapterRepository.GetByIdAsync(id) == null)
+            {
+                throw new Exception($"Chapter with Id {id} not found");
+            }
+            await _chapterRepository.DeleteAsync(id);
+        }
+
         public async Task<IEnumerable<ChapterResponse>> GetAllChapterAsync()
         {
             var chapters = await _chapterRepository.GetAllAsync();

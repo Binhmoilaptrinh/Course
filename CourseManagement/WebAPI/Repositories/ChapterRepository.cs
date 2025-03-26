@@ -20,6 +20,16 @@ namespace WebAPI.Repositories
             return chapter;
         }
 
+        public async Task DeleteAsync(int id)
+        {
+            var chapter = await _context.Chapters.FindAsync(id);
+            if (chapter != null)
+            {
+                _context.Chapters.Remove(chapter);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<IEnumerable<Chapter>> GetAllAsync()
         {
             return await _context.Chapters.ToListAsync();
