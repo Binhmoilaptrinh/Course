@@ -274,22 +274,22 @@
         cursor: pointer;
     }
     /*
-        button[type="submit"] {
-            display: block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
+            button[type="submit"] {
+                display: block;
+                margin-top: 20px;
+                padding: 10px 20px;
+                background-color: #007bff;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: background-color 0.3s ease;
+            }
 
-            button[type="submit"]:hover {
-                background-color: #0056b3;
-            } */
+                button[type="submit"]:hover {
+                    background-color: #0056b3;
+                } */
 
     .score-display {
         font-size: 20px; /* Increase the font size */
@@ -371,7 +371,7 @@
     </div>
     <div class="learning__wrapper">
         <div class="learning__video-content">
-            @if (Model.CurrentLesson.Type.Equals("Video"))
+            @if (Model.CurrentLesson.Type.Equals("video"))
             {
                 <div class="learning__video-box">
                     <video id="learning__video-now" title="@Model.CurrentLesson.Name"
@@ -381,73 +381,72 @@
                            controls></video>
                 </div>
                 <button id="load-saved-time-btn">Load Saved Time</button>
-                @if (Model.LessonProgressResponse.Passing == 0)
-                {
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            let player = document.getElementById('learning__video-now');
-                            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-                            const userId = userInfo.userId; // Assuming the user ID is stored as 'id' in userInfo
 
-                            // Track video progress
-                            player.addEventListener('timeupdate', function () {
-                                let currentTime = player.currentTime;
-                                console.log("Current Time of the Video Player: ", currentTime);
-                            });
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        let player = document.getElementById('learning__video-now');
+                        const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+                        const userId = userInfo.userId; // Assuming the user ID is stored as 'id' in userInfo
 
-                            // Save progress on various events
-                            player.addEventListener('pause', function () {
-                                saveLastWatchedTime(player.currentTime);
-                            });
-
-                            window.addEventListener('beforeunload', function () {
-                                saveLastWatchedTime(player.currentTime);
-                            });
-
-                            player.addEventListener('ended', function () {
-                                console.log('end');
-                                saveLastWatchedTime(player.currentTime);
-                            });
-
-                            async function saveLastWatchedTime(currentTime) {
-                                try {
-                                    const response = await fetch('https://api.2handshop.id.vn/api/CourseLearning/learning/update-progress', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            progress: currentTime,
-                                            lessonId: @Model.CurrentLesson.Id,
-                                            userId: userId
-                                        })
-                                    });
-
-                                    if (!response.ok) {
-                                        throw new Error(`HTTP error! status: ${response.status}`);
-                                    }
-
-                                    const data = await response.json();
-
-                                    if (data.isPassing) {
-                                        console.log("Đã vượt qua bài học hiện tại, khóa học tiếp theo sẽ được mở khóa.");
-                                        let currL = document.querySelector('.lesson-index-' + @Model.CurrentLesson.Id);
-                                        const nextL = currL ? currL.nextElementSibling : null;
-
-                                        if (nextL) {
-                                            console.log("Phần tử kế tiếp:", nextL);
-                                            nextL.classList.add("canLearn");
-                                        }
-                                    } else {
-                                        console.log("Chưa vượt qua bài học hiện tại.");
-                                    }
-                                } catch (error) {
-                                    console.error('Error updating progress:', error);
-                                }
-                            }
+                        // Track video progress
+                        player.addEventListener('timeupdate', function () {
+                            let currentTime = player.currentTime;
+                            console.log("Current Time of the Video Player: ", currentTime);
                         });
-                    </script>
-                }
+
+                        // Save progress on various events
+                        player.addEventListener('pause', function () {
+                            saveLastWatchedTime(player.currentTime);
+                        });
+
+                        window.addEventListener('beforeunload', function () {
+                            saveLastWatchedTime(player.currentTime);
+                        });
+
+                        player.addEventListener('ended', function () {
+                            console.log('end');
+                            saveLastWatchedTime(player.currentTime);
+                        });
+
+                        async function saveLastWatchedTime(currentTime) {
+                            try {
+                                const response = await fetch('https://api.2handshop.id.vn/api/CourseLearning/update-progress', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        progressPercentage: currentTime,
+                                        lessonId: @Model.CurrentLesson.Id,
+                                        userId: userId
+                                    })
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+
+                                const data = await response.json();
+                                console.log(data)
+
+                                if (data.passing === 1) {
+                                    console.log("Đã vượt qua bài học hiện tại, khóa học tiếp theo sẽ được mở khóa.");
+                                    let currL = document.querySelector('.lesson-index-' + @Model.CurrentLesson.Id);
+                                    const nextL = currL ? currL.nextElementSibling : null;
+
+                                    if (nextL) {
+                                        console.log("Phần tử kế tiếp:", nextL);
+                                        nextL.classList.add("canLearn");
+                                    }
+                                } else {
+                                    console.log("Chưa vượt qua bài học hiện tại.");
+                                }
+                            } catch (error) {
+                                console.error('Error updating progress:', error);
+                            }
+                        }
+                    });
+                </script>
             }
             else
             {
@@ -532,7 +531,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p class="fs-4"><strong>Due:</strong></p>
-                                        <p class="fs-4"><strong>Submitted:</strong>@Model.ProgressLesson.CreatedAt</p>
+                                        <p class="fs-4"><strong>Submitted:</strong></p>
                                     </div>
                                     <div class="col-md-6 text-end">
                                         <p class="fs-4"><strong>Attempts:</strong> Unlimited</p>
@@ -543,10 +542,10 @@
                                 </div>
                             </div>
                             <!-- Phần hiển thị điểm -->
-                            <div class="alert @(Model.ProgressLesson.Passing == 1 ? "alert-success" : "alert-danger") p-4 rounded shadow-sm text-center w-50">
+                            <div class="alert @(Model.LessonProgressResponse.Passing == 1 ? "alert-success" : "alert-danger") p-4 rounded shadow-sm text-center w-50">
                                 <h3 class="mb-3"><strong>Your grade</strong></h3>
-                                <p class="fs-4">@(Model.ProgressLesson.Passing == 1 ? "Congratulation" : "To pass you need try more").</p>
-                                <h1 class="display-4 mb-3">@Model.ProgressLesson.ProgressPercentage</h1>
+                                <p class="fs-4">@(Model.LessonProgressResponse.Passing == 1 ? "Congratulation" : "To pass you need try more").</p>
+                                <h1 class="display-4 mb-3">@Model.LessonProgressResponse.ProgressPercentage</h1>
                             </div>
                         </div>
                     }
@@ -554,7 +553,7 @@
                 }
                 else
                 {
-                    //chua lam va dang doing => form quizz
+                //chua lam va dang doing => form quizz
 
                     //chua lam => hien thi nut start
                     <div class="container mt-5">
@@ -660,13 +659,13 @@
                                     // Kiểm tra xem bài học trước đó đã hoàn thành chưa
                                     var previousLesson = Model.Chapters.SelectMany(chap => chap.Lessons)
                                     .ElementAt(index - 2);
-                                    passing = previousLesson.IsPassed ;
+                                    passing = previousLesson.IsPassed;
                                 }
 
                                 var classActive = Model.CurrentLesson.Id == Model.Chapters[i].Lessons[j].Id ? "learning" : "";
                                 var classLearned = Model.Chapters[i].Lessons[j].IsPassed == true ? "learned" : "";
                                 var lessonQuizz = Model.Chapters[i].Lessons[j].Type.Equals("quizz") ? "learning_quizz" : "";
-                                <div class="learning__lesson-item lesson-index-@Model.Chapters[i].Lessons[j].Id @classActive @classLearned @(passing||index==1?"canLearn":"")" onclick="learning(@Model.CourseId, @Model.Chapters[i].Lessons[j].Id)">
+                                <div class="learning__lesson-item lesson-index-@Model.Chapters[i].Lessons[j].Id @classActive @classLearned @(passing||index==1?"canLearn":"")" onclick="learning(@Model.CourseId, @Model.Chapters[i].Lessons[j].Id,@Model.UserId)">
                                     <h5 class="learning__lesson-item-name">@(index). @Model.Chapters[i].Lessons[j].Name</h5>
                                     <p class="learning__lesson-item-time @lessonQuizz">@ConvertToTimeFormat(@Model.Chapters[i].Lessons[j].Duration)</p>
                                 </div>
@@ -715,7 +714,7 @@
 
 
 
-    
+
 
 
 
@@ -735,174 +734,174 @@
 
 
     <script>
-        function learning(courseId, lessonId) {
-            window.location.href = `LearningCourse?courseId=${courseId}&lessonId=${lessonId}`;
-        }
-        function showListVideo() {
-            let listChapter = document.querySelectorAll('.learning__item')
-            listChapter.forEach((chapterItem) => {
-                chapterItem.addEventListener('click', () => {
-                    chapterItem.classList.toggle('showListLesson')
-                })
-                let listVideoofChapter = chapterItem.querySelector('.learning__chapter-collapse')
-                listVideoofChapter.addEventListener('click', (e) => {
-                    e.stopPropagation()
-                })
-            })
-        }
-        showListVideo()
+function learning(courseId, lessonId, userId) {
+    window.location.href = `LearningCourse?courseId=${courseId}&lessonId=${lessonId}&userId=${userId}`;
+}
+function showListVideo() {
+    let listChapter = document.querySelectorAll('.learning__item')
+    listChapter.forEach((chapterItem) => {
+        chapterItem.addEventListener('click', () => {
+            chapterItem.classList.toggle('showListLesson')
+        })
+        let listVideoofChapter = chapterItem.querySelector('.learning__chapter-collapse')
+        listVideoofChapter.addEventListener('click', (e) => {
+            e.stopPropagation()
+        })
+    })
+}
+showListVideo()
 
-        function handleLessonAction() {
-            let lessonNav = document.querySelector('.learning__lesson-nav')
-            let learningNav = document.querySelector('.learning__video-nav')
-            let learningContent = document.querySelector('.learning__video-content')
-            let closeNavBtn = document.querySelector('.close__nav-btn')
-            let overlayScreen = document.querySelector('.overlay-screen')
-            closeNavBtn.addEventListener('click', () => {
-                learningNav.classList.toggle('showNav')
-                overlayScreen.classList.toggle('showOverlay')
-                learningContent.classList.toggle('maxWidth')
-            })
-            overlayScreen.addEventListener('click', () => {
-                learningNav.classList.toggle('showNav')
-                overlayScreen.classList.toggle('showOverlay')
-                learningContent.classList.toggle('maxWidth')
-            })
-            lessonNav.addEventListener('click', () => {
-                learningNav.classList.toggle('showNav')
-                learningContent.classList.toggle('maxWidth')
-                lessonNav.classList.toggle('hasClick')
-                overlayScreen.classList.toggle('showOverlay')
-            })
-        }
-        handleLessonAction()
-    </script>
+function handleLessonAction() {
+    let lessonNav = document.querySelector('.learning__lesson-nav')
+    let learningNav = document.querySelector('.learning__video-nav')
+    let learningContent = document.querySelector('.learning__video-content')
+    let closeNavBtn = document.querySelector('.close__nav-btn')
+    let overlayScreen = document.querySelector('.overlay-screen')
+    closeNavBtn.addEventListener('click', () => {
+        learningNav.classList.toggle('showNav')
+        overlayScreen.classList.toggle('showOverlay')
+        learningContent.classList.toggle('maxWidth')
+    })
+    overlayScreen.addEventListener('click', () => {
+        learningNav.classList.toggle('showNav')
+        overlayScreen.classList.toggle('showOverlay')
+        learningContent.classList.toggle('maxWidth')
+    })
+    lessonNav.addEventListener('click', () => {
+        learningNav.classList.toggle('showNav')
+        learningContent.classList.toggle('maxWidth')
+        lessonNav.classList.toggle('hasClick')
+        overlayScreen.classList.toggle('showOverlay')
+    })
+}
+handleLessonAction()
+</script>
     <script>
 
-        function startCountdown(seconds) {
-            let remainingTime = seconds;
-            let timeDisplay = document.getElementById("time-count-down");
-            const countdownInterval = setInterval(() => {
-                const hours = Math.floor(remainingTime / 3600);
-                const minutes = Math.floor((remainingTime % 3600) / 60);
-                const secs = remainingTime % 60;
+function startCountdown(seconds) {
+    let remainingTime = seconds;
+    let timeDisplay = document.getElementById("time-count-down");
+    const countdownInterval = setInterval(() => {
+        const hours = Math.floor(remainingTime / 3600);
+        const minutes = Math.floor((remainingTime % 3600) / 60);
+        const secs = remainingTime % 60;
 
-                let timeString = "";
+        let timeString = "";
 
-                if (hours > 0) {
-                    timeString += `${String(hours).padStart(2, '0')}:`;
-                }
-
-                if (hours > 0 || minutes > 0) {
-                    timeString += `${String(minutes).padStart(2, '0')}:`;
-                }
-
-                timeString += String(secs).padStart(2, '0');
-
-                console.log(timeString);
-                timeDisplay.innerHTML = timeString;
-                if (remainingTime <= 0) {
-                    clearInterval(countdownInterval);
-                    document.getElementById("form-quizz").submit();
-                    console.log("Countdown finished! Form submitted.");
-                }
-                remainingTime -= 1;
-            }, 1000);
+        if (hours > 0) {
+            timeString += `${String(hours).padStart(2, '0')}:`;
         }
 
-        startCountdown(@Model.CurrentLesson.Duration);
-        var arr = [];
-        //click vào chapter
-        // window.load
-        window.onload = function () {
-            //process open before chapter
-            var json_str = getCookieByName('chapterOpen');
-            arr = json_str ? JSON.parse(json_str) : [];
-            console.log(arr)
-
-            function getCookieByName(name) {
-                let cookies = document.cookie.split(';');
-                for (let cookie of cookies) {
-                    cookie = cookie.trim();
-                    if (cookie.startsWith(name + "=")) {
-                        return cookie.substring(name.length + 1);
-                    }
-                }
-                return null;
-            }
-
-
-            function ShowChapter() {
-                for (chapterClass of arr) {
-                    let chapter = document.querySelector("." + chapterClass);
-                    if (chapter) {
-                        chapter.classList.add("showListLesson");
-                    }
-                }
-            }
-
-            ShowChapter();
-            //process next/prev lesson
-            let currL = document.querySelector('.lesson-index-' + @Model.CurrentLesson.Id);
-            let prevL = currL ? currL.previousElementSibling : null;
-            let nextL = currL ? currL.nextElementSibling : null;
-            const learningPrevBtn = document.querySelector('.learning__lesson-prev');
-            const learningNextBtn = document.querySelector('.learning__lesson-next');
-
-
-            function extractLessonId(element) {
-                for (let cls of element.classList) {
-                    if (cls.startsWith("lesson-index-")) {
-                        return cls.replace("lesson-index-", "");
-                    }
-                }
-                return null;
-            }
-
-
-            if (prevL != null && prevL.classList.contains("canLearn")) {
-                learningPrevBtn.classList.add("actionActive");
-                learningPrevBtn.addEventListener('click', () => {
-                    let prevLessonId = extractLessonId(prevL);
-                    if (prevLessonId) {
-                        window.location.href = "LearningCourse?courseId=" + @Model.CourseId + "&lessonId=" + prevLessonId;
-                    }
-                })
-            }
-            if (nextL != null && nextL.classList.contains("canLearn")) {
-                console.log(learningNextBtn)
-                learningNextBtn.classList.add("actionActive");
-                learningNextBtn.addEventListener('click', () => {
-                    let nextLessonId = extractLessonId(nextL);
-                    if (nextLessonId) {
-                        window.location.href = "LearningCourse?courseId=" + @Model.CourseId + "&lessonId=" + nextLessonId;
-                    }
-                })
-            }
-        }
-        function saveChapterOpen(index) {
-            let className = "learning_chapter-index-" + index;
-            let chapter = document.querySelector("." + className);
-            console.log(className);
-            if (chapter.classList.contains('showListLesson')) {
-                let indexOfArr = arr.indexOf(className);
-                if (indexOfArr >= 0) {
-                    console.log("remove");
-                    arr.splice(indexOfArr, 1);
-                    SaveChapterCookie(arr);
-                }
-            } else {
-                arr.push(className);
-                SaveChapterCookie(arr);
-            }
+        if (hours > 0 || minutes > 0) {
+            timeString += `${String(minutes).padStart(2, '0')}:`;
         }
 
-        function SaveChapterCookie(ar) {
-            console.log("ar:" + ar);
-            document.cookie = 'chapterOpen=' + JSON.stringify(ar);
-        }
+        timeString += String(secs).padStart(2, '0');
 
-    </script>
+        console.log(timeString);
+        timeDisplay.innerHTML = timeString;
+        if (remainingTime <= 0) {
+            clearInterval(countdownInterval);
+            document.getElementById("form-quizz").submit();
+            console.log("Countdown finished! Form submitted.");
+        }
+        remainingTime -= 1;
+    }, 1000);
+}
+
+startCountdown(@Model.CurrentLesson.Duration);
+var arr = [];
+//click vào chapter
+// window.load
+window.onload = function () {
+    //process open before chapter
+    var json_str = getCookieByName('chapterOpen');
+    arr = json_str ? JSON.parse(json_str) : [];
+    console.log(arr)
+
+    function getCookieByName(name) {
+        let cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                return cookie.substring(name.length + 1);
+            }
+        }
+        return null;
+    }
+
+
+    function ShowChapter() {
+        for (chapterClass of arr) {
+            let chapter = document.querySelector("." + chapterClass);
+            if (chapter) {
+                chapter.classList.add("showListLesson");
+            }
+        }
+    }
+
+    ShowChapter();
+    //process next/prev lesson
+    let currL = document.querySelector('.lesson-index-' + @Model.CurrentLesson.Id);
+    let prevL = currL ? currL.previousElementSibling : null;
+    let nextL = currL ? currL.nextElementSibling : null;
+    const learningPrevBtn = document.querySelector('.learning__lesson-prev');
+    const learningNextBtn = document.querySelector('.learning__lesson-next');
+
+
+    function extractLessonId(element) {
+        for (let cls of element.classList) {
+            if (cls.startsWith("lesson-index-")) {
+                return cls.replace("lesson-index-", "");
+            }
+        }
+        return null;
+    }
+
+
+    if (prevL != null && prevL.classList.contains("canLearn")) {
+        learningPrevBtn.classList.add("actionActive");
+        learningPrevBtn.addEventListener('click', () => {
+            let prevLessonId = extractLessonId(prevL);
+            if (prevLessonId) {
+                window.location.href = "LearningCourse?courseId=" + @Model.CourseId + "&lessonId=" + prevLessonId + "&userId=" + @Model.UserId;
+            }
+        })
+    }
+    if (nextL != null && nextL.classList.contains("canLearn")) {
+        console.log(learningNextBtn)
+        learningNextBtn.classList.add("actionActive");
+        learningNextBtn.addEventListener('click', () => {
+            let nextLessonId = extractLessonId(nextL);
+            if (nextLessonId) {
+                window.location.href = "LearningCourse?courseId=" + @Model.CourseId + "&lessonId=" + nextLessonId + "&userId=" + @Model.UserId;
+            }
+        })
+    }
+}
+function saveChapterOpen(index) {
+    let className = "learning_chapter-index-" + index;
+    let chapter = document.querySelector("." + className);
+    console.log(className);
+    if (chapter.classList.contains('showListLesson')) {
+        let indexOfArr = arr.indexOf(className);
+        if (indexOfArr >= 0) {
+            console.log("remove");
+            arr.splice(indexOfArr, 1);
+            SaveChapterCookie(arr);
+        }
+    } else {
+        arr.push(className);
+        SaveChapterCookie(arr);
+    }
+}
+
+function SaveChapterCookie(ar) {
+    console.log("ar:" + ar);
+    document.cookie = 'chapterOpen=' + JSON.stringify(ar);
+}
+
+</script>
 
 
 
