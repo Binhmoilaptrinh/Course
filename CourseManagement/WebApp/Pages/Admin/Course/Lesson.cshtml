@@ -394,38 +394,7 @@
             e.stopPropagation()
         })
     });
-    // // Lấy tham chiếu đến select và các form
-    // const lessonTypeSelect = document.getElementById('lessonType');
-    // const videoForm = document.getElementById('videoForm');
-    // const quizForm = document.getElementById('quizForm');
-
-    // // Sự kiện khi thay đổi loại lesson (video hoặc quiz)
-    // lessonTypeSelect.addEventListener('change', function () {
-    //     const selectedType = this.value; // Lấy giá trị được chọn từ select
-
-    //     if (selectedType === 'video') {
-    //         // Hiển thị form video và ẩn form quiz
-    //         videoForm.style.display = 'block';
-    //         quizForm.style.display = 'none';
-    //     } else if (selectedType === 'quiz') {
-    //         // Hiển thị form quiz và ẩn form video
-    //         quizForm.style.display = 'block';
-    //         videoForm.style.display = 'none';
-    //     }
-    // });
-
-    // // Khởi tạo trạng thái ban đầu (hiển thị form video nếu chọn video, hoặc quiz nếu chọn quiz)
-    // document.addEventListener('DOMContentLoaded', function () {
-    //     // Mặc định hiển thị form tương ứng khi load trang
-    //     if (lessonTypeSelect.value === 'video') {
-    //         videoForm.style.display = 'block';
-    //         quizForm.style.display = 'none';
-    //     } else {
-    //         quizForm.style.display = 'block';
-    //         videoForm.style.display = 'none';
-    //     }
-    // });
-
+   
     function addAnswer(questionIndex) {
         let questionItem = document.querySelectorAll('.learning__item')[questionIndex];
         let answerCount = questionItem.querySelectorAll('.learning__lesson-item').length - 1;

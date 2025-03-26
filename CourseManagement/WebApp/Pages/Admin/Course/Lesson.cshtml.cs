@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Text;
 using WebAPI.DTOS.request;
 using System.Reflection;
+using Azure.Core;
 
 namespace WebApp.Pages.Admin.Course
 {
@@ -177,5 +178,45 @@ namespace WebApp.Pages.Admin.Course
                 return Redirect("?chapterId=" + ChapterId);
             }
         }
+
+        //public IActionResult OnGetDeleteAnswer(int AnswerId, int LessonId)
+        //{
+        //    var response = new HttpResponseMessage();
+
+        //    if (LessonId == 0)
+        //    {
+        //        response = await _httpClient.DeleteAsync("https://api.2handshop.id.vn/api/Lesson");
+        //    }
+
+        //    if (isDelete)
+        //    {
+        //        TempData["ToastMessage"] = "Xóa câu trả lời thành công";
+        //        TempData["ToastType"] = "success";
+        //    }
+        //    else
+        //    {
+        //        TempData["ToastMessage"] = "Answer not found.";
+        //        TempData["ToastType"] = "fail";
+        //    }
+        //    return RedirectToAction("", new { lessonId = lessonId });
+        //}
+
+        ////delete Quizz Question | delete Quizz Question
+        //public IActionResult OnGetDeleteQuestion(int QuestionId, int LessonId)
+        //{
+
+        //    bool isDelete = _questionService.DeleteQuestionById(questionId);
+        //    if (isDelete)
+        //    {
+        //        TempData["ToastMessage"] = "Xóa câu hỏi thành công.";
+        //        TempData["ToastType"] = "success";
+        //    }
+        //    else
+        //    {
+        //        TempData["ToastMessage"] = "Question not found.";
+        //        TempData["ToastType"] = "fail";
+        //    }
+        //    return RedirectToAction("", new { lessonId = lessonId });
+        //}
     }
 }
