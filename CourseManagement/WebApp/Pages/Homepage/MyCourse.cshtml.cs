@@ -42,12 +42,12 @@ namespace WebApp.Pages.Homepage
                 {
                     var certificateUrl = await GetCertificateUrlAsync(enrollment.EnrollmentId);
 
-                    if (certificateUrl == null)
+                    if (string.IsNullOrEmpty(certificateUrl))
                     {
-                        certificateUrl = await CreateCertificateAsync(enrollment);
+                        CertificateUrls[enrollment.EnrollmentId] = await CreateCertificateAsync(enrollment);
                     }
 
-                    if (!string.IsNullOrEmpty(certificateUrl))
+                    else
                     {
                         CertificateUrls[enrollment.EnrollmentId] = certificateUrl;
                     }
