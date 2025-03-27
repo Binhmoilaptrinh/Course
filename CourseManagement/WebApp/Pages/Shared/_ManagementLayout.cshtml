@@ -53,8 +53,6 @@
 
 
             <div class="nav_menu-user">
-                @if (User.Identity.IsAuthenticated)
-                {
                     <!-- If logged in -->
                     <div class="nav_menu-user-notifi">
                         <i class="fa-solid fa-bell"></i>
@@ -98,7 +96,6 @@
                             </ul>
                         </div>
                     </div>
-                }
             </div>
         </nav>
     </div>
@@ -127,57 +124,41 @@
                             </li>
                         </ul>
                         <ul class="nav_menu-list">
-                            @if (User.IsInRole("Administrator"))
-                            {
-                                <li class="nav_menu-list-item">
-                                    <a asp-page="/Admin/Dashboard">
-                                        <i class="fa-solid fa-house"></i>
-                                        <span>Trang chủ</span>
-                                    </a>
-                                </li>
-                            }
                             <li class="nav_menu-list-item">
-                                <a href="/Admin/Courses/List">
+                                <a asp-page="/Admin/Dashboard">
+                                    <i class="fa-solid fa-house"></i>
+                                    <span>Trang chủ</span>
+                                </a>
+                            <li class="nav_menu-list-item">
+                                <a href="/Admin/Course/List">
                                     <i class="fa-solid fa-lightbulb"></i>
                                     <span>Khóa học</span>
                                 </a>
                             </li>
-                            @if (User.IsInRole("Administrator"))
-                            {
-                                <li class="nav_menu-list-item">
-                                    <a href="/Admin/Categories/List">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Danh mục</span>
-                                    </a>
-                                </li>
-                            }
-                            @if (User.IsInRole("Administrator"))
-                            {
-                                <li class="nav_menu-list-item">
-                                    <a href="/Admin/Users/List">
-                                        <i class="fa-solid fa-chalkboard-user"></i>
-                                        <span>Nhân sự</span>
-                                    </a>
-                                </li>
-                            }
-                            @if (User.IsInRole("Administrator"))
-                            {
-                                <li class="nav_menu-list-item">
-                                    <a href="/Admin/Discounts/List">
-                                        <i class="fa-solid fa-chalkboard-user"></i>
-                                        <span>Mã giảm giá</span>
-                                    </a>
-                                </li>
-                            }
-                            @if (User.IsInRole("Administrator"))
-                            {
-                                <li class="nav_menu-list-item">
-                                    <a asp-page="/Admin/Payments/List">
-                                        <i class="fa-solid fa-cart-shopping"></i>
-                                        <span>Thanh toán </span>
-                                    </a>
-                                </li>
-                            }
+                            <li class="nav_menu-list-item">
+                                <a href="/Admin/Categories/List">
+                                    <i class="fa-solid fa-lightbulb"></i>
+                                    <span>Danh mục</span>
+                                </a>
+                            </li>
+                            <li class="nav_menu-list-item">
+                                <a href="/Admin/User/List">
+                                    <i class="fa-solid fa-chalkboard-user"></i>
+                                    <span>Nhân sự</span>
+                                </a>
+                            </li>
+                            <li class="nav_menu-list-item">
+                                <a href="/Admin/Discounts/List">
+                                    <i class="fa-solid fa-chalkboard-user"></i>
+                                    <span>Mã giảm giá</span>
+                                </a>
+                            </li>
+                            <li class="nav_menu-list-item">
+                                <a asp-page="/Admin/Payments/List">
+                                    <i class="fa-solid fa-cart-shopping"></i>
+                                    <span>Thanh toán </span>
+                                </a>
+                            </li>
 
                             <li class="nav_menu-list-item">
                                 <a asp-page="/Admin/Comments/List">
@@ -311,7 +292,7 @@
     });
 
     @RenderSection("Scripts", required: false)
-            const removeSearchBtn = document.querySelector('.nav_search-removeBtn')
+                const removeSearchBtn = document.querySelector('.nav_search-removeBtn')
     const searchInput = document.querySelector('input[name="searchTxt"]')
     removeSearchBtn.addEventListener('click', () => {
         searchInput.value = "";

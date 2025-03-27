@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using WebAPI.Models;
 
 namespace WebApp.Pages.Admin.Course
 {
