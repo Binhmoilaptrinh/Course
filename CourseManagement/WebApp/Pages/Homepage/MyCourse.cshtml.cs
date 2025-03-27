@@ -2,8 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text;
 using System.Text.Json;
-using WebAPI.DTOS.response;
-using WebAPI.Models;
+using WebApp.Models;
 
 namespace WebApp.Pages.Homepage
 {

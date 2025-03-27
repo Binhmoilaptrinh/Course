@@ -1,17 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using MigraDoc.DocumentObjectModel;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using WebAPI.DTOS.request;
-using WebAPI.DTOS.response;
-using WebAPI.Models;
-using WebAPI.Services.Interfaces;
+using WebApp.Models;
 
 namespace WebApp.Pages.Homepage
 {
@@ -29,7 +25,6 @@ namespace WebApp.Pages.Homepage
         public LessonDetailResponseAdmin CurrentLesson { get; set; }
         public int CourseId { get; set; }
         public int UserId { get; set; }
-        public LessonProgress ProgressLesson { get; set; }
         [BindProperty]
         public bool IsDoingQuizz { get; set; } = false;
 
@@ -68,9 +63,9 @@ namespace WebApp.Pages.Homepage
             // 3. Fetch Lesson Progress
             var progressResponse = await _httpClient.GetAsync($"https://api.2handshop.id.vn/api/CourseLearning/lesson-progress?lessonId={lessonId}&userId={userId}");//
             var progressContent = await progressResponse.Content.ReadAsStringAsync();
-            if(!progressContent.IsValueNullOrEmpty())
+            if(!string.IsNullOrWhiteSpace(progressContent))
             {
-                ProgressLesson = JsonSerializer.Deserialize<LessonProgress>(
+                LessonProgressResponse = JsonSerializer.Deserialize<LessonProgressResponse>(
                     progressContent,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 );
@@ -131,16 +126,16 @@ namespace WebApp.Pages.Homepage
                         IsDoingQuizz = true;
                     }
 
-                    if (ProgressLesson != null && quizz.Equals("resume")) // resume
+                    if (LessonProgressResponse != null && quizz.Equals("resume")) // resume
                     {
-                        if (!validateTime(ProgressLesson.UpdatedAt ?? ProgressLesson.CreatedAt, ProgressLesson.CountDoing ?? 1))
+                        if (!validateTime(LessonProgressResponse.UpdatedAt ?? LessonProgressResponse.CreatedAt, LessonProgressResponse.CountDoing ?? 1))
                         {
                             TempData["messQuizz"] = "B?n không ?? ?i?u ki?n ?? làm bài quizz này";
                         }
                         else
                         {
                             IsDoingQuizz = true;
-                            ProgressLesson.CountDoing = ProgressLesson.CountDoing++;
+                            LessonProgressResponse.CountDoing = LessonProgressResponse.CountDoing++;
                         }
                     }
                 }
