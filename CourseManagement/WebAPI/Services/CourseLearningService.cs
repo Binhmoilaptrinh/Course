@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
 using WebAPI.Models;
@@ -43,6 +44,29 @@ namespace WebAPI.Services
             if (progressLesson.ProgressPercentage > passing)
             {
                 progressLesson.Passing = 1;
+            }
+            if (progressLesson.Passing == 1)
+            {
+                var enrollment = await _eCourseContext.Enrollments.Where(x => x.UserId == progress.UserId && x.CourseId == progress.CourseId).FirstOrDefaultAsync();
+                if (enrollment != null)
+                {
+                    int count = _eCourseContext.Lessons.Where(x => x.Chapter.Course.Id == progress.CourseId).Count();
+
+                    // Calculate the total number of lessons in the course (from all chapters)
+                    int countLesson = _eCourseContext.LessonProgresses
+            .Where(lp => lp.UserId == progress.UserId
+                 && lp.Passing == 1
+                 && lp.Lesson.Chapter.CourseId == progress.CourseId)
+            .Count();
+
+                    // Calculate the number of passing lessons in the course
+
+
+                    // Update the enrollment progress based on the ratio of passing lessons to total lessons
+                    enrollment.Progress = (double)countLesson / count * 100;
+                    _eCourseContext.Enrollments.Update(enrollment);
+                    await _eCourseContext.SaveChangesAsync();
+                }
             }
             progressLesson.CountDoing = progressLesson.CountDoing + 1;
             if (progressLesson.ProgressPercentage > progressLesson.HighestMark)

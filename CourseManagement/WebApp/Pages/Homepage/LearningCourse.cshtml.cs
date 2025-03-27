@@ -238,7 +238,8 @@ namespace WebApp.Pages.Homepage
             {
                 LessonId = lessonId,
                 UserId = userId,
-                ProgressPercentage = (float)mark
+                ProgressPercentage = (float)mark,
+                CourseId = courseId
             };
             using var jsonContent = new StringContent(JsonSerializer.Serialize(progressLessonUpdate), Encoding.UTF8, "application/json");
             var option = new JsonSerializerOptions
