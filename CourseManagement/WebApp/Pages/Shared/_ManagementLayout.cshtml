@@ -1,171 +1,182 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TVC Home</title>
-    <!-- Link Swiper's CSS -->
-    <link rel="icon" type="image/png" href="./img/logoTab.jpg">
+    <!-- Link external CSS -->
+    <link rel="icon" type="image/png" href="./img/logoTab.jpg" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
           integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
           crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="~/css/style.css">
-    <link rel="stylesheet" href="~/css/responsive.css">
-    <link rel="stylesheet" href="~/css/manage.css">
-    <link rel="stylesheet" href="~/css/course.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/responsive.css" />
+    <link rel="stylesheet" href="~/css/manage.css" />
+    <link rel="stylesheet" href="~/css/course.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
     <style>
+        /* Custom styles if needed */
+        .user-nav {
+            display: none;
+        }
 
+        .showUserNav {
+            display: block;
+        }
     </style>
 </head>
-
 <body>
     <div id="header">
         <nav class="container">
             <div class="nav_menu-btn">
                 <i class="fa-solid fa-bars"></i>
             </div>
-            <a href="http://127.0.0.1:5501/index.html" class="logo">
+            <a href="index.html" class="logo">
                 <h2 class="logo_name">TVCdev</h2>
             </a>
             <div class="nav_search w-100">
                 <form method="get" id="formSearch" onsubmit="submitForm(); return false;">
-                    <!-- Gọi submitForm khi nhấn vào biểu tượng kính lúp -->
                     <i class="fa-solid fa-magnifying-glass nav_search-searchBtn" onclick="submitForm()"></i>
-
-                    <input type="text" id="searchTxt" name="searchTxt" @* value="@Model.CurrentFilter" *@
-                           placeholder="Tìm kiếm khóa học, bài viết, video..." class="input_box">
-
-                    <!-- Dùng onclick để xóa nội dung tìm kiếm thay vì submit -->
+                    <input type="text" id="searchTxt" name="searchTxt" placeholder="Tìm kiếm khóa học, bài viết, video..." class="input_box">
                     <button type="button" onclick="clearSearch()">
                         <i class="fa-solid fa-xmark nav_search-removeBtn"></i>
                     </button>
                 </form>
             </div>
 
-
+            <!-- Top Navigation User Account Section -->
             <div class="nav_menu-user">
-                    <!-- If logged in -->
-                    <div class="nav_menu-user-notifi">
-                        <i class="fa-solid fa-bell"></i>
+                <div class="nav_menu-user-notifi">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <div class="nav_menu-user-account">
+                    <div class="account-image">
+                        <!-- Default avatar image; will be replaced if userInfo exists -->
+                        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+                             alt="Profile Picture" width="50" height="50">
                     </div>
-                    <div class="nav_menu-user-account">
-                        <div class="account-image">
-                            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
-                                 alt="Profile Picture">
+                    <div class="user-nav">
+                        <div class="d-flex align-items-center">
+                            <!-- Optionally include another image -->
+                            <img id="optionalUserAvatar" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+                                 alt="User Avatar" width="50" height="50">
+                            <div class="ms-4">
+                                <!-- Username will be inserted here -->
+                                <span id="optionalUserName" class="fw-bold fs-4 text-dark">User Name</span>
+                                <div class="fs-5 text-muted"></div>
+                            </div>
                         </div>
-                        <div class="user-nav">
-                            <ul class="p-0">
-                                <a class="d-flex align-items-center text-decoration-none" href="">
-                                    <div class="">
-                                        <div class="" style="">
-                                            <img src="" alt="Trần Cường">
-                                        </div>
-                                    </div>
-                                    <div class="ms-4">
-                                        <span class="fw-bold fs-4 text-dark"></span>
-                                        <div class="fs-5 text-muted"></div>
-                                    </div>
-                                </a>
-                                <hr>
-                                <ul class="p-0">
-                                    <li>
-                                        <a class="fs-4 text-muted text-decoration-none" asp-page="/Homepage/Profile">Trang cá nhân</a>
-                                    </li>
-                                </ul>
-                                <hr class="">
-                                <hr>
-                                <ul class="p-0">
-                                    <li class="py-2"><a class="fs-4 text-muted text-decoration-none" href="/new-post">Viết blog</a></li>
-                                    <li class="py-2"><a class="fs-4 text-muted text-decoration-none" href="/me/posts">Bài viết của tôi</a></li>
-                                    <li class="py-2"><a class="fs-4 text-muted text-decoration-none" href="/me/bookmark">Bài viết đã lưu</a></li>
-                                </ul>
-                                <hr>
-                                <ul class="p-0">
-                                    <li class="py-2"><a class="fs-4 text-muted text-decoration-none" href="/Homepage/EditProfile">Cài đặt</a></li>
-                                    <li class="py-2"><a asp-page="/Authentication/LogoutAdmin" class="fs-4 text-muted text-decoration-none">Đăng xuất</a></li>
-                                </ul>
-                            </ul>
-                        </div>
+                        <hr>
+                        <ul class="p-0">
+                            <li>
+                                <a class="fs-4 text-muted text-decoration-none" href="/Homepage/Profile">Trang cá nhân</a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <ul class="p-0">
+                            <li class="py-2">
+                                <a class="fs-4 text-muted text-decoration-none" href="/new-post">Viết blog</a>
+                            </li>
+                            <li class="py-2">
+                                <a class="fs-4 text-muted text-decoration-none" href="/me/posts">Bài viết của tôi</a>
+                            </li>
+                            <li class="py-2">
+                                <a class="fs-4 text-muted text-decoration-none" href="/me/bookmark">Bài viết đã lưu</a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <ul class="p-0">
+                            <li class="py-2">
+                                <a class="fs-4 text-muted text-decoration-none" href="/Homepage/EditProfile">Cài đặt</a>
+                            </li>
+                            <li class="py-2">
+                                <button id="logoutBtn" class="fs-4 text-muted text-decoration-none btn btn-link">Đăng xuất</button>
+                            </li>
+                        </ul>
                     </div>
+                </div>
             </div>
         </nav>
     </div>
+
+    <!-- Main Content -->
     <div id="content">
         <div class="row">
             <div class="col-xl-2">
-                <!-- nav menu -->
+                <!-- Side Navigation Menu -->
                 <div class="nav_menu w-100">
                     <div class="nav_overlay"></div>
                     <div class="nav_menu-account">
                         <div class="nav_menu-account-img">
-                            <img src=""
-                                 alt="">
+                            <img id="sideUserAvatar" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png" alt="Profile Picture" width="50" height="50">
                         </div>
                         <div class="nav_menu-account-name">
-                            <span></span>
+                            <span id="sideUserName">User Name</span>
                         </div>
                     </div>
                     <div class="nav_menu-list-wrap">
                         <ul class="nav_menu-list">
                             <li class="nav_menu-list-item">
-                                <a asp-page="/Homepage/Profile">
+                                <a href="/Homepage/Profile">
                                     <i class="fa-solid fa-user"></i>
                                     <span>Trang cá nhân</span>
                                 </a>
                             </li>
                         </ul>
+                        <!-- Additional menu items here -->
                         <ul class="nav_menu-list">
                             <li class="nav_menu-list-item">
-                                <a asp-page="/Admin/Dashboard">
+                                <a href="/Admin/Dashboard">
                                     <i class="fa-solid fa-house"></i>
                                     <span>Trang chủ</span>
                                 </a>
-                            <li class="nav_menu-list-item">
-                                <a href="/Admin/Course/List">
-                                    <i class="fa-solid fa-lightbulb"></i>
-                                    <span>Khóa học</span>
-                                </a>
                             </li>
-                            <li class="nav_menu-list-item">
-                                <a href="/Admin/Categories/List">
-                                    <i class="fa-solid fa-lightbulb"></i>
-                                    <span>Danh mục</span>
-                                </a>
-                            </li>
-                            <li class="nav_menu-list-item">
-                                <a href="/Admin/User/List">
-                                    <i class="fa-solid fa-chalkboard-user"></i>
-                                    <span>Nhân sự</span>
-                                </a>
-                            </li>
-                            <li class="nav_menu-list-item">
-                                <a href="/Admin/Discounts/List">
-                                    <i class="fa-solid fa-chalkboard-user"></i>
-                                    <span>Mã giảm giá</span>
-                                </a>
-                            </li>
-                            <li class="nav_menu-list-item">
-                                <a asp-page="/Admin/Payments/List">
-                                    <i class="fa-solid fa-cart-shopping"></i>
-                                    <span>Thanh toán </span>
-                                </a>
-                            </li>
-
-                            <li class="nav_menu-list-item">
-                                <a asp-page="/Admin/Comments/List">
-                                    <i class="fa-solid fa-comment"></i>
-                                    <span>Bình Luận </span>
-                                </a>
-                            </li>
+                            <!-- Add other menu items as needed -->
+                        </ul>
+                        <li class="nav_menu-list-item">
+                            <a href="/Admin/Course/List">
+                                <i class="fa-solid fa-lightbulb"></i>
+                                <span>Khóa học</span>
+                            </a>
+                        </li>
+                        <li class="nav_menu-list-item">
+                            <a href="/Admin/Categories/List">
+                                <i class="fa-solid fa-lightbulb"></i>
+                                <span>Danh mục</span>
+                            </a>
+                        </li>
+                        <li class="nav_menu-list-item">
+                            <a href="/Admin/User/List">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                                <span>Nhân sự</span>
+                            </a>
+                        </li>
+                        <li class="nav_menu-list-item">
+                            <a href="/Admin/Discounts/List">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                                <span>Mã giảm giá</span>
+                            </a>
+                        </li>
+                        <li class="nav_menu-list-item">
+                            <a href="/Admin/Payments/List">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span>Thanh toán</span>
+                            </a>
+                        </li>
+                        <li class="nav_menu-list-item">
+                            <a href="/Admin/Comments/List">
+                                <i class="fa-solid fa-comment"></i>
+                                <span>Bình Luận</span>
+                            </a>
+                        </li>
                         </ul>
                         <ul class="nav_menu-list">
                             <li class="nav_menu-list-item">
@@ -179,7 +190,7 @@
                             <li class="nav_menu-list-item setting_account-btn">
                                 <a href="/Homepage/EditProfile">
                                     <i class="fa-solid fa-laptop-code"></i>
-                                    <span>Cài đặt </span>
+                                    <span>Cài đặt</span>
                                 </a>
                                 <ul class="nav_menu-subList">
                                     <li class="nav_menu-list-item">
@@ -188,12 +199,12 @@
                                         </a>
                                     </li>
                                     <li class="nav_menu-list-item">
-                                        <a href="">
+                                        <a href="#">
                                             <span>Bảo mật đăng nhập</span>
                                         </a>
                                     </li>
                                     <li class="nav_menu-list-item">
-                                        <a href="">
+                                        <a href="#">
                                             <span>Thông báo</span>
                                         </a>
                                     </li>
@@ -202,7 +213,7 @@
                         </ul>
                         <ul class="nav_menu-list">
                             <li class="nav_menu-list-item">
-                                <a asp-page="/Authentication/LogoutAdmin">
+                                <a href="#" id="logoutBtnSide">
                                     <i class="fa-solid fa-right-from-bracket"></i>
                                     <span>Đăng xuất</span>
                                 </a>
@@ -212,13 +223,16 @@
                 </div>
             </div>
             <div class="col-xl-10">
+                <!-- Main page content would be rendered here -->
                 @RenderBody()
             </div>
         </div>
     </div>
+
     <a href="#" id="scroll-top">
         <i class="fa-sharp fa-solid fa-shuttle-space icon-scroll"></i>
     </a>
+
     <div id="footer" class="px-5">
         <div class="footer-wrapper">
             <div class="footer-col col-20 col-full mb-30">
@@ -236,7 +250,7 @@
                     <a href="" class="footer__icon"><i class="fa-brands fa-linkedin-in"></i></a>
                 </div>
             </div>
-            <div class="footer-col mt-30 ">
+            <div class="footer-col mt-30">
                 <h3 class="footer-col__header">Links</h3>
                 <ul class="footer-col__links">
                     <li><a href="">Home</a></li>
@@ -265,16 +279,16 @@
             </div>
             <div class="footer-col mt-30">
                 <div class="footer__app">
-                    <a href="" class="">
-                        <img src="~/img/chPlay-app.png" alt="">
+                    <a href="">
+                        <img src="~/img/chPlay-app.png" alt="" />
                     </a>
-                    <a href="" class="">
-                        <img src="~/img/appStore-app.png" alt="">
+                    <a href="">
+                        <img src="~/img/appStore-app.png" alt="" />
                     </a>
                 </div>
                 <div class="footer__certificate">
                     <a href="">
-                        <img src="~/img/dmca_logo.png" alt="">
+                        <img src="~/img/dmca_logo.png" alt="" />
                     </a>
                 </div>
             </div>
@@ -283,41 +297,95 @@
             <p>Copyright Cuong tran TVCdev 24/2/2023, All right Reserved</p>
         </div>
     </div>
-</body>
-<script>
-    const accImg = document.querySelector('.account-image');
-    const userNav = document.querySelector('.user-nav');
-    accImg.addEventListener('click', () => {
-        userNav.classList.toggle('showUserNav')
-    });
 
+    <!-- Logout Functionality -->
+    <script>
+        function logout() {
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("userInfo");
+            window.location.href = "/Authentication/Login";
+        }
+        document.getElementById("logoutBtn").addEventListener("click", logout);
+        const logoutBtnSide = document.getElementById("logoutBtnSide");
+        if (logoutBtnSide) {
+            logoutBtnSide.addEventListener("click", function (e) {
+                e.preventDefault();
+                logout();
+            });
+        }
+    </script>
+
+    <!-- Update User Information from localStorage -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const userInfoStr = localStorage.getItem("userInfo");
+            if (userInfoStr) {
+                const userInfo = JSON.parse(userInfoStr);
+                // Update optional image and username in top nav
+                const optionalUserAvatar = document.getElementById("optionalUserAvatar");
+                const optionalUserName = document.getElementById("optionalUserName");
+                if (optionalUserAvatar && userInfo.avatar) {
+                    optionalUserAvatar.src = userInfo.avatar;
+                }
+                if (optionalUserName && userInfo.userName) {
+                    optionalUserName.textContent = userInfo.userName;
+                }
+                // Update top account avatar
+                const topAccountImage = document.querySelector('.nav_menu-user-account .account-image img');
+                if (topAccountImage && userInfo.avatar) {
+                    topAccountImage.src = userInfo.avatar;
+                }
+                // Update side navigation avatar and username
+                const sideUserAvatar = document.getElementById("sideUserAvatar");
+                const sideUserName = document.getElementById("sideUserName");
+                if (sideUserAvatar && userInfo.avatar) {
+                    sideUserAvatar.src = userInfo.avatar;
+                }
+                if (sideUserName && userInfo.userName) {
+                    sideUserName.textContent = userInfo.userName;
+                }
+            }
+        });
+    </script>
+
+    <!-- Additional UI functionality (toggle user nav, clear search, menu actions) -->
+    <script>
+        const accImg = document.querySelector('.account-image');
+        const userNav = document.querySelector('.user-nav');
+        accImg.addEventListener('click', () => {
+            userNav.classList.toggle('showUserNav');
+        });
+
+        const removeSearchBtn = document.querySelector('.nav_search-removeBtn');
+        const searchInput = document.querySelector('input[name="searchTxt"]');
+        removeSearchBtn.addEventListener('click', () => {
+            searchInput.value = "";
+        });
+
+        function actionNavMenu() {
+            const settingAccountBtn = document.querySelector('.setting_account-btn');
+            const subMenu = document.querySelector('.nav_menu-subList');
+            const openNavBtn = document.querySelector('.nav_menu-btn');
+            const navMenu = document.querySelector('.nav_menu');
+            const menuNavOverLay = document.querySelector('.nav_overlay');
+            openNavBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('openNavMenu');
+            });
+            menuNavOverLay.addEventListener('click', () => {
+                navMenu.classList.toggle('openNavMenu');
+            });
+            settingAccountBtn.addEventListener('click', () => {
+                subMenu.classList.toggle('showSubList');
+                settingAccountBtn.classList.toggle('changeIcon');
+            });
+        }
+        actionNavMenu();
+    </script>
+
+    <!-- TinyMCE and CKEditor scripts -->
+    <script src="~/tinymce/tinymce.min.js"></script>
+    <script src="~/js/tinymceConfig.js"></script>
+    <script src="https://cdn.ckeditor.com/4.14.0/standard/ckeditor.js"></script>
     @RenderSection("Scripts", required: false)
-                const removeSearchBtn = document.querySelector('.nav_search-removeBtn')
-    const searchInput = document.querySelector('input[name="searchTxt"]')
-    removeSearchBtn.addEventListener('click', () => {
-        searchInput.value = "";
-    })
-    function actionNavMenu() {
-        let settingAccountBtn = document.querySelector('.setting_account-btn')
-        let subMenu = document.querySelector('.nav_menu-subList')
-        let openNavBtn = document.querySelector('.nav_menu-btn')
-        let navMenu = document.querySelector('.nav_menu')
-        let menuNavOverLay = document.querySelector('.nav_overlay')
-        openNavBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('openNavMenu')
-        })
-        menuNavOverLay.addEventListener('click', () => {
-            navMenu.classList.toggle('openNavMenu')
-        })
-        settingAccountBtn.addEventListener('click', () => {
-            subMenu.classList.toggle('showSubList')
-            settingAccountBtn.classList.toggle('changeIcon')
-        })
-    }
-    actionNavMenu()
-</script>
-<script src="~/tinymce/tinymce.min.js"></script>
-<script src="~/js/tinymceConfig.js"></script>
-<script src="https://cdn.ckeditor.com/4.14.0/standard/ckeditor.js"></script>
+</body>
 </html>
-@RenderSection("Scripts", required: false)

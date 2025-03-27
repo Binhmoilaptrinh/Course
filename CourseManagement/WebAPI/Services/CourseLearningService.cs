@@ -26,7 +26,8 @@ namespace WebAPI.Services
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
                 CountDoing = 0,
-                Passing = 0
+                Passing = 0,
+                HighestMark = 0
             };
             _eCourseContext.Add(lessonProgress);
             await _eCourseContext.SaveChangesAsync();
