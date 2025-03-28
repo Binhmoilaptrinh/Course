@@ -102,7 +102,6 @@
                     data: JSON.stringify({ username: username, password: password }),
                     success: function (response) {
                         console.log("API response:", response);
-                        alert("Login successful!");
 
                         // Lưu token vào LocalStorage
                         localStorage.setItem("authToken", response.token);
