@@ -8,6 +8,7 @@ using WebAPI.DTOS.response;
 using WebAPI.Models;
 using WebAPI.Repositories.Interfaces;
 using WebAPI.Services.Interfaces;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebAPI.Services
 {
@@ -42,11 +43,11 @@ namespace WebAPI.Services
         {
             try
             {
-                if(! await _categoryService.IsExistByIdAsync(request.CategoryId))
+                if (! await _categoryService.IsExistByIdAsync(request.CategoryId))
                 {
                     throw new Exception($"Category with Id {request.CategoryId} not found");
                 }
-                var user = await _userService.GetUserByIdAsync(request.CreateBy);
+                var user = await _userService.GetUserByIdAsync(request.UserId);
                 var thumbnailBlob = await _fileService.UploadAsync(request.Thumbnail);
                 var previewVideoBlob = await _fileService.UploadAsync(request.PreviewVideo);
 
@@ -75,7 +76,7 @@ namespace WebAPI.Services
 
             try
             {
-                var user = await _userService.GetUserByIdAsync(1);
+                var user = await _userService.GetUserByIdAsync(request.UserId);
                 _mapper.Map(request, existingCourse);
                 existingCourse.Updater = user;
                 if (request.Thumbnail != null)
@@ -131,16 +132,19 @@ namespace WebAPI.Services
                 CourseId = c.Id,
                 Title = c.Title,
                 Thumbnail = c.Thumbnail,
-                CategoryName = c.Category.Name,
+                PreviewVideo = c.PreviewVideo,
+                CategoryId = c.Category.Id,
                 Price = c.Price,
                 Enrollments = _courseContext.Enrollments.Where(x=>x.CourseId == id).Count(),
                 LessonsCount = _courseContext.Lessons.Where(l => l.Chapter.CourseId == id).Count(),
-                Status = c.Status
+                Status = c.Status,
+                Description = c.Description,
+                LimitDay = c.LimitDay
             }).FirstOrDefaultAsync(x => x.CourseId == id);
             return courseDetail;
         }
 
-        public async Task<List<ChapterDTO>> GetChapters(int courseId)
+        public async Task<List<ChapterDTO>> GetChapters(int courseId, int userId)
         {
             var chapters = await _courseContext.Chapters
                 .Include(c => c.Lessons)
@@ -156,13 +160,19 @@ namespace WebAPI.Services
                     {
                         Id = l.Id,
                         Name = l.Name,
-                        Duration = l.Duration
+                        Duration = l.Duration,
+                        Type = l.Type,
+                        IsPassed = _courseContext.LessonProgresses
+                            .Where(y => y.LessonId == l.Id && y.UserId == userId)
+                            .Select(a => a.Passing == 1)
+                            .FirstOrDefault() // Returns false if no record is found
                     }).ToList()
                 })
                 .ToListAsync(); // Return a list of chapters
 
             return chapters;
         }
+
 
     }
 }

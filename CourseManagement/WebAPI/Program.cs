@@ -18,6 +18,8 @@ using WebAPI.Services;
 using WebAPI.Services.Interfaces;
 using WebAPI.DTOS;
 using Microsoft.AspNetCore.Http.Features;
+using PdfSharp.Fonts;
+using WebAPI.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 var modelBuilder = new ODataConventionModelBuilder();
@@ -73,6 +75,8 @@ builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddHostedService<EnrollmentStatusUpdater>();
+
 
 // 🛠 Đăng ký Service
 builder.Services.Configure<SendEmail>(builder.Configuration.GetSection("SendEmail"));
@@ -81,6 +85,7 @@ builder.Services.AddScoped<ICustomAuthorizationService, CustomAuthorizationServi
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<PaymentHelper>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
+builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ICourseLearningService, CourseLearningService>();
 builder.Services.AddScoped<ICategoryService, CategoryServiceImpl>();

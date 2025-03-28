@@ -36,5 +36,12 @@ namespace WebAPI.Repositories
                 .ThenInclude(q => q.Answers)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<Lesson> UpdateAsync(Lesson lesson)
+        {
+            _context.Entry(lesson).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return lesson;
+        }
     }
 }

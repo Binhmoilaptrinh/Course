@@ -2,11 +2,11 @@
 {
     public class LessonQuizzRequestDto
     {
+        public int UserId { get; set; }
         public string Name { get; set; }
 
         public int ChapterId { get; set; }
 
-        public string Type { get; set; }//quizz
         public string Status { get; set; }
 
         public string? Content { get; set; }

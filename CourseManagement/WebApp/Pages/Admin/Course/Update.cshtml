@@ -1,0 +1,193 @@
+﻿@page
+@model WebApp.Pages.Admin.Course.UpdateModel
+@{
+    Layout = "_ManagementLayout";
+}
+
+<div class="popular-courses">
+    <div class="mt-5">
+        <a class="ms-5 text-decoration-none fs-2 p-0 back__page-btn" href="/Admin/Course/List">
+            <span><i class="fa-solid fa-caret-left"></i></span>
+            <span class="">Course management</span>
+        </a>
+    </div>
+    <h2 class="courses-title mt-5 px-5">Cập nhật khóa học</h2>
+    <div class="popular-header px-5">
+        <p class="popular-des">Cập nhật thông tin khóa học</p>
+    </div>
+    <h2>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+    </h2>
+    <div id="spinner" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+    <div id="successMessage" style="display: none; color: green;">Cập nhật thành công!</div>
+    <div class="container mt-5">
+        <div class="courses-container">
+
+            <!-- video form -->
+            <form id="updateForm" method="post" style="margin: 20px;" enctype="multipart/form-data">
+                <div>
+                    <input type="hidden" class="form-control fs-3 p-2" name="CourseId" value="@Model.CourseDetail.CourseId">
+                    <input type="hidden" id="updateBy" name="UpdateBy">
+                </div>
+                <label class="form-label fs-4">Preview course upload</label>
+                 <div class="mb-3 box-upload_file">
+                     <div id="dropArea" class="drop-area">
+                        <input type="file" name="PreviewVideo" id="videoUpload" accept="video/*" class="file-input" style="display: none;">
+                         <div id="uploadIcon" class="upload-icon">
+                             <i class="fa-solid fa-upload"></i>
+                             <p>Kéo thả video vào đây hoặc click để chọn</p>
+                         </div>
+                        <video id="videoPreview" src="@Model.CourseDetail.PreviewVideo" width="100%" controls style="display: @(string.IsNullOrEmpty(Model.CourseDetail.PreviewVideo) ? "none" : "block")"></video>
+                     </div>
+                 </div>
+
+                <label class="form-label fs-4">Image upload</label>
+
+                <div class="mb-3 box-upload_file">
+                    <div id="dropAreaImage" class="drop-area">
+                        <input type="file" id="imageUpload" name="Thumbnail" accept="image/*" class="file-input" style="display: none;">
+                        <div id="uploadIconImage" class="upload-icon">
+                            <i class="fa-solid fa-upload"></i>
+                            <p>Kéo thả hình ảnh vào đây hoặc click để chọn</p>
+                        </div>
+                        <img id="imagePreview" src="@Model.CourseDetail.Thumbnail" width="100%" style="display: @(string.IsNullOrEmpty(Model.CourseDetail.Thumbnail) ? "none" : "block")" />
+                    </div>
+                </div>
+                <div class="">
+                    <div class="progress_upload">
+                        <div class="progress-done_upload" data-done="70">70%</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fs-4">Title</label>
+                    <input type="text" class="form-control fs-3 p-2" name="Title" value="@Model.CourseDetail.Title">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fs-4">Price</label>
+                    <input type="number" class="form-control fs-3 p-2" name="Price" value="@Model.CourseDetail.Price">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fs-4" >Category</label>
+                    <select class="form-select form-select-lg mb-3 p-2 fs-3" name="Cate" aria-label=".form-select-lg example">
+                    @foreach (var cate in Model.Categories)
+                    {
+                            <!option value="@cate.id" @(cate.id == Model.CourseDetail.CategoryId ? "selected" : "")>@cate.name</!option>
+                     }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fs-4" for="limitDayInput">Ngày tối đa hoàn thành khóa học</label>
+                    <input type="number" class="form-control fs-3 p-2" name="Limit" value="@Model.CourseDetail.LimitDay" placeholder="Enter the number of days">
+                    <span class="text-danger mb-3 fs-4"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fs-4">Description</label>
+                    <textarea id="default" type="text" class="form-control fs-3 p-2" name="Desc" asp-for="CourseDetail.Description" value="@Model.CourseDetail?.Description"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary fs-4 px-5 py-3">Cập nhật khóa học</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Lấy userId từ localStorage và gán vào input hidden
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        if (userInfo && userInfo.userId) {
+            document.getElementById('updateBy').value = userInfo.userId;
+        }
+    });
+    // Handle video and image file uploads, similar to the create page.
+    const dropArea = document.getElementById('dropArea');
+    const fileInput = document.getElementById('videoUpload');
+    const videoPreview = document.getElementById('videoPreview');
+    const uploadIcon = document.getElementById('uploadIcon');
+
+    const dropAreaImage = document.getElementById('dropAreaImage');
+    const fileInputImage = document.getElementById('imageUpload');
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadIconImage = document.getElementById('uploadIconImage');
+
+    // Video file dialog handling
+    dropArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    dropAreaImage.addEventListener('click', () => {
+        fileInputImage.click();
+    });
+
+    fileInput.addEventListener('change', handleFiles);
+    dropArea.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropArea.classList.add('dragging');
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+        dropArea.classList.remove('dragging');
+    });
+
+    dropArea.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropArea.classList.remove('dragging');
+        const files = event.dataTransfer.files;
+        handleFiles({ target: { files } });
+    });
+
+    function handleFiles(event) {
+        const file = event.target.files[0];
+
+        if (file && file.type.startsWith('video/')) {
+            const videoURL = URL.createObjectURL(file);
+            videoPreview.src = videoURL;
+            videoPreview.style.display = 'block';
+            uploadIcon.style.display = 'none'; 
+        }
+    }
+
+    // Image file dialog handling
+    fileInputImage.addEventListener('change', handleImageFiles);
+    dropAreaImage.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropAreaImage.classList.add('dragging');
+    });
+
+    dropAreaImage.addEventListener('dragleave', () => {
+        dropAreaImage.classList.remove('dragging');
+    });
+
+    dropAreaImage.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropAreaImage.classList.remove('dragging');
+        const files = event.dataTransfer.files;
+        handleImageFiles({ target: { files } });
+    });
+
+    function handleImageFiles(event) {
+        const file = event.target.files[0];
+
+        if (file && file.type.startsWith('image/')) {
+            const imageURL = URL.createObjectURL(file);
+            imagePreview.src = imageURL;
+            imagePreview.style.display = 'block';
+            uploadIconImage.style.display = 'none'; 
+        }
+    }
+</script>

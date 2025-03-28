@@ -43,5 +43,12 @@ namespace WebAPI.Controllers
             var chapter = await _chapterService.GetChapterByIdAsync(id);
             return Ok(chapter);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteChapterById(int id)
+        {
+            await _chapterService.DeleteChapterById(id);
+            return Ok("Delete successfully");
+        }
     }
 }

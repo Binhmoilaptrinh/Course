@@ -2,8 +2,7 @@ using System.Net.Http;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using WebAPI.DTOS.response;
-
+using WebApp.Models;
 namespace WebApp.Pages.Admin.Enrollment
 {
     public class ListModel : PageModel

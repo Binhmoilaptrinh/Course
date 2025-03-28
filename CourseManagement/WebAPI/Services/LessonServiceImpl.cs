@@ -38,6 +38,7 @@ namespace WebAPI.Services
 
             lesson.Creator = user;
             lesson.CreatedAt = DateTime.Now;
+            lesson.Type = "video";
 
             var videoBlob = await _fileService.UploadAsync(lessonDto.Video);
             lesson.VideoUrl = videoBlob.Blob.Uri.ToString();
@@ -55,7 +56,8 @@ namespace WebAPI.Services
                     var user = await _userService.GetUserByIdAsync(1);
                     lesson.Creator = user;
                     lesson.CreatedAt = DateTime.Now;
-                    if (lessonDto.Type == "quizz" && lessonDto.QuestionsDto != null)
+                    lesson.Type = "quizz";
+                    if (lessonDto.QuestionsDto != null && lessonDto.QuestionsDto.Count > 0)
                     {
                         lesson = await _lessonRepository.CreateAsync(lesson);
                         foreach (var questionDto in lessonDto.QuestionsDto)
@@ -93,6 +95,79 @@ namespace WebAPI.Services
                 throw new Exception("Not found");
             }
             return _mapper.Map<LessonDetailResponseAdmin>(lesson);
+        }
+
+        public async Task<LessonVideoResponseAdmin> UpdateLessonVideoAsync(int lessonId, LessonVideoUpdateDto request)
+        {
+            var existingLesson = await _lessonRepository.GetByIdAsync(lessonId);
+            if(existingLesson == null)
+            {
+                throw new Exception($"Lesson with Id {lessonId} not found");
+            }
+            var user = await _userService.GetUserByIdAsync(request.UserId);//gia su ng 1 login => request can bien userId
+            _mapper.Map(request, existingLesson);
+
+            existingLesson.Updater = user;
+            existingLesson.UpdatedAt = DateTime.Now;
+            if(request.Video != null)
+            {
+                var videoBlob = await _fileService.UploadAsync(request.Video);
+                existingLesson.VideoUrl = videoBlob.Blob.Uri.ToString();
+            }
+
+            var updateLesson = await _lessonRepository.UpdateAsync(existingLesson);
+            return _mapper.Map<LessonVideoResponseAdmin>(updateLesson);
+        }
+
+        public async Task<LessonQuizzResponseAdmin> UpdateLessonQuizzAsync(int lessonId, LessonQuizzUpdateDto request)
+        {
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var existingLesson = await _lessonRepository.GetByIdAsync(lessonId);
+                    _mapper.Map(request, existingLesson);
+                    var user = await _userService.GetUserByIdAsync(request.UserId);
+                    existingLesson.Updater = user;
+                    existingLesson.UpdatedAt = DateTime.Now;
+                    if (request.Type == "quizz" && request.QuestionsDto != null)
+                    {
+                        existingLesson = await _lessonRepository.UpdateAsync(existingLesson);
+                        foreach (var questionDto in request.QuestionsDto)
+                        {
+                            if(questionDto.Id == 0 || questionDto.Id == null)
+                            {
+                                var createQues = new QuestionRequestDto
+                                {
+                                    LessonId = lessonId,
+                                    QuestionText = questionDto.QuestionText,
+                                    AnswersDto = questionDto.AnswersDto.Select(x => new AnswerRequestDto
+                                    {
+                                        AnswerText = x.AnswerText,
+                                        IsCorrect = x.IsCorrect
+                                    }).ToList()
+                                };
+                                await _questionService.CreateQuestionAsync(createQues);
+                            } else
+                            {
+                                await _questionService.UpdateQuestionAsync(questionDto);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Cần cung cấp câu hỏi");
+                    }
+
+                    await transaction.CommitAsync();
+                    return _mapper.Map<LessonQuizzResponseAdmin>(existingLesson);
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync(); // Rollback nếu có lỗi
+                    throw new Exception("Lỗi trong quá trình tạo Lesson", ex);
+                }
+            }
         }
     }
 }

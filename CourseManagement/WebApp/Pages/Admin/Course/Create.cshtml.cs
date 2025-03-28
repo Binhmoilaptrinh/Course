@@ -68,7 +68,7 @@ namespace WebApp.Pages.Admin.Course
             requestContent.Add(new StringContent(Title ?? ""), "Title");
             requestContent.Add(new StringContent("pending"), "Status");
             requestContent.Add(new StringContent(Price.ToString()), "Price");
-            requestContent.Add(new StringContent(CreateBy.ToString()), "CreateBy");
+            requestContent.Add(new StringContent(CreateBy.ToString()), "UserId");
             requestContent.Add(new StringContent(Cate.ToString()), "CategoryId");
             requestContent.Add(new StringContent(Limit.ToString()), "LimitDay");
             requestContent.Add(new StringContent(Desc ?? ""), "Description");
@@ -85,45 +85,6 @@ namespace WebApp.Pages.Admin.Course
                 ModelState.AddModelError("", "Lỗi khi gửi dữ liệu đến API: " + errorMessage);
                 return Page();
             }
-
-            //using (var content = new MultipartFormDataContent())
-            //{
-            //    // Thêm video
-            //    using (var stream = PreviewVideo.OpenReadStream())
-            //    {
-            //        var videoContent = new StreamContent(stream);
-            //        videoContent.Headers.ContentType = new MediaTypeHeaderValue(PreviewVideo.ContentType);
-            //        content.Add(videoContent, "PreviewVideo", PreviewVideo.FileName);
-            //    }
-
-            //    // Thêm ảnh thumbnail
-            //    using (var stream = Thumbnail.OpenReadStream())
-            //    {
-            //        var imageContent = new StreamContent(stream);
-            //        imageContent.Headers.ContentType = new MediaTypeHeaderValue(Thumbnail.ContentType);
-            //        content.Add(imageContent, "Thumbnail", Thumbnail.FileName);
-            //    }
-
-            //    // Thêm các dữ liệu khác
-            //    content.Add(new StringContent(Title), "Title");
-            //    content.Add(new StringContent(Price.ToString()), "Price");
-            //    content.Add(new StringContent(Cate.ToString()), "Cate");
-            //    content.Add(new StringContent(Limit.ToString()), "Limit");
-            //    content.Add(new StringContent(Desc), "Desc");
-
-            //    // Gửi request
-            //    var response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/Course", content);
-
-            //    if (response.IsSuccessStatusCode)
-            //    {
-            //        return RedirectToPage("/Admin/Course/CourseManageModel"); // Chuyển hướng nếu thành công
-            //    }
-            //    else
-            //    {
-            //        ModelState.AddModelError("", "Lỗi khi gửi dữ liệu đến API.");
-            //        return RedirectToPage();
-            //    }
-            //}
         }
     }
 }

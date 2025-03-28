@@ -31,6 +31,28 @@ namespace WebAPI.Services
             }
             return _mapper.Map<QuestionResponse>(questionCreated);
         }
-       
+
+        public async Task<QuestionResponse> UpdateQuestionAsync(QuestionUpdateDto request)
+        {
+            var question = await _questionRepository.GetQuestionByIdAsync(request.Id);
+            _mapper.Map(request, question);
+            var questionUpdated = await _questionRepository.UpdateQuestionAsync(question);
+            foreach (var answerDto in request.AnswersDto)
+            {
+                if(answerDto.Id == null || answerDto.Id == 0)
+                {
+                    await _answerService.CreateAnswerAsync(new AnswerRequestDto
+                    {
+                        QuestionId = request.Id,
+                        AnswerText = answerDto.AnswerText,
+                        IsCorrect = answerDto.IsCorrect
+                     });
+                } else
+                {
+                    await _answerService.UpdateAnswerAsync(answerDto);
+                }
+            }
+            return _mapper.Map<QuestionResponse>(questionUpdated);
+        }
     }
 }

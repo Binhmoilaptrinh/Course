@@ -463,6 +463,9 @@ namespace WebAPI.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
+                    b.Property<float?>("HighestMark")
+                        .HasColumnType("real");
+
                     b.Property<int>("LessonId")
                         .HasColumnType("int");
 

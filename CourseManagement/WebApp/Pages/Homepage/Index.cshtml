@@ -127,61 +127,62 @@
         </div>
         <button class="popular-btn__more">More Course</button>
     </div>
-    @* <div class="popular-courses"> *@
-    @*     <h2 class="courses-title">Popular courses for you</h2> *@
-    @*     <div class="popular-header"> *@
-    @*         <p class="popular-des">Get the best course with the best price with world-class tutor</p> *@
-    @*         <button class="popular-button">View All Courses</button> *@
-    @*     </div> *@
-    @*     <div class="courses-container"> *@
-    @*         @if (Model.Courses != null && Model.Courses.Any()) *@
-    @*         { *@
-    @*             foreach (var course in Model.Courses) *@
-    @*             { *@
-    @*                 <a class="courses-item" href="/Homepage/CourseDetail/@course.Id"> *@
-    @*                     <div class="courses-item__link"> *@
-    @*                         <img src="@course.Thumbnail" alt="@course.Title" /> *@
-    @*                         <div class="actionHover"> *@
-    @*                             <button class="courses-item__btn">Xem khóa học</button> *@
-    @*                         </div> *@
-    @*                     </div> *@
-    @*                     <div class="course-info"> *@
-    @*                         <span class="course-info__type">@course.Category</span> *@
-    @*                         <h3 class="course-info__name">@course.Title</h3> *@
-    @*                         <div class="course-count"> *@
-    @*                             <div class="student-count"> *@
-    @*                                 <i class="fa-regular fa-user"></i> *@
-    @*                                 <span>@course.Enrollments</span> <!-- Replace with dynamic data if available --> *@
-    @*                             </div> *@
-    @*                             <div class="star-count"> *@
-    @*                                 <i class="fa-solid fa-book"></i> *@
-    @*                                 <span>@course.Lessons</span> <!-- Dynamic lesson count --> *@
-    @*                             </div> *@
-    @*                             <div class="price-count"> *@
-    @*                                 <i class="fa-solid fa-dollar-sign"></i> *@
-    @*                                 <span> *@
-    @*                                     @if (course.Price == 0) *@
-    @*                                     { *@
-    @*                                         <text>Miễn phí</text> *@
-    @*                                     } *@
-    @*                                     else *@
-    @*                                     { *@
-    @*                                         @course.Price.ToString("#,##0") *@
-    @*                                     } *@
-    @*                                 </span> *@
-    @*                             </div> *@
-    @*                         </div> *@
-    @*                     </div> *@
-    @*                 </a> *@
-    @*             } *@
-    @*         } *@
-    @*         else *@
-    @*         { *@
-    @*             <p>No courses available at this time.</p> *@
-    @*         } *@
-    @*     </div> *@
-    @*     <button class="popular-btn__more">More Course</button> *@
-    @* </div> *@
+    <div class="popular-courses">
+        <h2 class="courses-title">Popular courses for you</h2>
+        <div class="popular-header">
+            <p class="popular-des">Get the best course with the best price with world-class tutor</p>
+            <button class="popular-button">View All Courses</button>
+        </div>
+        <div class="courses-container">
+            @if (Model.FreeCourses != null && Model.FreeCourses.Any())
+            {
+                foreach (var course in Model.FreeCourses)
+                {
+                    <a class="courses-item" href="/Homepage/CourseDetail/@course.Id">
+                        <div class="courses-item__link">
+                            <img src="@course.Thumbnail" alt="@course.Title" />
+                            <div class="actionHover">
+                                <button class="courses-item__btn">Xem khóa học</button>
+                            </div>
+                        </div>
+                        <div class="course-info">
+                            <span class="course-info__type">@course.Category</span>
+                            <h3 class="course-info__name">@course.Title</h3>
+                            <div class="course-count">
+                                <div class="student-count">
+                                    <i class="fa-regular fa-user"></i>
+                                    <span>@course.Enrollments</span> <!-- Replace with dynamic data if available -->
+                                </div>
+                                <div class="star-count">
+                                    <i class="fa-solid fa-book"></i>
+                                    <span>@course.Lessons</span> <!-- Dynamic lesson count -->
+                                </div>
+                                <div class="price-count">
+                                    <i class="fa-solid fa-dollar-sign"></i>
+                                    <span>
+                                        @if (course.Price == 0)
+                                        {
+                                            <text>Miễn phí</text>
+                                        }
+                                        else
+                                        {
+                                            @course.Price.ToString("#,##0")
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+            else
+            {
+                <p>No courses available at this time.</p>
+            }
+        </div>
+        <button class="popular-btn__more">More Course</button>
+    </div>
+
     @* <div class="popular-courses"> *@
     @*     <h2 class="courses-title">Popular courses for you</h2> *@
     @*     <div class="popular-header"> *@
@@ -288,3 +289,26 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <script>
+        // Retrieve the userInfo string from local storage
+        const userInfoString = localStorage.getItem('userInfo');
+
+        // Check if userInfo exists
+        if (userInfoString) {
+            try {
+                // Parse the JSON string to an object
+                const userInfo = JSON.parse(userInfoString);
+
+                // Check if the role is "admin"
+                if (userInfo.roleId === 1) {
+                    // Redirect to the admin course list page
+                    window.location.href = '/Admin/Course/List';
+                }
+            } catch (error) {
+                // Log any parsing errors to the console and do nothing
+                console.error('Error parsing userInfo:', error);
+            }
+        }
+    </script>
+}
