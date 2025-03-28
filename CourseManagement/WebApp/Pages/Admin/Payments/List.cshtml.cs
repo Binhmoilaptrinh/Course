@@ -3,13 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-<<<<<<< HEAD
-using WebAPI.DTOS.response;
-using WebAPI.Models;
-using WebAPI.Services.Interfaces;
-=======
 using WebApp.Models;
->>>>>>> fad08288afac4a42f7b11c5301bc2529bf53a97b
 using WebApp.Pages.Homepage;
 using X.PagedList;
 using X.PagedList.Extensions;
@@ -37,7 +31,7 @@ namespace WebApp.Pages.Admin.Payments
             pageNo ??= 1;
             pageSize ??= 5;
 
-            var apiUrl = $"http://localhost:5298/api/Payments/SearchPayments?fromDate={fromDate}&status={status}&toDate={toDate}&orderNumber={orderNumber}";
+            var apiUrl = $"http://localhost:5000/api/Payments/SearchPayments?fromDate={fromDate}&status={status}&toDate={toDate}&orderNumber={orderNumber}";
             var response = await _httpClient.GetAsync(apiUrl);
 
             if (response.IsSuccessStatusCode)
