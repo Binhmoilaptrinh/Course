@@ -3,6 +3,35 @@
 @{
     Layout = "_ManagementLayout";
 }
+<style>
+    .card.user-card {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 15px;
+        background: #fff;
+    }
+
+        .card.user-card img {
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+        }
+
+        .card.user-card .user-info {
+            flex-grow: 1;
+            margin-left: 15px;
+        }
+
+        .card.user-card .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+</style>
 
 <div class="popular-courses">
     <h2 class="courses-title mt-5 px-5">Quản lý người dùng</h2>
@@ -14,14 +43,18 @@
         <div class="col-6 d-flex align-items-center">
             <span class="fs-3 me-3">Hiển thị</span>
             <select id="pageSize" class="drop-show_number">
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
+                <option value="2">2</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
             </select>
             <span class="fs-3 ms-3">người</span>
             <select id="roleUser" class="drop-show_number">
                 <option value="">Tất cả vai trò</option>
+                <option value="Admin">Admin</option>
+                <option value="Staff">Staff</option>
+                <option value="User">User</option>
             </select>
+            <button id="sortButton" class="btn btn-outline-primary ms-3">Sắp xếp A-Z</button>
         </div>
         <div class="col-6 d-flex justify-content-end">
             <button id="refreshButton" class="btn btn-primary">Làm mới</button>
@@ -32,18 +65,46 @@
             <!-- Danh sách người dùng sẽ được cập nhật ở đây -->
         </div>
     </div>
+    <div class="pagination-container mt-4 d-flex justify-content-center">
+        <button id="prevPage" class="btn btn-secondary me-2" disabled>Trang trước</button>
+        <span id="currentPage" class="fs-5 mx-3">Trang 1</span>
+        <button id="nextPage" class="btn btn-secondary">Trang sau</button>
+    </div>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
         const userList = document.getElementById("userList");
+        const pageSizeSelect = document.getElementById("pageSize");
+        const roleUserSelect = document.getElementById("roleUser");
+        const refreshButton = document.getElementById("refreshButton");
+        const prevPageButton = document.getElementById("prevPage");
+        const nextPageButton = document.getElementById("nextPage");
+        const currentPageText = document.getElementById("currentPage");
+        const sortButton = document.getElementById("sortButton");
+
+        let pageSize = pageSizeSelect.value;
+        let currentPage = 1;
+        let selectedRole = "";
+        let sortOrder = "asc"; // Mặc định sắp xếp A-Z
 
         async function fetchUsers() {
             try {
-                const response = await fetch("https://api.2handshop.id.vn/api/User/all");
+                let skip = (currentPage - 1) * pageSize;
+                let query = `$top=${pageSize}&$skip=${skip}&$orderby=UserName ${sortOrder}`;
+                if (selectedRole) {
+                    query += `&$filter=RoleName eq '${selectedRole}'`;
+                }
+                console.log("Query API:", query);
+
+                const response = await fetch(`http://localhost:5000/api/User/all?${query}`);
                 if (!response.ok) throw new Error("Lỗi HTTP: " + response.status);
+
                 const users = await response.json();
+                console.log("Data fetched:", users);
+
                 renderUsers(users);
+                updatePagination(users.length);
             } catch (error) {
                 console.error("Lỗi tải danh sách người dùng:", error);
                 userList.innerHTML = '<p class="text-danger">Không thể tải danh sách người dùng.</p>';
@@ -51,26 +112,78 @@
         }
 
         function renderUsers(users) {
-            userList.innerHTML = '';
-            if (!users || users.length === 0) {
-                userList.innerHTML = '<p class="text-warning">Không có người dùng nào.</p>';
-                return;
-            }
-            users.forEach(user => {
-                userList.innerHTML += `
-                    <div class="courses-item">
-                        <img src="${user.avatar || 'default-avatar.png'}" class="user-avatar" alt="Avatar" />
-                        <h3>${user.userName}</h3>
-                        <p>Vai trò: ${user.roleName || 'Không xác định'}</p>
-                        <a href="./Update/${user.userId}" class="btn btn-warning">Sửa</a>
-                        <a href="./Delete?id=${user.userId}" class="btn btn-danger">Xóa</a>
-                    </div>`;
-            });
+        userList.innerHTML = ""; // Xóa danh sách cũ
+        if (users.length === 0) {
+            userList.innerHTML = '<p class="text-warning">Không có người dùng nào.</p>';
+            return;
         }
 
-        document.getElementById('refreshButton').addEventListener('click', fetchUsers);
+        users.forEach(user => {
+            const userCard = document.createElement("div");
+            userCard.className = "card user-card d-flex flex-row align-items-center";
+
+            let avatarUrl = user.avatar ? user.avatar : "https://via.placeholder.com/80"; // Kiểm tra avatar
+
+            userCard.innerHTML = `
+                <img src="${avatarUrl}" alt="Avatar">
+                <div class="user-info">
+                    <h5 class="mb-1">${user.userName}</h5>
+                    <p class="mb-1"><strong>Email:</strong> ${user.email}</p>
+                    <p class="mb-1"><strong>Vai trò:</strong> ${user.roleName}</p>
+                    <p class="mb-1"><strong>Số điện thoại:</strong> ${user.phoneNumber ? user.phoneNumber : "Chưa cập nhật"}</p>
+                    <p class="mb-1"><strong>Tiểu sử:</strong> ${user.bio ? user.bio : "Chưa có tiểu sử"}</p>
+                </div>
+                <div class="btn-group">
+                    <a href="/Admin/User/Update/${user.userId}" class="btn btn-warning btn-sm">Sửa</a>
+                    <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userId}')">Xóa</button>
+                </div>
+            `;
+            userList.appendChild(userCard);
+        });
+        }
+
+
+
+
+        function updatePagination(usersFetched) {
+            currentPageText.textContent = `Trang ${currentPage}`;
+            prevPageButton.disabled = currentPage === 1;
+            nextPageButton.disabled = usersFetched < pageSize;
+        }
+
+        pageSizeSelect.addEventListener("change", function () {
+            pageSize = this.value;
+            currentPage = 1;
+            fetchUsers();
+        });
+
+        roleUserSelect.addEventListener("change", function () {
+            selectedRole = this.value;
+            currentPage = 1;
+            fetchUsers();
+        });
+
+        refreshButton.addEventListener("click", fetchUsers);
+        prevPageButton.addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchUsers();
+            }
+        });
+
+        nextPageButton.addEventListener("click", function () {
+            currentPage++;
+            fetchUsers();
+        });
+
+        // Xử lý nút sắp xếp A-Z / Z-A
+        sortButton.addEventListener("click", function () {
+            sortOrder = sortOrder === "asc" ? "desc" : "asc";
+            this.textContent = sortOrder === "asc" ? "Sắp xếp A-Z" : "Sắp xếp Z-A";
+            fetchUsers();
+        });
+
         fetchUsers();
     });
+
 </script>
-
-

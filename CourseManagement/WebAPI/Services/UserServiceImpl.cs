@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using AutoMapper;
+using Azure.Storage.Blobs;
 using Microsoft.IdentityModel.Tokens;
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
@@ -17,8 +18,9 @@ namespace WebAPI.Services
         public readonly ISendEmail _emailSender;
         public readonly IAuthenticateService _authenticateService;
         private readonly IConfiguration _configuration;
+        private BlobContainerClient _filesContainer;
 
-        public UserServiceImpl(IUserRepository userRepository, IUserRoleRepository repoUR, IMapper mapper, ISendEmail emailSender, IAuthenticateService authenticateService, IConfiguration configuration)
+        public UserServiceImpl(IUserRepository userRepository, IUserRoleRepository repoUR, IMapper mapper, ISendEmail emailSender, IAuthenticateService authenticateService, IConfiguration configuration, BlobContainerClient filesContainer)
         {
             _userRepository = userRepository;
             _repoUR = repoUR;
@@ -26,6 +28,7 @@ namespace WebAPI.Services
             _emailSender = emailSender;
             _authenticateService = authenticateService;
             _configuration = configuration;
+            _filesContainer = filesContainer;
         }
 
         public async Task<UserReponseDto> GetUserResponseByIdAsync(int id)
@@ -64,14 +67,28 @@ namespace WebAPI.Services
 
             var password = GenerateRandomPassword();
             newUser.Password = await _authenticateService.HashPasswordAsync(password);
-            newUser.IsEmailVerify = false; // Chưa xác minh email
+            newUser.IsEmailVerify = false;
 
             // 🔥 Tạo token xác minh email
             string token = GenerateVerificationToken();
-            DateTime expiry = DateTime.UtcNow.AddHours(24); // Token hết hạn sau 24 giờ
-
+            DateTime expiry = DateTime.UtcNow.AddHours(24);
             newUser.EmailVerificationToken = token;
             newUser.EmailVerificationExpiry = expiry;
+
+            // 🔥 Upload ảnh Bio lên Azure Blob Storage
+            if (user.Avatar != null)
+            {
+                string fileName = $"bio_{DateTime.UtcNow.Ticks}_{user.Avatar.FileName}";
+                BlobClient client = _filesContainer.GetBlobClient(fileName);
+
+                await using (Stream data = user.Avatar.OpenReadStream())
+                {
+                    await client.UploadAsync(data, overwrite: true);
+                }
+
+                // Lưu URL của ảnh vào User
+                newUser.Avatar = client.Uri.AbsoluteUri;
+            }
 
             var createdUser = await _userRepository.CreateAsync(newUser);
             if (createdUser != null)
@@ -84,7 +101,6 @@ namespace WebAPI.Services
 
                 await _emailSender.SendEmailAsync(createdUser.Email, "Account Created - Verify Your Email", emailBody);
 
-                // Kiểm tra role hợp lệ
                 if (await _repoUR.CheckUserRoleAsync(user.SelectedRole, createdUser.UserId))
                     throw new Exception($" {user.SelectedRole} is invalid");
 
@@ -98,51 +114,45 @@ namespace WebAPI.Services
             return userResponse;
         }
 
-        public async Task<UserReponseDto> UpdateUser(UserReponseDto user)
+
+        public async Task<UserReponseDto> UpdateUser(int id, UserRequestDto user)
         {
-            var existingUser = await _userRepository.GetAsync(user.UserId); // Lấy thông tin user hiện tại
+            var existingUser = await _userRepository.GetAsync(id);
             if (existingUser == null)
             {
-                throw new Exception($"User with ID {user.UserId} not found");
+                throw new Exception($"User with ID {id} not found");
             }
 
             var checkU = await _userRepository.GetUserAsyncForUserName(user.UserName);
-            if (checkU != null && checkU.UserId != user.UserId)  // Kiểm tra username có bị trùng với user khác không
+            if (checkU != null && checkU.UserId != id)
             {
                 throw new Exception($"User with {user.UserName} is existed");
             }
 
-            var checkE = await _userRepository.GetUserAsyncForEmail(user.Email);
-            if (checkE != null && checkE.UserId != user.UserId)  // Kiểm tra email có bị trùng với user khác không
+            existingUser.Username = user.UserName;
+            existingUser.PhoneNumber = user.PhoneNumber;
+            existingUser.Bio = user.Bio;
+
+            // 🔥 Kiểm tra nếu có ảnh mới thì upload, nếu không thì giữ nguyên
+            if (user.Avatar != null)
             {
-                throw new Exception($"User with {user.Email} is existed");
+                string fileName = $"bio_{DateTime.UtcNow.Ticks}_{user.Avatar.FileName}";
+                BlobClient client = _filesContainer.GetBlobClient(fileName);
+
+                await using (Stream data = user.Avatar.OpenReadStream())
+                {
+                    await client.UploadAsync(data, overwrite: true);
+                }
+
+                existingUser.Avatar = client.Uri.AbsoluteUri;
             }
 
-            // Cập nhật thông tin user
-            existingUser.Username = user.UserName;
-            existingUser.Email = user.Email;
-
             var updatedUser = await _userRepository.UpdateAsync(existingUser);
-            //if (updatedUser != null)
-            //{
-            //    // Kiểm tra role hợp lệ
-            //    var roleExists = await _repoUR.CheckUserRoleAsync(staff.SelectedRole);
-            //    if (!roleExists)
-            //    {
-            //        throw new Exception($"{staff.SelectedRole} is invalid");
-            //    }
-
-            //    var userRole = await _repoUR.UpdateAsync(new UserRole { UserId = updatedUser.UserId, RoleId = staff.SelectedRole });
-            //    if (userRole == null)
-            //    {
-            //        throw new Exception($"{staff.SelectedRole} is invalid");
-            //    }
-            //}
-
-            var staffResponse = _mapper.Map<UserReponseDto>(updatedUser);
-            staffResponse.SelectedRole = user.SelectedRole;
-            return staffResponse;
+            var userResponse = _mapper.Map<UserReponseDto>(updatedUser);
+            userResponse.SelectedRole = user.SelectedRole;
+            return userResponse;
         }
+
 
         public async Task<List<UserReponseDto>> GetUserReponses()
         {
@@ -155,6 +165,9 @@ namespace WebAPI.Services
                 userReponse.UserId = e.UserId;
                 userReponse.UserName = e.User.Username;
                 userReponse.Email = e.User.Email;
+                userReponse.Avatar = e.User.Avatar;
+                userReponse.Bio = e.User.Bio;
+                userReponse.PhoneNumber = e.User.PhoneNumber;
                 userReponse.SelectedRole = e.RoleId;
                 userReponse.RoleName = e.Role.RoleName;
                 list.Add(userReponse);

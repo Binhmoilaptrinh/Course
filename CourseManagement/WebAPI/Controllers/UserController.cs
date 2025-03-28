@@ -6,6 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using WebAPI.Filters;
 using WebAPI.Services.Interfaces;
 using Microsoft.AspNetCore.OData.Query;
+using Azure.Storage.Blobs;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace WebAPI.Controllers
 {
@@ -15,7 +19,7 @@ namespace WebAPI.Controllers
     {
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, BlobContainerClient filesContainer)
         {
             _userService = userService;
         }
@@ -29,8 +33,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("add")]
-        
-        public async Task<IActionResult> AddStaff([FromBody] UserRequestDto userDTO)
+        public async Task<IActionResult> AddUser([FromForm] UserRequestDto userDTO)
         {
             if (userDTO == null)
             {
@@ -48,17 +51,18 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateUser([FromBody] UserReponseDto userDTO)
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromForm] UserRequestDto userDTO)
         {
             if (userDTO == null)
             {
-                return BadRequest("Staff data is required");
+                return BadRequest("User data is required");
             }
 
             try
             {
-                var result = await _userService.UpdateUser(userDTO);
+                var result = await _userService.UpdateUser(id, userDTO);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -66,6 +70,8 @@ namespace WebAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
@@ -79,6 +85,31 @@ namespace WebAPI.Controllers
 
             return Ok(userResponse);
         }
+
+        [HttpGet("current")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+
+            var userResponse = await _userService.GetUserResponseByIdAsync(int.Parse(userIdClaim));
+            if (userResponse == null) return NotFound("User not found");
+
+            return Ok(userResponse);
+        }
+
+
+        [HttpGet("current-user")]
+        public IActionResult GetCurrentUserId()
+        {
+            var userId = User.FindFirst("sub")?.Value;
+            if (string.IsNullOrEmpty(userId)) return Unauthorized("User is not logged in");
+
+            return Ok(new { userId = int.Parse(userId) });
+        }
+
+
 
 
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOS.request;
+using WebAPI.DTOS.response;
 using WebAPI.Models;
 using WebAPI.Repositories.Interfaces;
 using WebAPI.Services;
@@ -61,5 +62,13 @@ namespace WebAPI.Controllers
             var payment = await _paymentService.UpdatePayment(orderCode);
             return Ok(payment);
         }
+
+        [HttpGet("SearchPayments")]
+        public async Task<ActionResult<PaymentListResponse>> UpdateSuccess(DateTime? fromDate, DateTime? toDate, string? orderNumber, int? status)
+        {
+            var payment = await _paymentService.SearchPaymentsAsync(fromDate, toDate, orderNumber, status);
+            return Ok(payment);
+        }
+
     }
 }

@@ -114,7 +114,7 @@ namespace WebAPI.Services
         }
 
 
-        public async Task<List<PaymentListResponse>> SearchPaymentsAsync(DateTime? fromDate, DateTime? toDate, string orderNumber, int? status)
+        public async Task<List<PaymentListResponse>> SearchPaymentsAsync(DateTime? fromDate, DateTime? toDate, string? orderNumber, int? status)
         {
             var query = _eCourseContext.Payments.AsQueryable();
 
