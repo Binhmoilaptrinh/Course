@@ -34,9 +34,9 @@
         </div>
         <div class="col-md-8">
             <div class="">
-                <h3 style="display: inline-block;" class="mb-3">Số người đã tham gia khóa học: 0 người</h3>
+                <h3 style="display: inline-block;" class="mb-3">Số người đã tham gia khóa học</h3>
                 <div style="display:inline" class="h4">
-                    <a style="display:inline; text-decoration:none" asp-page="/Admin/Enrollment/ManageEnrollment" asp-route-id="1">- Chi tiết</a>
+                    <a style="display:inline; text-decoration:none" asp-page="/Admin/Enrollment/list" asp-route-id="@Model.CourseDetail.Id">- Chi tiết</a>
                 </div>
                 <h2 class="mb-3">Tên Khóa Học:@Model.CourseDetail.Title</h2>
                 <p class="fs-3"><strong>Thể loại:</strong>@Model.CourseDetail.CategoryId </p>

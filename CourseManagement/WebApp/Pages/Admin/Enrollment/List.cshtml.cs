@@ -32,7 +32,7 @@ namespace WebApp.Pages.Admin.Enrollment
             }
             else
             {
-                return NotFound();
+                return Page();
             }
         }
     }
