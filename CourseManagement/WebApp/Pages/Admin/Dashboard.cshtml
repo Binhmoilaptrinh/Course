@@ -1,0 +1,148 @@
+﻿@page
+@model WebApp.Pages.Admin.DashboardModel
+@{
+    Layout = "_ManagementLayout";
+}
+
+<div class="dashboard-container px-5 py-4">
+    <h2 class="dashboard-title mb-4">Admin Dashboard</h2>
+
+    <div class="row mb-4" id="statistics">
+        <!-- Thống kê tổng quan sẽ được tải từ API -->
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center">
+                    <span>Finance Management</span>
+                    <div class="ml-auto">
+                        <select id="monthSelect" class="mr-3" onchange="updateHiddenInputs()"></select>
+                        <select id="yearSelect" class="mr-3" onchange="updateHiddenInputs()"></select>
+                        <button class="btn btn-primary ml-2" onclick="loadStatistics()">Search</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Total Revenue</td>
+                                <td id="totalRevenue">$0</td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="updateRevenue()">Update Revenue</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Total Fees</td>
+                                <td id="totalFee">$0</td>
+                                <td>
+                                    <button class="btn btn-primary">Update Fees</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Net Profit</td>
+                                <td id="netProfit">$0</td>
+                                <td>
+                                    <button class="btn btn-secondary" disabled>Auto-Calculated</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Finance Management Chart</div>
+                <div class="card-body">
+                    <canvas id="financeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    async function loadStatistics() {
+        const month = document.getElementById('monthSelect').value;
+        const year = document.getElementById('yearSelect').value;
+        const response = await fetch(`http://localhost:5298/api/dashboard/statistics?month=${month}&year=${year}`);
+        const data = await response.json();
+        document.getElementById('totalRevenue').innerText = `$${data.totalRevenue}`;
+        document.getElementById('totalFee').innerText = `$${data.totalFee}`;
+        document.getElementById('netProfit').innerText = `$${data.totalRevenue - data.totalFee}`;
+    }
+
+    async function updateRevenue() {
+        const month = document.getElementById('monthSelect').value;
+        const year = document.getElementById('yearSelect').value;
+        await fetch('http://localhost:5298/api/dashboard/update-revenue', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ month, year, revenue: 10000 }) // Giá trị mẫu
+        });
+        loadStatistics();
+    }
+
+    function updateHiddenInputs() {
+        loadStatistics();
+    }
+
+    async function loadFinanceChart() {
+        const year = document.getElementById('yearSelect').value;
+        const response = await fetch(`http://localhost:5298/api/dashboard/finance-chart?year=${year}`);
+        const data = await response.json();
+        const ctx = document.getElementById('financeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Net Profit',
+                    data: data.values,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    function initializeFilters() {
+        let monthSelect = document.getElementById('monthSelect');
+        let yearSelect = document.getElementById('yearSelect');
+        for (let i = 1; i <= 12; i++) {
+            monthSelect.innerHTML += `<option value="${i}">${new Date(0, i - 1).toLocaleString('default', { month: 'long' })}</option>`;
+        }
+        let currentYear = new Date().getFullYear();
+        for (let y = currentYear; y >= 2000; y--) {
+            yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
+        }
+        loadStatistics();
+        loadFinanceChart();
+    }
+
+    window.onload = initializeFilters;
+</script>
+
+<style>
+    .dashboard-title { font-size: 2rem; font-weight: bold; }
+    .card { min-height: 150px; }
+    .card-header { font-weight: bold; }
+    .chart-container { position: relative; height: 400px; width: 100%; }
+</style>
