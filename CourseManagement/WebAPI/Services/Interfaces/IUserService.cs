@@ -11,7 +11,7 @@ namespace WebAPI.Services.Interfaces
         
         Task<UserReponseDto> AddUser(UserRequestDto user);
 
-        Task<UserReponseDto> UpdateUser(UserReponseDto user);
+        Task<UserReponseDto> UpdateUser(int id, UserRequestDto user);
 
         Task<List<UserReponseDto>> GetUserReponses();
         Task<bool> VerifyEmailAsync(string token);

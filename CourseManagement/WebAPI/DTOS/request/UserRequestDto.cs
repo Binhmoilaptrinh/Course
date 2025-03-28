@@ -13,8 +13,12 @@ namespace WebAPI.DTOS.request
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
         public int SelectedRole { get; set; }
+        public IFormFile? Avatar { get; set; }
+
+        public string? PhoneNumber { get; set; }
+        public string? Bio { get; set; }
 
     }
 }

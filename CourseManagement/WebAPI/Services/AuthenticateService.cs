@@ -188,14 +188,14 @@ namespace WebAPI.Services
                 return "User creation failed.";
             }
 
-            // Kiểm tra role hợp lệ
-            var roleExists = await _eCourseContext.Roles.AnyAsync(r => r.RoleId == user.RoleId);
-            if (!roleExists)
-            {
-                return "Invalid role.";
-            }
+            //// Kiểm tra role hợp lệ
+            //var roleExists = await _eCourseContext.Roles.AnyAsync(r => r.RoleId == user.RoleId);
+            //if (!roleExists)
+            //{
+            //    return "Invalid role.";
+            //}
 
-            _eCourseContext.UserRoles.Add(new UserRole { UserId = savedUser.UserId, RoleId = user.RoleId });
+            _eCourseContext.UserRoles.Add(new UserRole { UserId = savedUser.UserId, RoleId = 1002 });
             await _eCourseContext.SaveChangesAsync();
 
             return "User registered successfully.";

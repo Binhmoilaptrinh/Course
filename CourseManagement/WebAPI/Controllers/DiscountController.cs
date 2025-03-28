@@ -3,10 +3,11 @@ using WebAPI.DTOS.request;
 using WebAPI.Services.Interfaces;
 using WebAPI.DTOS.response;
 using WebAPI.Filters;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("odata/[controller]")]
     [ApiController]
     public class DiscountController : ControllerBase
     {
@@ -18,8 +19,9 @@ namespace WebAPI.Controllers
         }
 
         // Lấy danh sách Discount
-        [HttpGet]
-        [AuthorizePermission("ManageDiscount")]
+        [HttpGet("all")]
+        [EnableQuery]
+        //[AuthorizePermission("ManageDiscount")]
         public async Task<ActionResult<List<DiscountResponseDto>>> GetAll()
         {
             var discounts = await _discountService.GetAllAsync();
@@ -28,7 +30,7 @@ namespace WebAPI.Controllers
 
         // Lấy Discount theo ID
         [HttpGet("{id}")]
-        [AuthorizePermission("ManageDiscount")]
+        //[AuthorizePermission("ManageDiscount")]
 
         public async Task<ActionResult<DiscountResponseDto>> GetById(int id)
         {
@@ -38,7 +40,7 @@ namespace WebAPI.Controllers
 
         // Tạo mới Discount
         [HttpPost]
-        [AuthorizePermission("ManageDiscount")]
+        //[AuthorizePermission("ManageDiscount")]
 
         public async Task<ActionResult<DiscountResponseDto>> Create([FromBody] DiscountRequestDto dto)
         {
@@ -53,7 +55,7 @@ namespace WebAPI.Controllers
 
         // Cập nhật Discount
         [HttpPut("{id}")]
-        [AuthorizePermission("ManageDiscount")]
+        //[AuthorizePermission("ManageDiscount")]
 
         public async Task<ActionResult<DiscountResponseDto>> Update(int id, [FromBody] DiscountRequestDto dto)
         {
@@ -66,7 +68,7 @@ namespace WebAPI.Controllers
 
         // Xóa Discount
         [HttpDelete("{id}")]
-        [AuthorizePermission("ManageDiscount")]
+        //[AuthorizePermission("ManageDiscount")]
 
         public async Task<IActionResult> Delete(int id)
         {

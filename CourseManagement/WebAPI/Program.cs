@@ -1,47 +1,62 @@
+using Azure.Storage;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
-using WebAPI.Models;
-using WebAPI.Utilities;
-using WebAPI.DTOS.response;
-using PdfSharp.Charting;
-
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using WebAPI.Extensions;
+using WebAPI.DTOS.response;
+using WebAPI.Models;
 using WebAPI.Repositories;
 using WebAPI.Repositories.Interfaces;
 using WebAPI.Services;
 using WebAPI.Services.Interfaces;
+using WebAPI.Utilities;
 using WebAPI.DTOS;
 using Microsoft.AspNetCore.Http.Features;
 using PdfSharp.Fonts;
 using WebAPI.Tasks;
+using WebAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-var modelBuilder = new ODataConventionModelBuilder();
-modelBuilder.EntitySet<LessonResponseAdmin>("Lesson");
-modelBuilder.EntitySet<Chapter>("Chapter");
-modelBuilder.EntitySet<CourseAdminResponseDto>("Course");
-modelBuilder.EntitySet<UserReponseDto>("User");
-builder.Services.AddControllers().AddOData(
-    options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
-    .AddRouteComponents(
-    "odata",
-        modelBuilder.GetEdmModel())
+
+// ---------------------- OData Configuration ----------------------
+var modelBuilderOData = new ODataConventionModelBuilder();
+modelBuilderOData.EntitySet<LessonResponseAdmin>("Lesson");
+modelBuilderOData.EntitySet<Chapter>("Chapter");
+modelBuilderOData.EntitySet<CourseAdminResponseDto>("Course");
+modelBuilderOData.EntitySet<UserReponseDto>("User");
+modelBuilderOData.EntitySet<DiscountResponseDto>("Discount");
+
+builder.Services.AddControllers().AddOData(options =>
+    options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)
+           .AddRouteComponents("odata", modelBuilderOData.GetEdmModel())
 );
-// 🛠 Inject IConfiguration
+
+// ---------------------- IConfiguration ----------------------
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
-// 🛠 Cấu hình Database
+// ---------------------- Database & Other Configurations ----------------------
 builder.Services.ConfigureSqlContext(builder.Configuration);
 
-// 🛠 Cấu hình Authentication với JWT
+// ---------------------- BlobContainerClient Registration ----------------------
+string? storageAccount = builder.Configuration["AzureBlobStorage:AccountName"];
+string? storageKey = builder.Configuration["AzureBlobStorage:AccountKey"];
+string? containerName = builder.Configuration["AzureBlobStorage:ContainerName"];
+string? blobUri = builder.Configuration["AzureBlobStorage:BlobServiceUrl"];
+
+if (string.IsNullOrEmpty(storageAccount) || string.IsNullOrEmpty(storageKey) || string.IsNullOrEmpty(containerName) || string.IsNullOrEmpty(blobUri))
+{
+    throw new InvalidOperationException("Azure Blob Storage configuration is missing or incorrect.");
+}
+
+builder.Services.AddSingleton(new BlobContainerClient(
+    new Uri($"{blobUri.TrimEnd('/')}/{containerName}"),
+    new StorageSharedKeyCredential(storageAccount, storageKey)));
+
+// ---------------------- Authentication with JWT ----------------------
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = Encoding.UTF8.GetBytes(jwtSettings["secretKey"]);
+var secretKey = Encoding.UTF8.GetBytes(jwtSettings["secretKey"] ?? "");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -61,10 +76,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// 🛠 Đăng ký AutoMapper
+// ---------------------- AutoMapper ----------------------
 builder.Services.AddAutoMapper(typeof(Program));
 
-// 🛠 Đăng ký Repository
+// ---------------------- Repository Registrations ----------------------
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
@@ -77,8 +92,11 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddHostedService<EnrollmentStatusUpdater>();
 
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 
-// 🛠 Đăng ký Service
+// ---------------------- Service Registrations ----------------------
 builder.Services.Configure<SendEmail>(builder.Configuration.GetSection("SendEmail"));
 builder.Services.AddScoped<ISendEmail, SendEmailService>();
 builder.Services.AddScoped<ICustomAuthorizationService, CustomAuthorizationService>();
@@ -95,23 +113,16 @@ builder.Services.AddScoped<IChapterService, ChapterServiceImpl>();
 builder.Services.AddScoped<ICourseClientService, CourseClientService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IEnrollmentAdminService, EnrollmentAdminService>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IFinanceService, FinanceService>();
+
 builder.Services.AddTransient<IFileService, FileService>();
-builder.Services.AddTransient<IUserRepository, UserRepository>();
-builder.Services.AddTransient<IUserService, UserServiceImpl>();
-builder.Services.AddTransient<IChapterRepository, ChapterRepository>();
-builder.Services.AddTransient<IChapterService, ChapterServiceImpl>();
-builder.Services.AddTransient<ILessonRepository, LessonRepository>();
 builder.Services.AddTransient<ILessonService, LessonServiceImpl>();
-
-builder.Services.AddTransient<IAnswerRepository, AnswerRepository>();
 builder.Services.AddTransient<IAnswerService, AnswerServiceImpl>();
-
-builder.Services.AddTransient<IQuestionRepository, QuestionRepository>();
 builder.Services.AddTransient<IQuestionService, QuestionServiceImpl>();
 
-builder.Services.AddAutoMapper(typeof(Program));
-
-
+// ---------------------- CORS Configuration ----------------------
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", policy =>
@@ -122,10 +133,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// 🛠 Thêm Controllers
-builder.Services.AddControllers();
-
-// 🛠 Cấu hình Swagger hỗ trợ JWT
+// ---------------------- Swagger Configuration ----------------------
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -154,16 +162,14 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// ---------------------- Build and Configure the App ----------------------
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-
 app.UseSwagger();
 app.UseCors("AllowAllOrigins");
-
 app.UseSwaggerUI();
 
-// 🛠 Thêm Authentication và Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
