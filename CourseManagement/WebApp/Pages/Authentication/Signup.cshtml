@@ -22,7 +22,7 @@
             };
 
             try {
-                const response = await fetch("http://localhost:5298/api/authentication/signup", {
+                const response = await fetch("http://localhost:5000/api/authentication/signup", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(user)
