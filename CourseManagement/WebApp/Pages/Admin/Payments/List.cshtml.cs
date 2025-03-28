@@ -31,7 +31,7 @@ namespace WebApp.Pages.Admin.Payments
             pageNo ??= 1;
             pageSize ??= 5;
 
-            var apiUrl = $"http://localhost:5000/api/Payments/SearchPayments?fromDate={fromDate}&status={status}&toDate={toDate}&orderNumber={orderNumber}";
+            var apiUrl = $"https://api.2handshop.id.vn/api/Payments/SearchPayments?fromDate={fromDate}&status={status}&toDate={toDate}&orderNumber={orderNumber}";
             var response = await _httpClient.GetAsync(apiUrl);
 
             if (response.IsSuccessStatusCode)

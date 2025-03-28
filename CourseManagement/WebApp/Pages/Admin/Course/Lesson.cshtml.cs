@@ -137,11 +137,11 @@ namespace WebApp.Pages.Admin.Course
             };
             if (LessonId == 0)
             {
-                response = await _httpClient.PostAsync("http://localhost:5000/api/Lesson/add/quizz", jsonContent);
+                response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/Lesson/add/quizz", jsonContent);
             }
             else
             {
-                response = await _httpClient.PutAsync("http://localhost:5000/api/Lesson/update/quizz/"+ LessonId, jsonContent);
+                response = await _httpClient.PutAsync("https://api.2handshop.id.vn/api/Lesson/update/quizz/" + LessonId, jsonContent);
             }
             var jsonResponse = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
