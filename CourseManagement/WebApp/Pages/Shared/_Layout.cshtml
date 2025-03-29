@@ -25,6 +25,85 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
+
+    <style>
+        /* Hộp chat động */
+        #chat-container {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 320px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+            cursor: grab; /* Cho phép kéo */
+        }
+
+        /* Header của chatbox */
+        #chat-header {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            cursor: move; /* Kéo thả */
+        }
+
+        /* Nội dung chat */
+        #chat-body {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        /* Footer chat */
+        #chat-footer {
+            display: flex;
+            padding: 10px;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #chat-send {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        /* Nút mở chat */
+        #chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Khi hiển thị hộp chat */
+        #chat-container.active {
+            display: flex;
+        }
+
+    </style>
 </head>
 <body>
     <div id="header">
@@ -167,6 +246,101 @@
         }
     </script>
 
+    <!-- Chatbox động -->
+    <div id="chat-container">
+        <div id="chat-header">
+            <span>Chat với TVC AI</span>
+            <button id="chat-close">&times;</button>
+        </div>
+        <div id="chat-body"></div>
+        <div id="chat-footer">
+            <input type="text" id="chat-input" placeholder="Nhập câu hỏi...">
+            <button id="chat-send"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Nút mở chat -->
+    <button id="chat-toggle">
+        <i class="fa-solid fa-comment-dots"></i>
+    </button>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const chatContainer = document.getElementById("chat-container");
+            const chatToggle = document.getElementById("chat-toggle");
+            const chatClose = document.getElementById("chat-close");
+            const chatSend = document.getElementById("chat-send");
+            const chatInput = document.getElementById("chat-input");
+            const chatBody = document.getElementById("chat-body");
+            const chatHeader = document.getElementById("chat-header");
+
+            // Mở/Tắt chatbox
+            chatToggle.addEventListener("click", () => chatContainer.classList.toggle("active"));
+            chatClose.addEventListener("click", () => chatContainer.classList.remove("active"));
+
+            // Gửi tin nhắn
+            chatSend.addEventListener("click", async () => {
+                const question = chatInput.value.trim();
+                if (!question) return;
+
+                // Hiển thị tin nhắn của người dùng
+                chatBody.innerHTML += `<div style="text-align: right; margin-bottom: 5px;"><strong>Bạn:</strong> ${question}</div>`;
+                chatInput.value = "";
+
+                // Gọi API ChatGPT
+                try {
+                    const response = await fetch(`http://localhost:5000/api/chatgpt/ask?question=${encodeURIComponent(question)}`);
+                    const answer = await response.text();
+                    chatBody.innerHTML += `<div style="text-align: left; margin-bottom: 5px;"><strong>Bot:</strong> ${answer}</div>`;
+                } catch (error) {
+                    chatBody.innerHTML += `<div style="text-align: left; color: red;">Lỗi khi lấy dữ liệu từ chatbot.</div>`;
+                }
+
+                // Cuộn xuống tin nhắn mới nhất
+                chatBody.scrollTop = chatBody.scrollHeight;
+            });
+
+            // Gửi tin nhắn bằng phím Enter
+            chatInput.addEventListener("keypress", (event) => {
+                if (event.key === "Enter") {
+                    chatSend.click();
+                }
+            });
+
+            // ==========================
+            //  📌 Kéo thả hộp thoại chat
+            // ==========================
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            chatHeader.addEventListener("mousedown", (event) => {
+                isDragging = true;
+                offsetX = event.clientX - chatContainer.getBoundingClientRect().left;
+                offsetY = event.clientY - chatContainer.getBoundingClientRect().top;
+                chatContainer.style.cursor = "grabbing";
+            });
+
+            document.addEventListener("mousemove", (event) => {
+                if (isDragging) {
+                    let newX = event.clientX - offsetX;
+                    let newY = event.clientY - offsetY;
+
+                    // Giới hạn di chuyển trong màn hình
+                    const maxX = window.innerWidth - chatContainer.offsetWidth;
+                    const maxY = window.innerHeight - chatContainer.offsetHeight;
+
+                    chatContainer.style.left = Math.max(0, Math.min(newX, maxX)) + "px";
+                    chatContainer.style.top = Math.max(0, Math.min(newY, maxY)) + "px";
+                }
+            });
+
+            document.addEventListener("mouseup", () => {
+                isDragging = false;
+                chatContainer.style.cursor = "grab";
+            });
+        });
+    </script>
 
 
 
