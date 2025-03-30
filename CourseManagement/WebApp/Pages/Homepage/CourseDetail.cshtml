@@ -14,51 +14,16 @@
         <div class="course__preview preview-second">
             <h5 class="course__preview-price">Free</h5>
             <button class="course__preview-learn" onclick="directionLearningPage()">Đăng ký học</button>
-            <ul>
-                <li>
-                    <i class="fa-solid fa-bars-progress"></i>
-                    <span>Trình độ cơ bản</span>
-                </li>
-                <li>
-                    <i class="fa-solid fa-film"></i>
-                    <span>Tổng số 11 bài học</span>
-                </li>
-                <li>
-                    <i class="fa-solid fa-clock"></i>
-                    <span>Trình độ cơ bản</span>
-                </li>
-                <li>
-                    <i class="fa-solid fa-battery-three-quarters"></i>
-                    <span>Học mọi thứ, mọi nơi</span>
-                </li>
-            </ul>
         </div>
         <div class="course__info-topic">
-            <h2 class="topic-heading">Bạn sẽ học được gì?</h2>
-            <div class="topic-content">
-                <ul class="topic-list">
-
-                    <li>
-                        <i class="fa-solid fa-check"></i>
-                        <span>Giải Đề PE Java Web: Nâng Cao Kỹ Năng Servlet và JSP</span>
-                    </li>
-
-                    <li>
-                        <i class="fa-solid fa-check"></i>
-                        <span> Thực Hành Java Servlet và JSP: Giải Quyết Đề Thi PE</span>
-                    </li>
-
-                    <li>
-                        <i class="fa-solid fa-check"></i>
-                        <span>Khóa Học Giải Đề PE: Phát Triển Ứng Dụng Web với Java Servlet và JSP</span>
-                    </li>
-
-                    <li>
-                        <i class="fa-solid fa-check"></i>
-                        <span>Học Thực Hành Java Web: Giải Đề PE Servlet và JSP</span>
-                    </li>
-
-                </ul>
+            <h2 class="topic-heading">Mô tả: </h2>
+            <div class="topic-content" >
+                @if (Model.CourseDetail.Description != null)
+                {
+                    <embed class="pdf"
+                           src="@Model.CourseDetail.Description"
+                           width="800" height="500">
+                }
             </div>
         </div>
         @functions {

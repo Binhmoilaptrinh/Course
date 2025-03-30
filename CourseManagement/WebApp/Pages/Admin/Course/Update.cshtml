@@ -96,7 +96,15 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label fs-4">Description</label>
-                    <textarea id="default" type="text" class="form-control fs-3 p-2" name="Desc" asp-for="CourseDetail.Description" value="@Model.CourseDetail?.Description"></textarea>
+
+                    <input type="file" id="pdfUpload" name="Desc" accept="application/pdf">
+                    @if (@Model.CourseDetail.Description != null && @Model.CourseDetail.Description != "")
+                    {
+                        <embed class="pdf"
+                               src="@Model.CourseDetail.Description"
+                               width="800" height="500">
+                    }
+                    @* <textarea id="default" type="text" class="form-control fs-3 p-2" name="Desc" asp-for="CourseDetail.Description" value="@Model.CourseDetail?.Description"></textarea> *@
                 </div>
 
                 <button type="submit" class="btn btn-primary fs-4 px-5 py-3">Cập nhật khóa học</button>

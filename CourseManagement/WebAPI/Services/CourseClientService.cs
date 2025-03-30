@@ -28,6 +28,7 @@ namespace WebAPI.Services
                 ThumbnailImage = c.Thumbnail,
                 PreviewVideo = c.PreviewVideo,
                 Price = c.Price,
+                Description = c.Description,
                 Duration = _context.Lessons
                         .Where(l => l.Chapter.CourseId == id && l.Duration.HasValue)
                         .Sum(l => l.Duration.Value),

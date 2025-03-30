@@ -1,0 +1,72 @@
+﻿@page
+@model WebApp.Pages.Homepage.ViewCerModel
+@{
+	Layout = "_Layout";
+}
+
+
+<div id="certificateContainer" style="position: relative; text-align: center; width: 60%; margin: 0 auto;">
+    <img id="certificateImage" src="@Model.Certificate.certificate" style="width: 100%;" />
+
+    <h4 id="userName" style="font-size: 50px; font-style: oblique; font-family: emoji;
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        color: #daa642; white-space: nowrap;">
+        @Model.Certificate.userName
+    </h4>
+
+    <h3 id="courseName" style="font-size: 25px; font-family: emoji;
+        position: absolute; top: 68%; left: 50%; transform: translate(-50%, -50%);
+        color: #daa642; white-space: nowrap;">
+        @Model.Certificate.courseName
+    </h3>
+</div>
+
+<div style="text-align: center; margin-top: 20px;">
+    <button id="btnDownloadPdf">Download PDF</button>
+</div>
+<script src="~/js/jspdf.debug.js"></script>
+<script src="~/js/html2canvas.min.js"></script>
+<script src="~/js/html2pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+
+     const downloadBtn = document.getElementById("btnDownloadPdf");
+    downloadBtn.addEventListener("click", async function (e) {
+        e.preventDefault();
+
+        const certificateContainer = document.getElementById("certificateContainer");
+        const certificateImage = document.getElementById("certificateImage");
+
+        // Đợi ảnh tải hoàn tất
+        await new Promise((resolve) => {
+            if (certificateImage.complete) resolve();
+            else certificateImage.onload = resolve;
+        });
+
+        // Lấy kích thước thực tế của ảnh
+        const imgWidth = certificateImage.naturalWidth;
+        const imgHeight = certificateImage.naturalHeight;
+
+        let options = {
+            margin: 0,
+            filename: "certificate.pdf",
+            image: { type: "jpeg", quality: 1 },
+            html2canvas: {
+                scale: 2, // Giữ chất lượng cao
+                useCORS: true // Nếu dùng ảnh từ server ngoài
+            },
+            jsPDF: {
+                unit: "px",
+                format: [imgWidth, imgHeight], // Đặt kích thước PDF theo ảnh gốc
+                orientation: imgWidth > imgHeight ? "landscape" : "portrait"
+            }
+        };
+
+        html2pdf().from(certificateContainer).set(options).save();
+    });
+
+
+</script>

@@ -45,8 +45,15 @@
                 <p class="fs-3"><strong>Giá tiền:</strong>@Model.CourseDetail.Price.ToString("#,##0")  VNĐ</p>
                 <p class="fs-3"><strong>Trạng thái khóa học:</strong>@Model.CourseDetail.Status</p>
                 <a href="/Admin/Course/Update?id=@Model.CourseDetail.Id" class="btn btn-primary fs-4 px-4 py-2">Chỉnh sửa</a>
-
-
+                <h5>Mô tả: </h5>
+                <p  class="fs-4 px-4 py-2">
+                    @if (@Model.CourseDetail.Description != null && @Model.CourseDetail.Description != "")
+                    {
+                        <embed class="pdf"
+                               src="@Model.CourseDetail.Description"
+                               width="800" height="500">
+                    }
+                </p>
             </div>
         </div>
     </div>
@@ -178,7 +185,31 @@
     </form>
 
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <script>
+        
+        var pdfUrl = @Model.CourseDetail.Description; // Link PDF
+        var pdfjsLib = window['pdfjs-dist/build/pdf'];
+
+        pdfjsLib.getDocument(pdfUrl).promise.then(pdf => {
+            pdf.getPage(1).then(page => {
+                var scale = 1.5;
+                var viewport = page.getViewport({ scale: scale });
+
+                var canvas = document.getElementById('pdf-canvas');
+                var context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                var renderContext = { canvasContext: context, viewport: viewport };
+                page.render(renderContext);
+            });
+        });
+
+
+
+
+
     document.addEventListener('DOMContentLoaded', function () {
         var toastElement = document.querySelector('.toast.show');
         if (toastElement) {
