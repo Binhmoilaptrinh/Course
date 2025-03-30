@@ -9,6 +9,6 @@ namespace WebAPI.Services.Interfaces
         Task<CoursePayment> CreatePaymentUrl(int courseId, int userId);
         Task<Payment> UpdatePayment(long orderCode);
 
-        Task<List<PaymentListResponse>> SearchPaymentsAsync(DateTime? fromDate, DateTime? toDate, string orderNumber, int? status);
+        Task<List<PaymentListResponse>> SearchPaymentsAsync(DateTime? fromDate, DateTime? toDate, string? orderNumber, int? status);
     }
 }

@@ -22,8 +22,8 @@ namespace WebAPI.Utilities
         public  async Task<string> GetLinkAsync(long orderCode, int price, List<ItemData> items)
         {
             PayOS payOS = new(_clientId, _apiKey, _checksumKey);
-            string cancelUrl = $"https://localhost:7282/Homepage/PaymentFail";
-            string returnUrl = "https://localhost:7282/Homepage/PaymentSuccess";
+            string cancelUrl = $"https://course.2handshop.id.vn/Homepage/PaymentFail";
+            string returnUrl = "https://course.2handshop.id.vn/Homepage/PaymentSuccess";
             PaymentData paymentData = new PaymentData(orderCode, price, "Thanh toan don hang",
                 items, cancelUrl, returnUrl);
 

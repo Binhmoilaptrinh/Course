@@ -2,8 +2,7 @@ using System.Net.Http;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using WebAPI.DTOS.response;
-
+using WebApp.Models;
 namespace WebApp.Pages.Admin.Enrollment
 {
     public class ListModel : PageModel
@@ -21,7 +20,7 @@ namespace WebApp.Pages.Admin.Enrollment
                 return BadRequest();
             }
 
-            var apiUrl = $"http://localhost:5298/api/EnrolledManagement/GetEnrollmentListByCourseId/{id}";
+            var apiUrl = $"https://api.2handshop.id.vn/api/EnrolledManagement/GetEnrollmentListByCourseId/{id}";
             var response = await _httpClient.GetAsync(apiUrl);
 
             if (response.IsSuccessStatusCode)
@@ -33,7 +32,7 @@ namespace WebApp.Pages.Admin.Enrollment
             }
             else
             {
-                return NotFound();
+                return Page();
             }
         }
     }

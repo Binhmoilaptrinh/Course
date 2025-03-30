@@ -1,8 +1,8 @@
-﻿ using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using WebAPI.DTOS.response;
 using System.Text.Json;
+using WebApp.Models;
 
 namespace WebApp.Pages.Admin.Course
 {

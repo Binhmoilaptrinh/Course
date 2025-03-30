@@ -1,9 +1,10 @@
+using System.Net.Http;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.DTOS.response;
-using WebAPI.Models;
-using WebAPI.Services.Interfaces;
+using WebApp.Models;
+using WebApp.Pages.Homepage;
 using X.PagedList;
 using X.PagedList.Extensions;
     
@@ -11,30 +12,35 @@ namespace WebApp.Pages.Admin.Payments
 {
     public class ListModel : PageModel
     {
-        private readonly IPaymentService _paymentService;
-        
-        public ListModel(IPaymentService paymentService)
+        private readonly HttpClient _httpClient;
+        public ListModel(HttpClient httpClient)
         {
-            _paymentService = paymentService;
-            
+            _httpClient = httpClient;
         }
         public List<PaymentListResponse> Payments { get; set; }
 
 
         public IPagedList<PaymentListResponse> PagedPayments { get; set; }
-
         public string CurrentFilter { get; set; } = "";
         public string CurrentSort { get; set; }
         public int? PageSize { get; set; }
         public int? PageNo { get; set; }
-
         public int? TotalPage { get; set; }
         public async Task OnGetAsync(DateTime? fromDate, DateTime? toDate, string orderNumber, int? status, int? pageNo, int? pageSize)
         {
             pageNo ??= 1;
             pageSize ??= 5;
 
-            var paymentsQuery = await _paymentService.SearchPaymentsAsync(fromDate, toDate, orderNumber, status);
+            var apiUrl = $"https://api.2handshop.id.vn/api/Payments/SearchPayments?fromDate={fromDate}&status={status}&toDate={toDate}&orderNumber={orderNumber}";
+            var response = await _httpClient.GetAsync(apiUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                Payments = JsonSerializer.Deserialize<List<PaymentListResponse>>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+
+            var paymentsQuery = Payments;
 
             PagedPayments = paymentsQuery.ToPagedList((int)pageNo, (int)pageSize);
 
@@ -45,5 +51,6 @@ namespace WebApp.Pages.Admin.Payments
             PageNo = pageNo;
             PageSize = pageSize;
         }
+
     }
 }

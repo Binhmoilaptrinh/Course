@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WebAPI\WebAPI.csproj" />
+    <Folder Include="Pages\Admin\Payments\" />
   </ItemGroup>
 
 </Project>

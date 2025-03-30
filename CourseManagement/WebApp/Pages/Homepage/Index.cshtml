@@ -289,3 +289,26 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <script>
+        // Retrieve the userInfo string from local storage
+        const userInfoString = localStorage.getItem('userInfo');
+
+        // Check if userInfo exists
+        if (userInfoString) {
+            try {
+                // Parse the JSON string to an object
+                const userInfo = JSON.parse(userInfoString);
+
+                // Check if the role is "admin"
+                if (userInfo.roleId === 1) {
+                    // Redirect to the admin course list page
+                    window.location.href = '/Admin/Course/List';
+                }
+            } catch (error) {
+                // Log any parsing errors to the console and do nothing
+                console.error('Error parsing userInfo:', error);
+            }
+        }
+    </script>
+}

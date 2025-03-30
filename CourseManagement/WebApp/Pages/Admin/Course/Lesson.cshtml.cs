@@ -1,16 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net.Http;
-using WebAPI.DTOS.response;
 using System.Text.Json;
-using WebAPI.Models;
-using WebAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Collections.Generic;
 using System.Text;
-using WebAPI.DTOS.request;
 using System.Reflection;
-using Azure.Core;
+using WebApp.Models;
 
 namespace WebApp.Pages.Admin.Course
 {
@@ -141,11 +137,11 @@ namespace WebApp.Pages.Admin.Course
             };
             if (LessonId == 0)
             {
-                response = await _httpClient.PostAsync("http://localhost:5000/api/Lesson/add/quizz", jsonContent);
+                response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/Lesson/add/quizz", jsonContent);
             }
             else
             {
-                response = await _httpClient.PutAsync("http://localhost:5000/api/Lesson/update/quizz/"+ LessonId, jsonContent);
+                response = await _httpClient.PutAsync("https://api.2handshop.id.vn/api/Lesson/update/quizz/" + LessonId, jsonContent);
             }
             var jsonResponse = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)

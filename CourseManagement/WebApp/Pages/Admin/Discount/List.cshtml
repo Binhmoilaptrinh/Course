@@ -1,0 +1,107 @@
+﻿@page
+@model WebApp.Pages.Admin.Discount.ListModel
+@{
+    Layout = "_ManagementLayout";
+}
+<div class="discounts">
+    <h2 class="discounts-title mt-5 px-5">Quản lý Mã Giảm Giá</h2>
+    <div class="discounts-header px-5">
+        <p class="discounts-des">Tạo và quản lý các mã giảm giá</p>
+        <a class="discounts-button text-decoration-none" href="Create">Thêm mã giảm giá</a>
+    </div>
+
+    <div class="row mt-4 px-5">
+        <div class="col-6 d-flex align-items-center">
+            <span class="fs-3 me-3">Hiển thị</span>
+            <select class="drop-show_number" id="pageSize" onchange="submitForm()">
+                <option value="2">2</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+            </select>
+            <span class="fs-3 ms-3">Mã giảm giá</span>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <div class="sort-btn_manager">
+                <span class="sort-title">Sắp xếp theo</span>
+                <i class="fa-solid fa-sort"></i>
+                <div class="sort_fields">
+                    <ul>
+                        <li><input type="radio" name="sortBy" id="nameAsc" value="Code asc" onclick="submitForm()" /><label for="nameAsc">Tên A-Z</label></li>
+                        <li><input type="radio" name="sortBy" id="nameDesc" value="Code desc" onclick="submitForm()" /><label for="nameDesc">Tên Z-A</label></li>
+                        <li><input type="radio" name="sortBy" id="percentAsc" value="DiscountPercent asc" onclick="submitForm()" /><label for="percentAsc">Giảm ít nhất</label></li>
+                        <li><input type="radio" name="sortBy" id="percentDesc" value="DiscountPercent desc" onclick="submitForm()" /><label for="percentDesc">Giảm nhiều nhất</label></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="discounts-container" id="discounts-container"></div>
+        <ul class="d-flex align-items-center pagination" id="pagination"></ul>
+    </div>
+</div>
+<script>
+    let pageSize = 5;
+    let currentPage = 1;
+    let totalPages = 1;
+    let orderBy = "Id asc";
+
+    function submitForm() {
+        pageSize = document.getElementById('pageSize').value;
+        orderBy = document.querySelector('input[name="sortBy"]:checked')?.value || "Id asc";
+        fetchDiscounts(1);
+    }
+
+    function fetchDiscounts(page) {
+        let skip = (page - 1) * pageSize;
+        $.ajax({
+            url: `https://api.2handshop.id.vn/api/Discount/all?$count=true&$top=${pageSize}&$skip=${skip}&$orderby=${orderBy}`,
+            type: "GET",
+            success: function (data) {
+                let discounts = data.value;
+                let totalItems = Object.values(data)[1]; // Lấy odata.count
+                     totalPages = Math.ceil(totalItems / pageSize);
+                     console.log(totalPages);
+            },
+            error: function (error) {
+                console.log(`Error ${error}`);
+            }
+        });
+    }
+
+    function renderDiscounts(discounts) {
+        let html = discounts.map(discount => `
+            <div class="discount-item">
+                <h3>${discount.Code}</h3>
+                <p>Giảm: ${discount.DiscountPercent}%</p>
+                <p>Ngày tạo: ${new Date(discount.CreatedAt).toLocaleDateString()}</p>
+            </div>
+        `).join('');
+        document.getElementById("discounts-container").innerHTML = html;
+    }
+
+    function renderPagination() {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        if (currentPage > 1) {
+            pagination.innerHTML += `<li><a href="#" onclick="changePage(${currentPage - 1})">&laquo;</a></li>`;
+        }
+        for (let i = 1; i <= totalPages; i++) {
+            pagination.innerHTML += `<li class="${i === currentPage ? 'active' : ''}"><a href="#" onclick="changePage(${i})">${i}</a></li>`;
+        }
+        if (currentPage < totalPages) {
+            pagination.innerHTML += `<li><a href="#" onclick="changePage(${currentPage + 1})">&raquo;</a></li>`;
+        }
+    }
+
+    function changePage(page) {
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            fetchDiscounts(page);
+        }
+    }
+
+    fetchDiscounts(currentPage);
+</script>

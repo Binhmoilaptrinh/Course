@@ -1,12 +1,10 @@
-﻿using Azure.Core;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using WebAPI.DTOS.request;
-using WebAPI.DTOS.response;
-using WebAPI.Services.Interfaces;
+using WebApp.Models;
 
 namespace WebApp.Pages.Admin.Course
 {

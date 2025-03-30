@@ -102,7 +102,6 @@
                     data: JSON.stringify({ username: username, password: password }),
                     success: function (response) {
                         console.log("API response:", response);
-                        alert("Login successful!");
 
                         // Lưu token vào LocalStorage
                         localStorage.setItem("authToken", response.token);
@@ -121,7 +120,7 @@
 
                                 // Kiểm tra role để chuyển hướng
                             if (response.roleId == 1) {
-                                window.location.href = "/Admin/User/List"; // Admin vào trang quản lý user
+                                window.location.href = "/Admin/Course/List"; // Admin vào trang quản lý user
                             } else if (response.roleId == 2) {
                                 window.location.href = "/HomePage/Index"; // Staff vào dashboard riêng
                             } else {

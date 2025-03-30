@@ -47,6 +47,7 @@ namespace WebAPI.Services
             var myCourse = await _eCourseContext.Enrollments.Include(b=>b.User).Include(x => x.Course).ThenInclude(y => y.Category).Where(a=>a.UserId == userId).Select(z => new MyCourseResponse
             {
                 EnrollmentId = z.Id, 
+                CourseId =z.CourseId,
                 UserName = z.User.Username,
                 Title = z.Course.Title,
                 ThumbnailImage = z.Course.Thumbnail,

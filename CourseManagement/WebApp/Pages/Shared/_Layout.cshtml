@@ -93,7 +93,7 @@
                 // Populate user account section with stored user data
                 authSection.innerHTML = `
                                 <div class="">
-                                <a href="/Homepage/MyCourse" class="nav_menu-myLearn text-decoration-none">Khóa học của tôi</a>
+                                        <a href="/Homepage/MyCourse/${userInfo.userId}" class="nav_menu-myLearn text-decoration-none">Khóa học của tôi</a>
                             </div>
                             <div class="nav_menu-user-notifi">
                                 <i class="fa-solid fa-bell"></i>
@@ -118,7 +118,7 @@
                                     <hr>
                                     <ul class="p-0">
                                         <li>
-                                            <a class="fs-4 text-muted text-decoration-none" href="/Homepage/Profile">Trang cá nhân</a>
+                                            <a class="fs-4 text-muted text-decoration-none" href="/Homepage/EditProfile">Trang cá nhân</a>
                                         </li>
                                     </ul>
                                     <hr>
