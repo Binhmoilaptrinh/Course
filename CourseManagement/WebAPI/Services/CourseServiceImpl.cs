@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Azure.Core;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
 using WebAPI.DTOS.request;
 using WebAPI.DTOS.response;
 using WebAPI.Models;
@@ -20,6 +23,7 @@ namespace WebAPI.Services
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
         private readonly ECourseContext _courseContext;
+        private readonly Cloudinary _cloudinary;
 
         public CourseServiceImpl(ICourseRepository courseRepository, 
             IMapper mapper, IFileService fileService, IUserService userService,
@@ -31,6 +35,8 @@ namespace WebAPI.Services
             _userService = userService;
             _categoryService = categoryService;
             _courseContext = courseContext;
+            var account = new Account("doslvje9p", "111261246971633", "lMdfdvz3SsDnpHJA_WDBtRQmFKU");
+            _cloudinary = new Cloudinary(account);
         }
 
         public async Task<IQueryable<CourseAdminResponseDto>> GetAllCourse()
@@ -54,7 +60,11 @@ namespace WebAPI.Services
                 string thumbnail = thumbnailBlob.Blob.Uri.ToString();
                 string previewVideo = previewVideoBlob.Blob.Uri.ToString();
 
+                var desTemplate = await _fileService.UploadAsync(request.DescriptionPDF);
+
                 var course = _mapper.Map<Course>(request);
+
+                course.Description = desTemplate.Blob.Uri.ToString();
                 course.Thumbnail = thumbnail;
                 course.PreviewVideo = previewVideo;
                 course.Creator = user;
@@ -83,6 +93,19 @@ namespace WebAPI.Services
                 {
                     var thumbnailBlob = await _fileService.UploadAsync(request.Thumbnail);
                     existingCourse.Thumbnail = thumbnailBlob.Blob.Uri.ToString();
+                }
+                if (request.DescriptionPDF != null)
+                {
+                    using (var stream = request.DescriptionPDF.OpenReadStream())
+                    {
+                        var uploadParams = new RawUploadParams()
+                        {
+                            File = new FileDescription(request.DescriptionPDF.FileName, stream) 
+                        };
+
+                        var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                        existingCourse.Description = uploadResult.SecureUrl.ToString();
+                    }
                 }
                 if (request.PreviewVideo != null)
                 {

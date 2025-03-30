@@ -8,7 +8,7 @@ namespace WebAPI.Services.Interfaces
     {
         Task<List<BlobDto>> ListAsync();
         Task<BlobResponseDto> UploadAsync(IFormFile blob);
-        public byte[] GenerateCertificatePdf(string userName, string courseName, DateTime issueDate);
+        //public byte[] GenerateCertificatePdf(string userName, string courseName, DateTime issueDate);
         Task<Certificate> GenerateAndUploadCertificateAsync(CertificateRequest cer);
     }
 }

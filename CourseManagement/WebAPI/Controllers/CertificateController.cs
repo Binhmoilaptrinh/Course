@@ -20,6 +20,21 @@ namespace WebAPI.Controllers
             _certificateService = certificateService;
         }
 
+        [HttpPost("/upload/template")]
+        public async Task<ActionResult<CertificateTemplateRes>> UploadCertificateTeamplate(IFormFile cerPdf)
+        {
+            CertificateTemplateRes certificateUrl = await _certificateService.UploadCertificateUrl(cerPdf);
+            return certificateUrl;
+        }
+
+        [HttpGet("/template")]
+        public async Task<ActionResult<string>> GetCertificateUrlTemplate()
+        {
+            var certificateUrl = await _certificateService.GetCertificateTemplateUrl();
+            return Ok(certificateUrl);
+        }
+
+
         [HttpPost]
         public async Task<ActionResult<Certificate>> CreateCertificate(CertificateRequest request)
         {
@@ -27,9 +42,9 @@ namespace WebAPI.Controllers
             return Ok(categories);
         }
         [HttpGet]
-        public async Task<ActionResult<string>> GetCertificateUrl(int enrollmentId)
+        public async Task<ActionResult<CertificateUserRes>> GetCertificateUrl(int enrollmentId)
         {
-            var certificateUrl = await _certificateService.GetCertificateUrl(enrollmentId);
+            var certificateUrl = await _certificateService.GetCertificate(enrollmentId);
             return Ok(certificateUrl);
         }
     }

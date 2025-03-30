@@ -10,7 +10,8 @@ namespace WebAPI.DTOS.request
         public int CategoryId { get; set; }
         public double Price { get; set; }
         public IFormFile? Thumbnail { get; set; }
-        public string Description { get; set; }
+        //public string Description { get; set; }
+        public IFormFile? DescriptionPDF { get; set; }
 
         [RegularExpression("^(pending|online)$", ErrorMessage = "Status must be 'pending' or 'online'.")]
         public string Status { get; set; }

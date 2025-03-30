@@ -39,7 +39,7 @@ namespace WebApp.Pages.Admin.Course
         }
 
         public async Task<IActionResult> OnPostAsync(IFormFile PreviewVideo, IFormFile Thumbnail, string Title, 
-            decimal Price, int Cate, int Limit, string Desc, int CreateBy)
+            decimal Price, int Cate, int Limit, IFormFile Desc, int CreateBy)
         {
 
             using var requestContent = new MultipartFormDataContent();
@@ -65,16 +65,24 @@ namespace WebApp.Pages.Admin.Course
                 ByteArrayContent bytes = new ByteArrayContent(data);
                 requestContent.Add(bytes, "Thumbnail", Thumbnail.FileName);
             }
-
+            if (PreviewVideo != null)
+            {
+                byte[] data;
+                using (var br = new BinaryReader(PreviewVideo.OpenReadStream()))
+                {
+                    data = br.ReadBytes((int)PreviewVideo.OpenReadStream().Length);
+                }
+                ByteArrayContent bytes = new ByteArrayContent(data);
+                requestContent.Add(bytes, "DescriptionPDF", Desc.FileName);
+            }
             requestContent.Add(new StringContent(Title ?? ""), "Title");
             requestContent.Add(new StringContent("pending"), "Status");
             requestContent.Add(new StringContent(Price.ToString()), "Price");
             requestContent.Add(new StringContent(CreateBy.ToString()), "UserId");
             requestContent.Add(new StringContent(Cate.ToString()), "CategoryId");
             requestContent.Add(new StringContent(Limit.ToString()), "LimitDay");
-            requestContent.Add(new StringContent(Desc ?? ""), "Description");
 
-            using var response = await _httpClient.PostAsync("https://api.2handshop.id.vn/api/Course", requestContent);
+            using var response = await _httpClient.PostAsync("http://localhost:5000/api/Course", requestContent);
 
             if (response.IsSuccessStatusCode)
             {

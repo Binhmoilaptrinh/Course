@@ -9,8 +9,7 @@
       },
       {
         "Path": "WebApp\\WebApp.csproj",
-        "Action": "Start",
-        "DebugTarget": "https"
+        "Action": "Start"
       }
     ]
   }

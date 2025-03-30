@@ -5,8 +5,7 @@ namespace WebAPI.Models
 {
     public class ECourseContext : DbContext
     {
-        public ECourseContext(DbContextOptions<ECourseContext> options)
-       : base(options)
+        public ECourseContext(DbContextOptions<ECourseContext> options) : base(options)
         {
         }
 
@@ -30,6 +29,7 @@ namespace WebAPI.Models
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<Certificate> Certificates { get; set; }
 
+        public DbSet<CertificateTemplate> CertificateTemplate { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // Thiết lập cấu hình kết nối với cơ sở dữ liệu
